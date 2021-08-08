@@ -30,7 +30,7 @@
         <project-reactor.version>Dysprosium-SR20</project-reactor.version>
         <lombok.version>1.18.20</lombok.version>
         <mybatis.version>3.5.7</mybatis.version>
-        <mybatis-plus.version>3.4.3</mybatis-plus.version>
+        <mybatis-plus.version>3.4.3.1</mybatis-plus.version>
         <guava.version>30.1.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.32</jmh.version>
@@ -43,11 +43,11 @@
         <cglib.versin>3.3.0</cglib.versin>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
-        <asciidoctor.version>2.1.0</asciidoctor.version>
+        <asciidoctor.version>2.2.1</asciidoctor.version>
         <asciidoctorj-diagram>2.1.2</asciidoctorj-diagram>
         <testcontainer.version>1.15.3</testcontainer.version>
         <javafx.version>16</javafx.version>
-        <arthas.version>3.5.1</arthas.version>
+        <arthas.version>3.5.3</arthas.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <logstash-logback.version>6.6</logstash-logback.version>
 
