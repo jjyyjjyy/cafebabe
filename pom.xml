@@ -44,7 +44,7 @@
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
         <asciidoctor.version>2.2.1</asciidoctor.version>
-        <asciidoctorj-diagram>2.1.2</asciidoctorj-diagram>
+        <asciidoctorj-diagram>2.2.1</asciidoctorj-diagram>
         <testcontainer.version>1.16.0</testcontainer.version>
         <javafx.version>16</javafx.version>
         <arthas.version>3.5.3</arthas.version>
