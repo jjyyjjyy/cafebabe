@@ -1,0 +1,84 @@
+= Database
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: idea
+:hardbreaks:
+:sectlinks:
+:sectnums:
+:stem:
+:toc: left
+:toclevels: 3
+:toc-title: 目录
+:tabsize: 4
+:docinfo: shared
+
+== SQL历史
+
+. SQL86
+. SQL89
+. SQL92
+. SQL1999
+. SQL2003
+. SQL2006
+. SQL2008
+. SQL2011
+. SQL2016
+
+== SQL92
+
+* 新的数据类型: `DATE, TIME, TIMESTAMP, INTERVAL, BIT, VARCHAR, NATIONAL CHARACTER等` .
+* 新的标量操作: `字符串拼接, 取子字符串, 日期时间计算等` .
+* 新增集合操作: `UNION JOIN, NATURAL JOIN 等` .
+* 条件操作: `CASE语句` .
+* 新的DML语句: `ALTER, DROP` .
+* 数据库元数据视图: `information_schema` .
+* 临时表: `CREATE TEMP TABLE` .
+* 事务隔离级别.
+* 类型转换: `CAST (expr AS type)` .
+* 查询结果集游标.
+
+== SQL1999
+
+* 新增 `boolean` 类型.
+* 支持 `WITH [RECURSIVE]` 语句.
+* 支持 `ROLLUP, CUBE, GROUPING SETS` .
+* 支持数组类型及相关函数.
+
+== SQL2003
+
+* 新增窗口函数.
+* 新增 `MERGE/ON CONFLICT DO NOTHING/UPDATE` 语句.
+* 新增 `xml` 类型.
+* 新增自增序列和 `identity` 类型.
+
+== SQL2006
+
+* 支持 `XQuery` .
+* 新增 `xml` 操作类函数.
+
+== SQL2008
+
+* `TRUNCATE TABLE` .
+* `CASE` 语句支持多个 `WHEN` 分支条件.
+* 数据库触发器 支持 `INSTEAD OF` .
+* `TOP N` 查询方式:
+** `FETCH FIST <N> ROWS ONLY` .
+** `OFFSET <M> ROWS FETCH NEXT <N> ROWS ONLY` .
+
+== SQL2011
+
+* `Temporal database` .
+* `System-versioned tables` .
+
+== SQL2016
+
+* 新增对 `JSON` 类型的支持.
+* `MATCH_RECOGNIZE` .
+* 新增 `LISTAGG` 函数.
+* 新增 `DECFLOAT` 类型.
+* 新增日期/时间的格式化函数: `CAST, EXTRACT` .
+
+== SQL2019
+
+* 新增对多维数组的支持.
+

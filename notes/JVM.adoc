@@ -707,6 +707,7 @@ TIP: JDK11新增的收集器
 
 .新生代大小设置参数, 后者优先级更高
 ** -XX:NewRatio 设置新生代与老年代的比例, 默认值为2. 默认情况下新生代大小初始值等于 `初始堆大小/(1+NewRatio)`
+
 ** -XX:NewSize 设置新生代大小的初始值
 ** -XX:MaxNewSize 设置新生代大小的最大值
 ** -Xmn 同时设置新生代的初始值和最大值
@@ -714,8 +715,17 @@ TIP: JDK11新增的收集器
 == 调试JDK源码
 
 . 下载openjdk源码: `git clone https://github.com/openjdk/jdk.git`
-. 设置当前使用的jdk(BootJDK)版本为最新的发布版本.
-. `bash configure --enable-debug`
-. `make images`
-. 等待编译结束, build目录下会生成jdk目录.
-. CLion导入项目, 选择 `New CMake project from existing sources` .
+. 设置机器上当前使用的jdk(Boot JDK)版本为最新的发布版本.
+. 编译jdk:
+.. `bash configure --with-debug-level=slowdebug`
+.. `make all`
+.. 等待编译结束, build目录下会生成jdk目录.
+.. `make compile-commands`
+. 导入项目到CLION:
+.. 点击open, 选择编译好的jdk目录下的 `compile_commands.json` 文件.
+.. `Tools -> Compilation Database -> Change Project Root` 选择源码目录.
+.. `Custom Build Targets` 新增配置make和clean命令组合:
+... Program: `make` , Arguments: `CONF=编译好的jdk目录名` , Working directory: `源码目录` .
+... Program: `make` , Arguments: `CONF=编译好的jdk目录名 clean` , Working directory: `源码目录` .
+.. `Run/Debug Configurations` 新增 `Custom Build Application` , Target选择上一步创建的Build命令组合, Executable 选择编译好的 `java` 可执行文件, Program Arguments 填想要运行的Java类全限定名, Working directory 填想要运行的Java类所在目录.
+. 设置debug环境: `echo "breakpoint set --file /path/to/jdk/src/java.base/share/native/launcher/main.c --line 98 -C "pro hand -p true -s false SIGSEGV SIGBUS" --auto-continue true" | tee ~./.lldbinit`
