@@ -55,7 +55,7 @@ plantuml::charts/mybatis/TransactionFactory.puml[format=svg]
 
 === 会话
 
-plantuml::charts/mybatis/SqlSessionFactory.puml[format=svg]
+plantuml::charts/mybatis/SqlSession.puml[format=svg]
 
 === Executor
 
@@ -996,3 +996,16 @@ public class SimpleExecutor extends BaseExecutor {
 }
 ----
 
+== MyBatis-Plus
+
+=== Mapper扫描
+
+. `@MapperScan` 导入了 `MapperScannerRegistrar` 类, `MapperScannerRegistrar` 实现了 `ImportBeanDefinitionRegistrar` 接口, 负责向IOC容器根据注解字段值创建并注册Bean `MapperScannerConfigurer` .
+. `BeanDefinitionRegistryPostProcessor` 实现了 `BeanDefinitionRegistryPostProcessor` 接口, 在容器初始化过程中根据 `basePackage` 扫描并注册Mapper接口类bean, 设置beanClass为 `MapperFactoryBean` 类.
+
+plantuml::charts/mybatis/MapperScan.puml[format=svg]
+
+=== Mapper初始化
+
+. `MapperFactoryBean` 实现了 `SqlSessionDaoSupport` 接口, 在 `checkDaoConfig()` 方法中将Mapper接口注册到 `MyBatis` 的 `Configuration` 中.
+. `BaseMapper` 中的方法是通过 `MybatisMapperAnnotationBuilder::parserInjector()` 方法注册为 `MapperStatement` 的.

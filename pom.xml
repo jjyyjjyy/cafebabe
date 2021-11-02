@@ -25,12 +25,12 @@
 
         <!-- dependencies -->
         <spring-boot.version>2.5.4</spring-boot.version>
-        <spring-cloud.version>2020.0.3</spring-cloud.version>
+        <spring-cloud.version>2020.0.4</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
         <project-reactor.version>Dysprosium-SR23</project-reactor.version>
         <lombok.version>1.18.20</lombok.version>
         <mybatis.version>3.5.7</mybatis.version>
-        <mybatis-plus.version>3.4.3.1</mybatis-plus.version>
+        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <guava.version>30.1.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.33</jmh.version>
@@ -46,7 +46,7 @@
         <asciidoctor.version>2.2.1</asciidoctor.version>
         <asciidoctorj-diagram>2.2.1</asciidoctorj-diagram>
         <testcontainer.version>1.16.0</testcontainer.version>
-        <javafx.version>17</javafx.version>
+        <javafx.version>17.0.1</javafx.version>
         <arthas.version>3.5.4</arthas.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <logstash-logback.version>6.6</logstash-logback.version>
@@ -54,7 +54,7 @@
         <maven-complier-plugin.version>3.8.1</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-        <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+        <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
     </properties>
 
     <dependencyManagement>

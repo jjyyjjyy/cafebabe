@@ -1,0 +1,10 @@
+@startuml
+
+!include ../global/stylesheet.iuml
+
+@MapperScan -> MapperScannerRegistrar : registerBeanDefinitions
+MapperScannerRegistrar -> BeanDefinitionRegistry : registerBeanDefinition
+BeanDefinitionRegistry -> MapperScannerConfigurer : postProcessBeanDefinitionRegistry
+MapperScannerConfigurer -> ClassPathMapperScanner : scan
+
+@enduml
