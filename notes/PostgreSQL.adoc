@@ -685,33 +685,33 @@ update tbl_mvcc set ival = 100 where id = 1;
 
 |===
 
-.PostgreSQL事务隔离级别
+.事务隔离级别
 |===
 | 隔离级别 | 脏读 | 不可重复读 | 幻读 | 序列化异常
 
 | Read Uncommitted
+|
+|
+|
+|
+
+| Read Committed (PostgreSQL默认)
 | x
 |
 |
 |
 
-| Read Committed
+| Repeatable Read (MySQL默认)
+| x
 | x
 |
-|
-|
-
-| Repeatable Read
-| x
-| x
-| x
 |
 
 | Serializable
 | x
 | x
 | x
-| x
+|
 
 |===
 
