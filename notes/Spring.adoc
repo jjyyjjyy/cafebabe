@@ -30,55 +30,54 @@ https://docs.spring.io/spring-boot/docs/current/reference/html[window="_blank"]
 * ServerPortInfoApplicationContextInitializer
 * ConditionEvaluationReportLoggingListener
 . 获取 `META-INF/spring.factories` 中的 `ApplicationListener` 并设置到 `SpringApplication` 成员变量中.
-* CloudFoundryVcapEnvironmentPostProcessor
-* ConfigFileApplicationListener
+* EnvironmentPostProcessorApplicationListener
 * AnsiOutputApplicationListener
 * LoggingApplicationListener
-* ClasspathLoggingApplicationListener
 * BackgroundPreinitializer
 * DelegatingApplicationListener
 * ParentContextCloserApplicationListener
 * ClearCachesApplicationListener
 * FileEncodingApplicationListener
-* LiquibaseServiceLocatorApplicationListener
 . 设置启动类class对象.
 
-=== 读取配置初始化Environment
+=== 初始化Environment
 
-. 从 `META-INF/spring.factories` 中获取 `SpringApplicationRunListener` (EventPublishRunListener).
+. 创建 `DefaultBootstrapContext` , 执行 `BootstrapRegistryInitializer#initialize` 方法来扩展 `DefaultBootstrapContext` .
+. 从 `META-INF/spring.factories` 中获取所有的 `SpringApplicationRunListener` 封装进 `SpringApplicationRunListeners` .
 . 发布 *ApplicationStartingEvent*
-* LoggingApplicationListener: 设置log system,默认logback.
-* BackgroundPreInitializer: 执行内置bean的构造函数.
+* LoggingApplicationListener: 设置loggingSystem, 默认logback.
+* BackgroundPreInitializer.
+* DelegatingApplicationListener
 . 根据 `webApplicationType` 初始化 `Environment` 对象.
-** SERVLET: `StandardServletEnvironment`
-** REACTIVE: `StandardReactiveWebEnvironment`
-** NONE: `StandardEnvironment`
-* 添加系统属性:
-** springApplicationCommandLineArgs(启动命令行参数)
-** servletConfigInitParams
-** servletContextInitParams
-** systemProperties
-** systemEnvironment
-** defaultProperties(SpringApplication::defaultProperties)
-. 根据命令行参数设置active profiles.
+* SERVLET: `ApplicationServletEnvironment`
+* REACTIVE: `ApplicationReactiveWebEnvironment`
+* NONE: `ApplicationEnvironment`
+. 读取系统属性, 设置到Environment中:
+* springApplicationCommandLineArgs `启动命令行参数`
+* servletConfigInitParams
+* servletContextInitParams
+* systemProperties `System.getProperties()`
+* systemEnvironment `System.getEnv()`
+* defaultProperties
 . 发布 *ApplicationEnvironmentPreparedEvent*
-* ConfigFileApplicationListener: 调用 `EnvironmentPostProcessor::postProcessEnvironment` .
-** SystemEnvironmentPropertySourceEnvironmentPostProcessor: 把systemEnvironment包装成OriginAwareSystemEnvironmentPropertySource.
-** SpringApplicationJsonEnvironmentPostProcessor: 解析 `spring.application.json` 中的配置, 比systemProperties优先级高.
-** CloudFoundryVcapEnvironmentPostProcessor: 设置vcap属性配置.
-** ConfigFileApplicationListener:
-*** 加入一个优先级最低的 `RandomValuePropertySource` .
-*** 从 `META-INF/spring.factories` 中获取 `PropertySourceLoader` 并读取配置文件(properties/xml/yaml/yml).
-** DebugAgentEnvironmentPostProcessor: 调用 `reactor.tools.agent.ReactorDebugAgent.init` 方法.
-* AnsiOutputApplicationListener: 设置 `spring.output.ansi.enabled` 和 `spring.output.ansi.console-available` .
+* `EnvironmentPostProcessorApplicationListener` : 从 `META-INF/spring.factories` 中获取所有的 `EnvironmentPostProcessor`, 调用 `EnvironmentPostProcessor#postProcessEnvironment()` 方法 .
+** `RandomValuePropertySourceEnvironmentPostProcessor` : 新增一个获取随机数的 `PropertySource` , 加入到 `Environment` 中.
+** `SystemEnvironmentPropertySourceEnvironmentPostProcessor` : 把 `systemEnvironment` 的 `PropertySource` 包装成 `OriginAwareSystemEnvironmentPropertySource` , 能根据转换后的属性名获取到原始的属性名.
+** `SpringApplicationJsonEnvironmentPostProcessor` : 解析 `spring.application.json` 中的json配置, 加入到 `Environment` 中, 比systemProperties优先级高.
+** `CloudFoundryVcapEnvironmentPostProcessor` : 读取vcap属性, 加入到 `Environment` 中.
+** `ConfigDataEnvironmentPostProcessor` : 读取配置文件(properties/xml/yaml/yml) 中的配置项, 加入到 `Environment` 中.
+** `IntegrationPropertiesEnvironmentPostProcessor` : 读取 `META-INF/spring.integration.properties` 文件配置, 加入到 `Environment` 中.
+** `DebugAgentEnvironmentPostProcessor` : 如果引入的 `ProjectReactor` 包并开启了debug功能, 则调用 `reactor.tools.agent.ReactorDebugAgent.init` 方法.
+* AnsiOutputApplicationListener: 读取 `spring.output.ansi.enabled` 和 `spring.output.ansi.console-available` 配置.
 * LoggingApplicationListener: 初始化 `Log properties/system` .
-* ClassPathLoggingApplicationListener: 打印 `classpath` 路径.
-* BackgroundPreinitializer
+//* ClassPathLoggingApplicationListener: 打印 `classpath` 路径.
+//* BackgroundPreinitializer
 * DelegatingApplicationListener: 向 `context.listener.classes` 中的listeners发送 `ApplicationEnvironmentPreparedEvent` 事件.
 * FileEncodingApplicationListener: 比较 `file.encoding` 和 `spring.mandatory-file-encoding` 是否相同, 如果不同则抛出异常.
-. bindToSpringApplication: 设置 `spring.main` 为 `SpringApplication` 对象.
+. 将 `default PropertySource` 移动到最低优先级处.
+. bindToSpringApplication: 将以 `spring.main` 开头的配置设置到 `SpringApplication` 属性中.
 . 包装 `Environment::propertySources` 为 `ConfigurationPropertySourcesPropertySource(key为configurationProperties)` .
-. 设置 `spring.beaninfo.ignore=true` .
+. 将 `spring.beaninfo.ignore` 配置设置到系统属性中.
 . 打印banner日志.
 
 === 初始化ApplicationContext
@@ -87,7 +86,7 @@ https://docs.spring.io/spring-boot/docs/current/reference/html[window="_blank"]
 * None-Web: `AnnotationConfigApplicationContext`
 * Servlet: `AnnotationConfigServletWebServerApplicationContext`
 * Reactive: `AnnotationConfigReactiveWebServerApplicationContext`
-. 初始化AnnotatedBeanDefinitionReader.
+. 初始化 `AnnotatedBeanDefinitionReader` .
 * 设置BeanFactory属性.
 ** AnnotationAwareOrderComparator
 ** ContextAnnotationAutowireCandidateResolver
