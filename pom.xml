@@ -27,7 +27,7 @@
         <spring-boot.version>2.5.4</spring-boot.version>
         <spring-cloud.version>2020.0.4</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
-        <project-reactor.version>Dysprosium-SR23</project-reactor.version>
+        <project-reactor.version>Dysprosium-SR25</project-reactor.version>
         <lombok.version>1.18.20</lombok.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
