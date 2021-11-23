@@ -177,7 +177,7 @@ start方法不能重复调用.
 
 === Object::wait
 
-当前线程从 `RUNNABLE` 变为 `BLOCKED` 状态.
+当前线程从 `RUNNABLE` 变为 `WAITING` 状态.
 
 === Object::notify
 
@@ -191,7 +191,8 @@ start方法不能重复调用.
 
 == volatile
 
-* 保证有序性和可见性.
+* 保障可见性: volatile修饰的变量值被修改后, 其他线程工作内存里缓存的该变量的值会标记为过期, 需要从主存重新取值.
+* 保障有序性: volatile变量读写前后会加入内存屏障, 保障读写指令不会乱序执行.
 * 修饰double/long时保证写入/读取的原子性, 但不保证代码块对字段操作的原子性.
 
 === 读写屏障来实现volatile语义
@@ -202,8 +203,8 @@ start方法不能重复调用.
 写操作
 // StoreLoadFence
 
-读操作
 // LoadLoadFence
+读操作
 // LoadStoreFence
 ----
 
@@ -1994,7 +1995,7 @@ static class ThreadLocalMap {
 
 | 插入
 a|
-boolean add(e) 队列满了抛出异常, 否则插入成功返回true.
+boolean add(e) 队列满了抛出 `IllegalStateException` 异常, 否则插入成功返回true.
 a|
 boolean offer(e) 队列满了返回false, 否则插入成功返回true.
 a|
@@ -2004,7 +2005,7 @@ boolean offer(e, time, unit) 队列满了会等待指定时间直到能插入.
 
 | 删除
 a|
-E remove() 队列如果为空抛出异常, 否则直接删除队列头部元素.
+E remove() 队列如果为空抛出 `NoSuchElementException` 异常, 否则直接删除队列头部元素.
 a|
 E poll() 队列如果为空返回null, 否则直接删除队列头部元素.
 a|
@@ -2014,7 +2015,7 @@ poll(time, unit) 队列为空会等待指定时间直到能删除.
 
 | 查看头部元素
 a|
-E element() 队列如果为空抛出异常, 否则返回队列头部元素.
+E element() 队列如果为空抛出 `NoSuchElementException` 异常, 否则返回队列头部元素.
 a|
 E peek() 队列如果为空返回null, 否则返回队列头部元素.
 | -

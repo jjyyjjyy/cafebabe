@@ -1,4 +1,4 @@
-= JUC
+= JVM
 :icons: font
 :source-highlighter: highlightjs
 :highlightjs-theme: idea

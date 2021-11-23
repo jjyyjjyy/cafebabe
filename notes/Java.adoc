@@ -379,11 +379,12 @@ Buffer是一个存放基本类型(除了boolean)数据的容器, 拥有以下属
 * position: 当前可以写入的位置.
 * limit: 能够写入的最后一个位置.
 * mark: 记录上一次读写开始的位置(position).
-* flip(): 将position赋值给limit, 再将position设置为0, 重置mark, 用于读取Buffer内容.
+* remaining(): 剩余可操作的个数.
+* flip(): (读模式) 将limit赋值为position的值, 再将position设置为0, 重置mark, 用于读取Buffer内容.
 * rewind(): 将position设置为0, 重置mark, 用于重新读取Buffer内容, 如读取同一个Buffer然后写入多个Channel时.
 * mark(): 将position赋值给mark, 记录一下当前position.
 * reset(): 重置position为上一次的position.
-* clear(): 重置所有变量: position=0, mark=-1, limit=capacity.
+* clear(): (写模式) 重置所有变量: position=0, mark=-1, limit=capacity.
 * compact(): 将position和limit中间的数据拷贝到Buffer开头, 然后将position指向这段数据的下一个位置.
 
 === Selector

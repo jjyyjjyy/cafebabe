@@ -1,10 +1,14 @@
 spring:
-  rabbitmq:
-    username: rabbit
-    password: 123456
-    virtual-host: dev
-    listener:
-      simple:
-        retry:
-          enabled: true
-          multiplier: 2
+  kafka:
+    bootstrap-servers: 192.168.3.254:9092
+    consumer:
+      group-id: spring-mq-demo
+#  rabbitmq:
+#    username: rabbit
+#    password: 123456
+#    virtual-host: dev
+#    listener:
+#      simple:
+#        retry:
+#          enabled: true
+#          multiplier: 2

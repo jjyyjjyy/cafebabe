@@ -118,45 +118,79 @@ https://docs.spring.io/spring-boot/docs/current/reference/html[window="_blank"]
 . 发布 *ApplicationPreparedEvent* .
 * `SpringApplicationShutdownHook` : 注册context关闭的listener.
 
-=== AbstractApplicationContext::refresh
+=== refresh
 
 . prepareRefresh: 初始化 `earlyApplicationListeners` .
 . prepareBeanFactory:
 * 设置 `classLoader/beanExpressionResolver/SPEL/ResourceEditorRegistrar` 属性.
 * 注册BeanPostProcessor `ApplicationContextAwareProcessor/ApplicationListenerDetector` .
-* 注册 `environment/systemProperties/systemEnvironment` Bean.
-. postProcessBeanFactory: 注册 `WebApplicationContextServletContextAwareProcessor` .
-. invokeBeanFactoryPostProcessors: 按PriorityOrdered/Ordered/Regular顺序调用 `BeanDefinitionRegistry#postProcessBeanDefinitionRegistry&&postProcessBeanFactory` , 再按顺序调用 `BeanFactoryPostProcessor#postProcessBeanFactory`
-* CachingMetadataReadFactoryPostProcessor: 注册 `SharedMetadataReaderFactoryBean` 并设置 `ConfigurationClassPostProcessor` 的 `metadataReaderFactory` 属性为 `SharedMetadataReaderFactoryBean` .
-* ConfigurationWarningsPostProcessor: 检查扫描的包路径是否存在并不以 `org/org.springframework` 开头.
-* ConfigurationClassPostProcessor:
-** 根据Configuration类扫描并注册BeanDefinition.
+* 注册 `environment/systemProperties/systemEnvironment/applicationStartup` Bean.
+. postProcessBeanFactory: (Web环境下) 注册 `WebApplicationContextServletContextAwareProcessor` .
+. invokeBeanFactoryPostProcessors: 按PriorityOrdered/Ordered/Regular顺序调用 `BeanDefinitionRegistry#postProcessBeanDefinitionRegistry()` 和 `BeanDefinitionRegistry#postProcessBeanFactory()` , 再按顺序调用 `BeanFactoryPostProcessor#postProcessBeanFactory()`
+* `CachingMetadataReadFactoryPostProcessor` : 注册 `SharedMetadataReaderFactoryBean` , 并设置 `ConfigurationClassPostProcessor` 的 `metadataReaderFactory` 属性为 `SharedMetadataReaderFactoryBean` .
+* `ConfigurationWarningsPostProcessor` : 检查扫描的包路径是否存在以 `org/org.springframework` 开头, 如果存在则打印warning日志.
+* `ConfigurationClassPostProcessor` :
+** 根据Configuration类扫描并注册 `BeanDefinition` .
 ** 为Configuration类创建CGLIB代理.
 ** 注册 `ImportAwareBeanPostProcessor` .
-* PropertySourceOrderingPostProcessor: 将defaultProperties优先级调至最低。
-* ConfigurationPropertiesBeanDefinitionValidator: 校验 `@ConstructorBinding` 必须和 `@EnableConfigurationProperties或@ConfigurationPropertiesScan` 一起使用.
-* EventListenerMethodProcessor: 初始化 `eventListenerFactories` 属性.
-* PropertySourcesPlaceHolderConfigurer: 替换 `${...}` .
-* ConfigurationBeanMetaData: 获取所有的bean method.
-* PreserverErrorControllerTargetClassPostProcessor: 设置BasicErrorController为CGLIB代理.
-. registerBeanPostProcessors: 设置beanPostProcessors属性
-* `org.springframework.context.annotation.internalAutowiredAnnotationProcessor`
-* `org.springframework.context.annotation.internalCommonAnnotationProcessor`
-* `org.springframework.aop.config.internalAutoProxyCreator`
-* `org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor`
-* `org.springframework.context.support.ApplicationListenerDetector`
-. initMessageSource: 注册MessageSource bean. `DelegatingMessageSource`
-. initApplicationEventMulticaster: 注册applicationEventMulticaster. `SimpleApplicationEventMulticaster`
+* `ConfigurationPropertiesBeanDefinitionValidator` : 校验 `@ConstructorBinding` 必须和 `@EnableConfigurationProperties或@ConfigurationPropertiesScan` 一起使用.
+* `PropertySourcesPlaceHolderConfigurer` : 替换 `${...}` .
+* `EventListenerMethodProcessor` : 初始化 `eventListenerFactories` 属性.
+* `PreserverErrorControllerTargetClassPostProcessor` : 设置BasicErrorController为CGLIB代理.
+. registerBeanPostProcessors: 注册beanPostProcessor:
+* `ApplicationContextAwareProcessor`
+* `ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor`
+* `PostProcessorRegistrationDelegate.BeanPostProcessorChecker`
+* `ConfigurationPropertiesBindingPostProcessor`
+* `AnnotationAwareAspectJAutoProxyCreator`
+* `CommonAnnotationBeanPostProcessor`
+* `AutowiredAnnotationBeanPostProcessor`
+* `ApplicationListenerDetector`
+. initMessageSource: 注册MessageSource `DelegatingMessageSource` .
+. initApplicationEventMulticaster: 注册ApplicationEventMulticaster `SimpleApplicationEventMulticaster` .
 . onRefresh: 创建WebServer,将 `servletContext` 设置到 `servletContextInitParams` 中.
-. registerListeners: 设置 `applicationEventMulticaster` 的applicationListener(Bean)属性.
+. registerListeners: 将 `ApplicationListener` 注册到 `applicationEventMulticaster` 中.
 . finishBeanFactoryInitialization: 初始化Singleton的BeanDefinition.
 . finishRefresh:
 * 注册lifeCycleProcessor bean 为 `DefaultLifeCycleProcessor` .
 * 调用实现了 `SmartLifeCycle` 接口的bean的start方法.
 * 发布 *ContextRefreshedEvent* .
-* 启动WebServer .
+* `ConditionEvaluationReportLoggingListener` 打印Spring自动装配过滤bean的日志.
+* `ClearCachesApplicationListener` 清空Spring启动时反射类和类加载器的缓存.
+* `SharedMetadataReaderFactoryBean` 清空Bean的元数据缓存.
+* 启动WebServer.
 * 发布 *ServletWebServerInitializedEvent* .
-. 清空cache.
+. 清空Spring启动时使用到的各种缓存.
+
+== 单例bean初始化流程
+
+. 遍历所有的bean, 筛选出非抽象类/单例/非懒加载的bean, 准备预先初始化.
+. 根据beanName从三级缓存中查找, 如果存在, 则直接返回.
+. 将beanName加入到 `singletonsCurrentlyInCreation` 集合中, 保证当前bean不被重复初始化.
+. 解析bean的class对象, 调用 `InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation` 方法.
+* `AbstractAutoProxyCreator` : 判断是否需要创建代理对象, 如果需要, 则直接创建好并返回.
+. 如果当前对象已经创建好, 则提前回调 `BeanPostProcessor#postProcessAfterInitialization` , 然后直接返回该对象, 创建过程直接结束.
+. 获取bean的构造方法, 如果构造方法需要参数, 则注入参数, 具体注入实现见 `ConstructorResolver#resolveAutowiredArgument`, 如果注入的对象为lazy, 就会创建一个代理对象, 获取对象属性或者调用对象方法时才会创建真正的对象.
+. 根据构造方法和参数创建bean对象.
+. 回调 `MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition` 方法.
+. 加入到三级缓存中.
+. populateBean:
+* 回调 `InstantiationAwareBeanPostProcessor#postProcessAfterInstantiation` 方法.
+* 回调 `InstantiationAwareBeanPostProcessor#postProcessProperties` 方法, 填充属性.
+** `CommonAnnotationBeanPostProcessor` .
+** `AutowiredAnnotationBeanPostProcessor` .
+. initializeBean:
+* 回调 `Aware` 系接口.
+* 回调 `BeanPostProcessor#postProcessBeforeInitialization` 方法 (此处会回调自定义的init方法).
+* 回调 `afterPropertiesSet()` 方法.
+* 回调 `BeanPostProcessor#postProcessAfterInitialization` 方法.
+. 如果bean存在回调方法, 则标记该bean到 `disposableBeans` 中.
+* 实现了 `DisposableBean` 接口.
+* 设置了 `destroyMethod` 属性.
+* 存在 `@PreDestroy` 注解的方法.
+. 创建完毕, 将beanName从 `singletonsCurrentlyInCreation` 中删除.
+. 将bean从二级/三级缓存中删除, 再加入到一级缓存中.
+. 如果bean实现了 `SmartInitializingSingleton` 接口, 则回调 `afterSingletonsInstantiated` 方法.
 
 === 后置处理
 

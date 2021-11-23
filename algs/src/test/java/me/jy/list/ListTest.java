@@ -2,6 +2,9 @@ package me.jy.list;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Objects;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -39,5 +42,15 @@ class ListTest {
 
         list.remove(0);
         assertEquals(2, list.get(0));
+    }
+
+    @Test
+    void testConcurrency() {
+        java.util.List<Integer> list = new java.util.ArrayList<>();
+        IntStream.range(1, 10000)
+            .parallel()
+            .forEach(list::add);
+        System.out.println(list.size());
+        System.out.println(list.parallelStream().filter(Objects::isNull).count());
     }
 }
