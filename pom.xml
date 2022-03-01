@@ -31,7 +31,7 @@
         <lombok.version>1.18.20</lombok.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.33</jmh.version>
         <disruptor.version>3.4.4</disruptor.version>
