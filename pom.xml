@@ -19,24 +19,24 @@
     </modules>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>18</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- dependencies -->
-        <spring-boot.version>2.5.7</spring-boot.version>
+        <spring-boot.version>2.6.4</spring-boot.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
         <project-reactor.version>Dysprosium-SR25</project-reactor.version>
         <lombok.version>1.18.20</lombok.version>
         <mybatis.version>3.5.7</mybatis.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>31.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.33</jmh.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <nimbus-jose-jwt.version>9.13</nimbus-jose-jwt.version>
-        <netty.version>4.1.70.Final</netty.version>
+        <nimbus-jose-jwt.version>9.21</nimbus-jose-jwt.version>
+        <netty.version>4.1.75.Final</netty.version>
         <jol.version>0.16</jol.version>
         <jcstress.version>0.14</jcstress.version>
         <fastjson.version>1.2.78</fastjson.version>
@@ -55,6 +55,7 @@
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
+        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
     </properties>
 
     <dependencyManagement>
