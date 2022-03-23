@@ -25,7 +25,7 @@
 
         <!-- dependencies -->
         <spring-boot.version>2.5.7</spring-boot.version>
-        <spring-cloud.version>2020.0.4</spring-cloud.version>
+        <spring-cloud.version>2021.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
         <project-reactor.version>Dysprosium-SR25</project-reactor.version>
         <lombok.version>1.18.20</lombok.version>
@@ -36,7 +36,7 @@
         <jmh.version>1.33</jmh.version>
         <disruptor.version>3.4.4</disruptor.version>
         <nimbus-jose-jwt.version>9.13</nimbus-jose-jwt.version>
-        <netty.version>4.1.70.Final</netty.version>
+        <netty.version>4.1.75.Final</netty.version>
         <jol.version>0.16</jol.version>
         <jcstress.version>0.14</jcstress.version>
         <fastjson.version>1.2.78</fastjson.version>
@@ -49,7 +49,7 @@
         <javafx.version>17.0.1</javafx.version>
         <arthas.version>3.5.4</arthas.version>
         <javassist.version>3.28.0-GA</javassist.version>
-        <logstash-logback.version>6.6</logstash-logback.version>
+        <logstash-logback.version>7.0.1</logstash-logback.version>
 
         <maven-complier-plugin.version>3.8.1</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
