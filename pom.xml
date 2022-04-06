@@ -24,12 +24,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- dependencies -->
-        <spring-boot.version>2.6.4</spring-boot.version>
+        <spring-boot.version>2.6.6</spring-boot.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
-        <project-reactor.version>Dysprosium-SR25</project-reactor.version>
+        <project-reactor.version>2020.0.17</project-reactor.version>
         <lombok.version>1.18.20</lombok.version>
-        <mybatis.version>3.5.7</mybatis.version>
+        <mybatis.version>3.5.9</mybatis.version>
         <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
         <guava.version>31.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
@@ -39,7 +39,7 @@
         <netty.version>4.1.75.Final</netty.version>
         <jol.version>0.16</jol.version>
         <jcstress.version>0.14</jcstress.version>
-        <fastjson.version>1.2.78</fastjson.version>
+        <fastjson.version>1.2.80</fastjson.version>
         <cglib.versin>3.3.0</cglib.versin>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
@@ -47,7 +47,7 @@
         <asciidoctorj-diagram>2.2.1</asciidoctorj-diagram>
         <testcontainer.version>1.16.2</testcontainer.version>
         <javafx.version>17.0.1</javafx.version>
-        <arthas.version>3.5.4</arthas.version>
+        <arthas.version>3.6.0</arthas.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <logstash-logback.version>7.0.1</logstash-logback.version>
 

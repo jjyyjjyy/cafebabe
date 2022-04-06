@@ -811,12 +811,172 @@ TIP: `pg_archivecleanup -d . `ls -r | head -2 | tail -1``
 
 通过代价估算的方式挑选代价比较低的物理路径
 
-== PG12参考配置文件
+== pgbench
+
+文档地址: https://www.postgresql.org/docs/current/pgbench.html[, role="external", window="_blank"]
+
+`pgbench` 命令是PostgreSQL自带的性能测试工具, 用于批量生产测试数据以及SQL性能测试.
+默认测试数据集由4张表组成, 可以通过 `-s` 参数设置数据量倍数, 默认数据量如下
+|===
+| 表名 | 数据量
+
+| pgbench_branches
+| 1
+
+| pgbench_tellers
+| 10
+
+| pgbench_accounts
+| 100000
+
+| pgbench_history
+| 0
+
+|===
+
+=== 初始化数据集
+
+[source,bash]
+----
+pgbench -i -I dtgvpf -q -s 1000 benchtest
+----
+
+.参数说明:
+* `-i` : 表明要进行数据初始化.
+* `-I` : 设置初始化步骤:
+** d: 删除已经存在的测试表.
+** t: 创建测试表.
+** g: 生成测试数据.
+** v: 执行 `VACUUM` .
+** p: 创建主键.
+** f: 创建外键.
+* `-q` : 每5秒数据输出一次进度, 否则每生成10万条数据输出一次.
+* `-s` : 设置测试数据量倍数, 如100则表示 `pgbench_accounts` 里会生成1000万条数据.
+* `benchtest` : 用于测试的数据库名, 示例中库名为 `benchtest`.
+
+=== SQL性能测试
+
+[source,bash]
+----
+pgbench -b tpcb-like -c 100 -C -j 100 -M simple -v -P 5 -r -T 30 benchtest
+----
+
+.参数说明:
+* `-b`: 运行内置脚本, 如果为自定义脚本, 替换为 `-f xxx.sql` 参数.
+** tpcb-like: 执行一个事务块, 包括3条update, 1条select和1条insert语句.
+** simple-update: 只执行3条update语句.
+** select-only: 只执行1条select语句.
+* `-c` : 测试时建立的连接数量, 默认为1.
+* `-C` : 标识每次执行测试SQL时重新建立连接.
+* `-j` : pgbench线程数量.
+* `-M` : SQL模式: simple/extended/prepared.
+* `-v` : 标识测试前vacuum `pgbench_tellers` 和 `pgbench_branches` 表, 并truncate `pgbench_history` 表.
+* `-P` : 设置每隔几秒输出一次测试进度.
+* `-r` : 标识输出SQL平均执行耗时.
+* `-T` : 设置测试执行时间.
+* `-R` : 设置测试每秒发送事务数.
+* `benchtest` : 用于测试的数据库名, 示例中库名为 `benchtest`.
+
+== 参考配置
 
 [source,conf]
-.postgresql.conf
 ----
-include::pg/postgresql.conf[]
+# 固定参数
+listen_addresses = '*'
+superuser_reserved_connections = 10
+unix_socket_directories = '., /tmp'
+unix_socket_permissions = 0700
+tcp_keepalives_idle = 60
+tcp_keepalives_interval = 10
+tcp_keepalives_count = 10
+huge_pages = try
+dynamic_shared_memory_type = posix
+vacuum_cost_delay = 0
+vacuum_cost_limit = 10000
+bgwriter_delay = 10ms
+bgwriter_lru_maxpages = 1000
+bgwriter_lru_multiplier = 10.0
+bgwriter_flush_after = 512kB
+effective_io_concurrency = 0
+max_worker_processes = 256
+parallel_leader_participation = on
+old_snapshot_threshold = 6h
+wal_level = replica
+synchronous_commit = off
+full_page_writes = on
+wal_compression = on
+wal_buffers = 16MB
+wal_writer_delay = 10ms
+wal_writer_flush_after = 1MB
+checkpoint_timeout = 30min
+checkpoint_completion_target = 0.2
+checkpoint_flush_after = 256kB
+archive_mode = on
+archive_command = '/bin/date'
+max_wal_senders = 64
+max_replication_slots = 64
+hot_standby = on
+max_standby_archive_delay = 120s
+max_standby_streaming_delay = 120s
+wal_receiver_status_interval = 1s
+hot_standby_feedback = off
+max_logical_replication_workers = 64
+enable_partitionwise_join = on
+enable_partitionwise_aggregate = on
+random_page_cost = 1.1
+log_destination = 'csvlog'
+logging_collector = on
+log_directory = 'log'
+log_filename = 'postgresql-%a.log'
+log_truncate_on_rotation = on
+log_rotation_age = 1d
+log_rotation_size = 1GB
+log_min_duration_statement = 5s
+log_checkpoints = on
+log_connections = off
+log_disconnections = off
+log_error_verbosity = verbose
+log_lock_waits = on
+log_statement = 'ddl'
+log_temp_files = 256MB
+track_io_timing = on
+track_functions = pl
+autovacuum = on
+log_autovacuum_min_duration = 0
+autovacuum_vacuum_scale_factor = 0.02
+autovacuum_analyze_scale_factor = 0.01
+autovacuum_freeze_max_age = 1200000000
+autovacuum_multixact_freeze_max_age = 1250000000
+autovacuum_vacuum_cost_delay = 0ms
+idle_in_transaction_session_timeout = '6h'
+vacuum_freeze_table_age = 200000000
+vacuum_multixact_freeze_table_age = 200000000
+default_text_search_config = 'pg_catalog.english'
+shared_preload_libraries = 'pg_stat_statements'
+deadlock_timeout = 1s
+log_timezone = 'PRC'
+datestyle = 'iso, mdy'
+timezone = 'PRC'
+lc_messages = 'C'
+lc_monetary = 'C'
+lc_numeric = 'C'
+lc_time = 'C'
+
+# 动态参数(以16C64G为例)
+max_connections = 3200                 # 物理内存(GB)*1000*(1/4)/5
+shared_buffers = 16GB                  # IF use hugepage: 主机内存*(1/4)   ELSE: min(32GB, 主机内存*(1/4))
+max_prepared_transactions = 3200       # max_prepared_transactions=max_connections
+work_mem = 16MB                        # max(min(物理内存/4096, 64MB), 4MB)
+maintenance_work_mem = 1GB             # min( 8G, (主机内存*1/8)/max_parallel_maintenance_workers )
+autovacuum_work_mem = 1GB              # min( 8G, (主机内存*1/8)/autovacuum_max_workers )
+max_parallel_maintenance_workers = 8   # min( max(2, CPU核数/2) , 16 )
+max_parallel_workers_per_gather = 12   # min( max(2, CPU核数-4) , 24 )
+max_parallel_workers = 12              # max(2, CPU核数-4)
+max_wal_size = 32GB                    # shared_buffers*2
+min_wal_size = 8GB                     # shared_buffers/2
+max_sync_workers_per_subscription = 12 # min ( 32 , max(2, CPU核数-4) )
+effective_cache_size = 32GB            # 主机内存/2
+autovacuum_max_workers = 8             # max(min( 8 , CPU核数/2 ) , 5)
 ----
 
 
