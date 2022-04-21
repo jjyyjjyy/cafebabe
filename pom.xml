@@ -46,7 +46,7 @@
         <asciidoctor.version>2.2.1</asciidoctor.version>
         <asciidoctorj-diagram>2.2.1</asciidoctorj-diagram>
         <testcontainer.version>1.16.2</testcontainer.version>
-        <javafx.version>17.0.1</javafx.version>
+        <javafx.version>18.0.1</javafx.version>
         <arthas.version>3.6.0</arthas.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <logstash-logback.version>7.0.1</logstash-logback.version>
