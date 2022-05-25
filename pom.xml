@@ -24,13 +24,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- dependencies -->
-        <spring-boot.version>2.6.6</spring-boot.version>
-        <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
+        <spring-cloud.version>2021.0.2</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
-        <project-reactor.version>2020.0.17</project-reactor.version>
-        <lombok.version>1.18.20</lombok.version>
-        <mybatis.version>3.5.9</mybatis.version>
-        <mybatis-plus.version>3.4.3.4</mybatis-plus.version>
+        <project-reactor.version>2020.0.19</project-reactor.version>
+        <mybatis.version>3.5.10</mybatis.version>
+        <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <guava.version>31.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.33</jmh.version>
@@ -43,11 +42,10 @@
         <cglib.versin>3.3.0</cglib.versin>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
-        <asciidoctor.version>2.2.1</asciidoctor.version>
+        <asciidoctor.version>2.2.2</asciidoctor.version>
         <asciidoctorj-diagram>2.2.1</asciidoctorj-diagram>
-        <testcontainer.version>1.16.2</testcontainer.version>
-        <javafx.version>17.0.1</javafx.version>
-        <arthas.version>3.6.0</arthas.version>
+        <testcontainer.version>1.17.2</testcontainer.version>
+        <arthas.version>3.6.1</arthas.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <logstash-logback.version>7.0.1</logstash-logback.version>
 
@@ -159,11 +157,6 @@
                 <groupId>org.openjdk.jcstress</groupId>
                 <artifactId>jcstress-core</artifactId>
                 <version>${jcstress.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-controls</artifactId>
-                <version>${javafx.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.javassist</groupId>
