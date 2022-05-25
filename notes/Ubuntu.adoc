@@ -49,42 +49,10 @@ sudo visudo
 
 [source,bash]
 ----
-sudo apt install -y git net-tools vim curl unzip unar tree apt-transport-https ca-certificates software-properties-common language-pack-zh-hans
+sudo apt install -y git net-tools vim curl unzip unar tree apt-transport-https ca-certificates software-properties-common language-pack-zh-hans openssh-server
 
 # gnome
 sudo apt install -y neofetch gnome-tweak-tool chrome-gnome-shell
-# 媒体解码
-sudo apt install -y libdvdnav4 libdvdread4 gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libdvd-pkg ubuntu-restricted-extras
-----
-
-== 安装SS客户端
-
-[source,bash]
-----
-# 安装Shadowsocks-qt5客户端,设置SOCKS5代理
-sudo add-apt-repository ppa:hzwhuang/ss-qt5
-sudo apt-get update
-sudo apt-get install shadowsocks-qt5
-# ubuntu 18.04之后的版本需要把apt(/etc/apt/sources.list.d/hzwhuang-ubuntu-ss-qt5-bionic.list)里的发行版本改为artful
-
-# 生成pac文件(option 1)
-mkdir ~/Documents/pacs && cd ~/Documents/pacs
-wget https://hlt-demo.oss-cn-shanghai.aliyuncs.com/autoproxy.pac
-
-# 生成pac文件(option 2)
-sudo apt-get install python-pip python-dev build-essential
-sudo pip install --upgrade pip
-sudo pip install --upgrade virtualenv
-sudo pip install genpac
-# genpac --proxy="SOCKS5 127.0.0.1:1080" --gfwlist-proxy="SOCKS5 	127.0.0.1:1080" -o autoproxy.pac --gfwlist-url="https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt"
-
-# 设置系统自动代理:
-file://~/Documents/pacs/autoproxy.pac  # ~用绝对路径代替
-
-vim ~/.bashrc
-# 添加
-export http_proxy="socks5://127.0.0.1:1080"
-export https_proxy="socks5://127.0.0.1:1080"
 ----
 
 == 美化字体/图标
@@ -102,36 +70,6 @@ mv macOS-iCons-master/ /usr/share/icons/
 sudo apt install chrome-gnome-shell -y
 # chrome访问 https://extensions.gnome.org
 # 安装User-Themes
-----
-
-== 安装主题
-
-[source,bash]
-----
-sudo apt install -y autoconf automake inkscape libgdk-pixbuf2.0-dev libglib2.0-dev libsass0 libxml2-utils pkg-config sassc parallel
-
-git config --global http.proxy 'socks5://127.0.0.1:1080'
-git config --global https.proxy 'socks5://127.0.0.1:1080'
-
-cd ~ && git clone https://github.com/adapta-project/adapta-gtk-theme.git && \
-cd ~/adapta-gtk-theme && \
-git fetch --all && \
-git reset --hard origin/master && \
-./autogen.sh \
-    --enable-chrome \
-    --enable-parallel \
-    --disable-cinnamon \
-    --disable-unity \
-    --disable-xfce \
-    --with-selection_color='#3F51B5' \
-    --with-second_selection_color='#5C6BC0' \
-    --with-accent_color='#4DB6AC' \
-    --with-suggestion_color='#009688' \
-    --with-destruction_color='#FF5252' && \
-make && \
-find . -type f|xargs sed -i 's/2a373e/3c3f41/g' && \
-find . -type f|xargs sed -i 's/2A373E/3c3f41/g' && \
-sudo make install
 ----
 
 == 安装docker

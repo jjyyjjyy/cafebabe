@@ -14,7 +14,7 @@ sudo docker version
 sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
-  "registry-mirrors": ["http://docker.mirrors.ustc.edu.cn"]
+  "registry-mirrors": ["https://3itj1ym2.mirror.aliyuncs.com"]
 }
 EOF
 # expose endpoint for external services, eg: portainer.
@@ -24,6 +24,6 @@ sudo chmod 777 /etc/docker/ -R
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 # install docker-compose
-sudo wget http://soft-1252259164.file.myqcloud.com/docker-compose-1.25.0 -O /usr/local/bin/docker-compose
+sudo wget http://soft-1252259164.file.myqcloud.com/docker-compose -O /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose version
