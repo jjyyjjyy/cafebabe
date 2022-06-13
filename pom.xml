@@ -29,12 +29,12 @@
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
         <project-reactor.version>2020.0.19</project-reactor.version>
         <mybatis.version>3.5.10</mybatis.version>
-        <mybatis-plus.version>3.5.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <guava.version>31.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.33</jmh.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <nimbus-jose-jwt.version>9.21</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.23</nimbus-jose-jwt.version>
         <netty.version>4.1.75.Final</netty.version>
         <jol.version>0.16</jol.version>
         <jcstress.version>0.14</jcstress.version>
@@ -42,18 +42,18 @@
         <cglib.versin>3.3.0</cglib.versin>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
-        <asciidoctor.version>2.2.1</asciidoctor.version>
-        <asciidoctorj-diagram>2.2.1</asciidoctorj-diagram>
+        <asciidoctorj-diagram>2.2.3</asciidoctorj-diagram>
         <testcontainer.version>1.17.2</testcontainer.version>
-        <arthas.version>3.6.1</arthas.version>
-        <javassist.version>3.28.0-GA</javassist.version>
-        <logstash-logback.version>7.0.1</logstash-logback.version>
+        <arthas.version>3.6.3</arthas.version>
+        <javassist.version>3.29.0-GA</javassist.version>
+        <logstash-logback.version>7.2</logstash-logback.version>
 
         <maven-complier-plugin.version>3.8.1</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+        <asciidoctor-maven-plugin.version>2.2.2</asciidoctor-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
