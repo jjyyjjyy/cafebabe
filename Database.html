@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.17">
+<title>Database</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="js/highlight/styles/idea.min.css">
+<style>
+.hidden {
+  display: none;
+}
+
+.switch {
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: #666;
+  display: inline-block;
+}
+
+.switch--item {
+  text-align: center;
+  min-width: 40px;
+  padding: 5px;
+  background-color: #ffffff;
+  color: #666;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+  border-width: 0 0 0 1px;
+  border-style: solid;
+  border-color: #666;
+}
+
+.switch--item.selected {
+  background-color: #666;
+  color: #ffffff;
+}
+
+</style>
+<script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+  $('.primary').each(function () {
+    primary = $(this);
+    createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+    primary.children('.title').remove();
+    primary.siblings('div[class*="secondary"]')
+      .each(function (idx, node) {
+        secondary = $(node);
+        switchItem = createSwitchItem(secondary, primary.children('.switch'));
+        switchItem.content.addClass('hidden');
+        primary.append(switchItem.content);
+        secondary.remove();
+      });
+  });
+}
+
+function createBlockSwitch(primary) {
+  blockSwitch = $('<div class="switch"></div>');
+  primary.prepend(blockSwitch);
+  return blockSwitch;
+}
+
+function findPrimary(secondary) {
+  candidate = secondary.prev();
+  while (!candidate.is('.primary')) {
+    candidate = candidate.prev();
+  }
+  return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+  blockName = block.children('.title').text();
+  content = block.children('.content').first().append(block.next('.colist'));
+  item = $('<div class="switch--item">' + blockName + '</div>');
+  item.on('click', '', content, function (e) {
+    $(this).addClass('selected');
+    $(this).siblings().removeClass('selected');
+    e.data.siblings('.content').addClass('hidden');
+    e.data.removeClass('hidden');
+  });
+  blockSwitch.append(item);
+  return {'item': item, 'content': content};
+}
+
+function globalSwitch() {
+  $('.switch--item').each(function () {
+    $(this).off('click');
+    $(this).on('click', function () {
+      selectedText = $(this).text()
+      selectedIndex = $(this).index()
+      $(".switch--item").filter(function () {
+        return ($(this).text() === selectedText)
+      }).each(function () {
+        $(this).addClass('selected');
+        $(this).siblings().removeClass('selected');
+        selectedContent = $(this).parent().siblings(".content").eq(selectedIndex)
+        selectedContent.removeClass('hidden');
+        selectedContent.siblings().addClass('hidden');
+      });
+    });
+  });
+}
+
+$(addBlockSwitches);
+$(globalSwitch);
+
+</script>
+
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>Database</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">目录</div>
+<ul class="sectlevel1">
+<li><a href="#_sql历史">1. SQL历史</a></li>
+<li><a href="#_sql92">2. SQL92</a></li>
+<li><a href="#_sql1999">3. SQL1999</a></li>
+<li><a href="#_sql2003">4. SQL2003</a></li>
+<li><a href="#_sql2006">5. SQL2006</a></li>
+<li><a href="#_sql2008">6. SQL2008</a></li>
+<li><a href="#_sql2011">7. SQL2011</a></li>
+<li><a href="#_sql2016">8. SQL2016</a></li>
+<li><a href="#_sql2019">9. SQL2019</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_sql历史"><a class="link" href="#_sql历史">1. SQL历史</a></h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>SQL86</p>
+</li>
+<li>
+<p>SQL89</p>
+</li>
+<li>
+<p>SQL92</p>
+</li>
+<li>
+<p>SQL1999</p>
+</li>
+<li>
+<p>SQL2003</p>
+</li>
+<li>
+<p>SQL2006</p>
+</li>
+<li>
+<p>SQL2008</p>
+</li>
+<li>
+<p>SQL2011</p>
+</li>
+<li>
+<p>SQL2016</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql92"><a class="link" href="#_sql92">2. SQL92</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>新的数据类型: <code>DATE, TIME, TIMESTAMP, INTERVAL, BIT, VARCHAR, NATIONAL CHARACTER等</code> .</p>
+</li>
+<li>
+<p>新的标量操作: <code>字符串拼接, 取子字符串, 日期时间计算等</code> .</p>
+</li>
+<li>
+<p>新增集合操作: <code>UNION JOIN, NATURAL JOIN 等</code> .</p>
+</li>
+<li>
+<p>条件操作: <code>CASE语句</code> .</p>
+</li>
+<li>
+<p>新的DML语句: <code>ALTER, DROP</code> .</p>
+</li>
+<li>
+<p>数据库元数据视图: <code>information_schema</code> .</p>
+</li>
+<li>
+<p>临时表: <code>CREATE TEMP TABLE</code> .</p>
+</li>
+<li>
+<p>事务隔离级别.</p>
+</li>
+<li>
+<p>类型转换: <code>CAST (expr AS type)</code> .</p>
+</li>
+<li>
+<p>查询结果集游标.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql1999"><a class="link" href="#_sql1999">3. SQL1999</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>新增 <code>boolean</code> 类型.</p>
+</li>
+<li>
+<p>支持 <code>WITH [RECURSIVE]</code> 语句.</p>
+</li>
+<li>
+<p>支持 <code>ROLLUP, CUBE, GROUPING SETS</code> .</p>
+</li>
+<li>
+<p>支持数组类型及相关函数.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql2003"><a class="link" href="#_sql2003">4. SQL2003</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>新增窗口函数.</p>
+</li>
+<li>
+<p>新增 <code>MERGE/ON CONFLICT DO NOTHING/UPDATE</code> 语句.</p>
+</li>
+<li>
+<p>新增 <code>xml</code> 类型.</p>
+</li>
+<li>
+<p>新增自增序列和 <code>identity</code> 类型.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql2006"><a class="link" href="#_sql2006">5. SQL2006</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>支持 <code>XQuery</code> .</p>
+</li>
+<li>
+<p>新增 <code>xml</code> 操作类函数.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql2008"><a class="link" href="#_sql2008">6. SQL2008</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><code>TRUNCATE TABLE</code> .</p>
+</li>
+<li>
+<p><code>CASE</code> 语句支持多个 <code>WHEN</code> 分支条件.</p>
+</li>
+<li>
+<p>数据库触发器 支持 <code>INSTEAD OF</code> .</p>
+</li>
+<li>
+<p><code>TOP N</code> 查询方式:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>FETCH FIST &lt;N&gt; ROWS ONLY</code> .</p>
+</li>
+<li>
+<p><code>OFFSET &lt;M&gt; ROWS FETCH NEXT &lt;N&gt; ROWS ONLY</code> .</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql2011"><a class="link" href="#_sql2011">7. SQL2011</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><code>Temporal database</code> .</p>
+</li>
+<li>
+<p><code>System-versioned tables</code> .</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql2016"><a class="link" href="#_sql2016">8. SQL2016</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>新增对 <code>JSON</code> 类型的支持.</p>
+</li>
+<li>
+<p><code>MATCH_RECOGNIZE</code> .</p>
+</li>
+<li>
+<p>新增 <code>LISTAGG</code> 函数.</p>
+</li>
+<li>
+<p>新增 <code>DECFLOAT</code> 类型.</p>
+</li>
+<li>
+<p>新增日期/时间的格式化函数: <code>CAST, EXTRACT</code> .</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sql2019"><a class="link" href="#_sql2019">9. SQL2019</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>新增对多维数组的支持.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2021-09-15 22:46:21 +0800
+</div>
+</div>
+<script src="js/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+<style>
+
+    .hljs-comment, .quoteblock blockquote, .quoteblock blockquote p {
+        font-style: normal;
+    }
+
+    .listingblock:hover .clipboard {
+        display: block;
+    }
+
+    .clipboard {
+        display: none;
+        border: 0;
+        font-size: .7em;
+        text-transform: uppercase;
+        font-weight: 400;
+        padding: 6px;
+        color: #999;
+        position: absolute;
+        cursor: pointer;
+        top: .425rem;
+        right: .1rem;
+        background: transparent;
+    }
+
+    code + .clipboard {
+        top: 2rem !important;
+    }
+
+    .clipboard:hover, .clipboard:focus, .clipboard:active {
+        outline: 0;
+        background-color: #eee9e6;
+    }
+</style>
+
+<script src="js/tocbot/tocbot.min.js" type="text/javascript"></script>
+<script src="js/toc.js" type="text/javascript"></script>
+<script src="https://cdn.bootcss.com/clipboard.js/2.0.4/clipboard.min.js"></script>
+<script src="js/clipboardInit.js" type="text/javascript"></script>
+</body>
+</html>

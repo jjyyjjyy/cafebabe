@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.17">
+<title>Postgresql</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="js/highlight/styles/idea.min.css">
+<style>
+.hidden {
+  display: none;
+}
+
+.switch {
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: #666;
+  display: inline-block;
+}
+
+.switch--item {
+  text-align: center;
+  min-width: 40px;
+  padding: 5px;
+  background-color: #ffffff;
+  color: #666;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+  border-width: 0 0 0 1px;
+  border-style: solid;
+  border-color: #666;
+}
+
+.switch--item.selected {
+  background-color: #666;
+  color: #ffffff;
+}
+
+</style>
+<script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+  $('.primary').each(function () {
+    primary = $(this);
+    createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+    primary.children('.title').remove();
+    primary.siblings('div[class*="secondary"]')
+      .each(function (idx, node) {
+        secondary = $(node);
+        switchItem = createSwitchItem(secondary, primary.children('.switch'));
+        switchItem.content.addClass('hidden');
+        primary.append(switchItem.content);
+        secondary.remove();
+      });
+  });
+}
+
+function createBlockSwitch(primary) {
+  blockSwitch = $('<div class="switch"></div>');
+  primary.prepend(blockSwitch);
+  return blockSwitch;
+}
+
+function findPrimary(secondary) {
+  candidate = secondary.prev();
+  while (!candidate.is('.primary')) {
+    candidate = candidate.prev();
+  }
+  return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+  blockName = block.children('.title').text();
+  content = block.children('.content').first().append(block.next('.colist'));
+  item = $('<div class="switch--item">' + blockName + '</div>');
+  item.on('click', '', content, function (e) {
+    $(this).addClass('selected');
+    $(this).siblings().removeClass('selected');
+    e.data.siblings('.content').addClass('hidden');
+    e.data.removeClass('hidden');
+  });
+  blockSwitch.append(item);
+  return {'item': item, 'content': content};
+}
+
+function globalSwitch() {
+  $('.switch--item').each(function () {
+    $(this).off('click');
+    $(this).on('click', function () {
+      selectedText = $(this).text()
+      selectedIndex = $(this).index()
+      $(".switch--item").filter(function () {
+        return ($(this).text() === selectedText)
+      }).each(function () {
+        $(this).addClass('selected');
+        $(this).siblings().removeClass('selected');
+        selectedContent = $(this).parent().siblings(".content").eq(selectedIndex)
+        selectedContent.removeClass('hidden');
+        selectedContent.siblings().addClass('hidden');
+      });
+    });
+  });
+}
+
+$(addBlockSwitches);
+$(globalSwitch);
+
+</script>
+
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>Postgresql</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">目录</div>
+<ul class="sectlevel1">
+<li><a href="#_安装">1. 安装</a>
+<ul class="sectlevel2">
+<li><a href="#_docker">1.1. docker</a></li>
+<li><a href="#_安装包安装">1.2. 安装包安装</a></li>
+</ul>
+</li>
+<li><a href="#_基本命令">2. 基本命令</a></li>
+<li><a href="#_配置">3. 配置</a>
+<ul class="sectlevel2">
+<li><a href="#_pg_hba_conf">3.1. pg_hba.conf</a></li>
+<li><a href="#_postgresql_conf">3.2. postgresql.conf</a></li>
+</ul>
+</li>
+<li><a href="#_psql命令">4. psql命令</a></li>
+<li><a href="#_数据类型">5. 数据类型</a>
+<ul class="sectlevel2">
+<li><a href="#_数字类型">5.1. 数字类型</a></li>
+<li><a href="#_字符串类型">5.2. 字符串类型</a></li>
+<li><a href="#_日期类型">5.3. 日期类型</a></li>
+<li><a href="#_range类型">5.4. range类型</a></li>
+<li><a href="#_其他">5.5. 其他</a></li>
+</ul>
+</li>
+<li><a href="#_函数">6. 函数</a></li>
+<li><a href="#_高级特性">7. 高级特性</a></li>
+<li><a href="#_monitor">8. Monitor</a>
+<ul class="sectlevel2">
+<li><a href="#_pg_stat_activity">8.1. pg_stat_activity</a></li>
+<li><a href="#_pg_stat_database">8.2. pg_stat_database</a></li>
+<li><a href="#_pg_stat_user_tables">8.3. pg_stat_user_tables</a></li>
+<li><a href="#_pg_stat_statements">8.4. pg_stat_statements</a></li>
+</ul>
+</li>
+<li><a href="#_体系结构">9. 体系结构</a>
+<ul class="sectlevel2">
+<li><a href="#_逻辑结构">9.1. 逻辑结构</a></li>
+<li><a href="#_物理结构">9.2. 物理结构</a>
+<ul class="sectlevel3">
+<li><a href="#_oid">9.2.1. OID</a></li>
+<li><a href="#_表空间">9.2.2. 表空间</a></li>
+</ul>
+</li>
+<li><a href="#_进程结构">9.3. 进程结构</a></li>
+<li><a href="#_内存结构">9.4. 内存结构</a></li>
+</ul>
+</li>
+<li><a href="#_事务">10. 事务</a>
+<ul class="sectlevel2">
+<li><a href="#_脏读">10.1. 脏读</a></li>
+<li><a href="#_不可重复读">10.2. 不可重复读</a></li>
+<li><a href="#_幻读">10.3. 幻读</a></li>
+<li><a href="#_查看全局事务默认隔离级别">10.4. 查看全局事务默认隔离级别</a></li>
+<li><a href="#_修改全局事务默认隔离级别">10.5. 修改全局事务默认隔离级别</a></li>
+<li><a href="#_查看当前会话事务默认隔离级别">10.6. 查看当前会话事务默认隔离级别</a></li>
+<li><a href="#_设置当前会话事务默认隔离级别">10.7. 设置当前会话事务默认隔离级别</a></li>
+</ul>
+</li>
+<li><a href="#_分区">11. 分区</a>
+<ul class="sectlevel2">
+<li><a href="#_优势">11.1. 优势</a></li>
+<li><a href="#_分区方式">11.2. 分区方式</a></li>
+<li><a href="#_sql">11.3. SQL</a></li>
+</ul>
+</li>
+<li><a href="#_清除wal日志">12. 清除WAL日志</a></li>
+<li><a href="#_查询优化">13. 查询优化</a>
+<ul class="sectlevel2">
+<li><a href="#_逻辑优化">13.1. 逻辑优化</a></li>
+<li><a href="#_物理优化">13.2. 物理优化</a></li>
+</ul>
+</li>
+<li><a href="#_pgbench">14. pgbench</a>
+<ul class="sectlevel2">
+<li><a href="#_初始化数据集">14.1. 初始化数据集</a></li>
+<li><a href="#_sql性能测试">14.2. SQL性能测试</a></li>
+</ul>
+</li>
+<li><a href="#_参考配置">15. 参考配置</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_安装"><a class="link" href="#_安装">1. 安装</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_docker"><a class="link" href="#_docker">1.1. docker</a></h3>
+<div class="listingblock">
+<div class="title">docker-compose.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">version: '3'
+services:
+    postgresql:
+        image: postgres:alpine
+        container_name: postgresql
+        volumes:
+            - ~/volumes/postgresql/:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_USER=jy
+            - POSTGRES_PASSWORD=123456
+            - TZ=Asia/Shanghai
+        network_mode: host</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_安装包安装"><a class="link" href="#_安装包安装">1.2. 安装包安装</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">groupadd postgres
+useradd postgres -g postgres
+passwd postgres
+mkdir -p /database/pg/pg_root
+chown -R postgres:postgres /database/pg
+
+sudo apt install postgresql-all
+initdb -D /database/pg/pg_root -E UTF8 --locale=C -U postgres -W</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_基本命令"><a class="link" href="#_基本命令">2. 基本命令</a></h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 创建db
+createdb -U &lt;username&gt; &lt;dbName&gt;
+# 删除b
+dropdb -U &lt;username&gt; &lt;dbName&gt;
+# 重建索引
+reindexdb -d &lt;dbName&gt;
+# 对数据库物理文件垃圾回收
+vacuumdb &lt;dbName&gt;
+# 清除数据库中未引用的大对象
+vacuumlo &lt;dbName&gt;
+
+pgdump
+pgrestore
+pgbench
+# 登录数据库
+psql [-h HOST] [-p PORT] DB [USERNAME]
+# 获取pg配置
+pg_config
+# 获取数据库状态
+pg_ctl -D &lt;data-dir&gt; status
+# 启动数据库
+postgres -D &lt;data-dir&gt; &amp;
+# 关闭数据库
+pg_ctl -D &lt;data-dir&gt; -m [fast|smart|immediate]  -t &lt;timeout&gt; stop</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_配置"><a class="link" href="#_配置">3. 配置</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pg_hba_conf"><a class="link" href="#_pg_hba_conf">3.1. pg_hba.conf</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">TYPE  DATABASE  USER  ADDRESS  METHOD</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>TYPE: 允许连接的方式</p>
+<div class="ulist">
+<ul>
+<li>
+<p>local: Unix domain socket</p>
+</li>
+<li>
+<p>host: TCP/IP, localhost default</p>
+</li>
+<li>
+<p>hostssl: OpenSSL restrict</p>
+</li>
+<li>
+<p>hostnossl: SSL not permitted</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>METHOD: 认证方法</p>
+<div class="ulist">
+<ul>
+<li>
+<p>trust</p>
+</li>
+<li>
+<p>password: 明文密码</p>
+</li>
+<li>
+<p>md5</p>
+</li>
+<li>
+<p>reject: 拒绝访问</p>
+</li>
+<li>
+<p>scram-sha-256</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_postgresql_conf"><a class="link" href="#_postgresql_conf">3.2. postgresql.conf</a></h3>
+<div class="literalblock">
+<div class="content">
+<pre>postgresql 启动时postgresql.auto.conf会覆盖postgresql.conf内容
+更改配置生效: pg_ctl -D &lt;data-dir&gt; reload</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_psql命令"><a class="link" href="#_psql命令">4. psql命令</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>psql -c "SQL" [-d DB_NAME] [-U USERNAME] [-W PASSWORD] [-f SQL_FILE]</p>
+</li>
+<li>
+<p>\db: 查看表空间</p>
+</li>
+<li>
+<p>\l: 查看数据库</p>
+</li>
+<li>
+<p>\d &lt;DB_NAME&gt;: 查看表定义</p>
+</li>
+<li>
+<p>\dt+ &lt;DB_NAME&gt;: 查看表空间大小</p>
+</li>
+<li>
+<p>\di+ &lt;IDX_NAME&gt;: 查看索引空间大小</p>
+</li>
+<li>
+<p>\x: 切换查询显示模式</p>
+</li>
+<li>
+<p>COPY &lt;DB&gt; FROM|TO "FILE_PATH" : (大表)导入导出数据(必须有superuser权限)</p>
+</li>
+<li>
+<p>\copy &lt;DB&gt; FROM|TO "FILE_PATH" : (小表)导入导出数据</p>
+</li>
+<li>
+<p>\set VAR_NAME VALUE: 设置变量, :VAR_NAME 使用</p>
+</li>
+<li>
+<p>\timing: 开启sql计时</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_数据类型"><a class="link" href="#_数据类型">5. 数据类型</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_数字类型"><a class="link" href="#_数字类型">5.1. 数字类型</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>int2 int4 int8</p>
+</li>
+<li>
+<p>decimal/numeric[(precision,scale)]</p>
+</li>
+<li>
+<p>real 6位十进制精度浮点数</p>
+</li>
+<li>
+<p>double precision 15位十进制精度浮点数</p>
+</li>
+<li>
+<p>smallserial/serial/bigserial 2/4/8字节自增序列</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_字符串类型"><a class="link" href="#_字符串类型">5.2. 字符串类型</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>varchar/character varying 变长</p>
+</li>
+<li>
+<p>character/char 定长</p>
+</li>
+<li>
+<p>text 变长, 长度小于1GB</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_日期类型"><a class="link" href="#_日期类型">5.3. 日期类型</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>timestamp[without time zone] 不带时区的时间戳</p>
+</li>
+<li>
+<p>timestamp[with time zone] / timestamptz 带时区的时间戳</p>
+</li>
+<li>
+<p>date 日期</p>
+</li>
+<li>
+<p>time[with[out] time zone] 一天的时间</p>
+</li>
+<li>
+<p>interval 时间间隔</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_range类型"><a class="link" href="#_range类型">5.4. range类型</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>int4range</p>
+</li>
+<li>
+<p>int8range</p>
+</li>
+<li>
+<p>numrange</p>
+</li>
+<li>
+<p>tsrange</p>
+</li>
+<li>
+<p>tstzrange</p>
+</li>
+<li>
+<p>daterange</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_其他"><a class="link" href="#_其他">5.5. 其他</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>boolean</p>
+</li>
+<li>
+<p>cidr/inet/macaddr/macaddr8</p>
+</li>
+<li>
+<p>数组</p>
+</li>
+<li>
+<p>json/jsonb</p>
+</li>
+</ul>
+</div>
+<div class="ulist">
+<div class="title">json和jsonb的区别</div>
+<ul>
+<li>
+<p>json以文本格式存储, jsonb以二进制存储.</p>
+</li>
+<li>
+<p>json输入和输出的键顺序保持一致, jsonb不保证.</p>
+</li>
+<li>
+<p>json会保留输入中的空格, jsonb不会.</p>
+</li>
+<li>
+<p>jsonb会删除重复的键, 只保留最后一个.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_函数"><a class="link" href="#_函数">6. 函数</a></h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-postgresql hljs" data-lang="postgresql">-- 计算字符串中的字符数
+select char_length('abcd'); -- 4
+-- 计算字符串占用的字节数
+select octet_length('abcd'); -- 4
+-- 获取字符在字符串中的位置, 位置从1开始
+select position('bc' in 'abcd'); -- 2
+-- 提取字符串中的子串
+select substring('abcd' from 2 for 3); -- bcd
+-- 分割字符串
+select split_part('abc,def,ghi', ',', 2); -- def
+
+-- 时间字段提取
+select extract(year from '2019-07-15:12:34:56'::timestamp); -- 2019
+
+-- 数组两种形式
+select array[1,2,3];
+select '{1,2,3}';
+-- 获取数组指定下标元素, 位置从1开始
+select arr[1] from (select array[1,2,3] arr) a; -- 1
+-- 数组追加元素
+select array_append(array[1,2,3],4); -- {1,2,3,4}
+select array[1,2,3]||4;
+select array[1,2,3] || array[1,2,3]; -- {1,2,3,1,2,3}
+-- 数组删除元素
+select array_remove(array[1,2,2,2,3],2); -- {1,3}
+-- 判断数组是否相等
+select array[1,2,3] = array [1,2,2,2,3]; -- false
+-- 判断数组是否不相等
+select array[1,2,3] &lt;&gt; array [1,2,2,2,3]; -- true
+-- 比较数组
+select array[1,2,3] &lt;= array[2,1]; -- true
+select array[1,2,3] &gt;= array[2,1]; -- false
+-- 判断数组包含关系
+select array[1,2,3] @&gt; array[1]; -- true
+select array[1,2,3] &lt;@ array[1,2,3,4,5]; -- true
+-- 判断数组是否有公共元素
+select array[1,2,3] &amp;&amp; array[22]; -- false
+-- 获取数组维度
+select array_dims(array[[4],[3],[2],[1]]); -- [1:4] [1:1]
+-- 获取数组指定维度的长度
+select array_length(array[1,2,3,4],1); -- 3
+select array_length(array[[4],[3],[2],[1]],2); -- 1
+-- 获取数组某一个元素第一次出现的位置, 位置从1开始
+select array_position(array[1,2,3],3); -- 3
+-- 替换数组指定元素
+select array_replace(array[1,2,3],2,11); -- {1,11,3}
+-- 数组转为字符串
+select array_to_string(array[1,2,3,null],',','99'); -- 1,2,3
+
+-- 范围
+select int4range(1,10,'[]'); -- [1,11)
+select daterange('2019-06-01','2019-07-02'); -- [2019-06-01,2019-07-02)
+-- 获取范围下界
+select lower(int4range(1,10));
+-- 获取范围上界
+select upper(int4range(1,10));
+-- 判断范围是否为空
+select isempty(int4range(1,10));
+
+-- json表示
+select '{"a":1}'::json;
+-- json字段值获取
+select j -&gt; 'a' from ( select '{"a":1}'::json j) sub; -- 1
+-- 提取json中的键值对
+select * from json_each('{"a":1,"b":2}'::json); -- a 1 b 2
+select * from json_each_text('{"a":"aaa","b":2}'::json); -- a 1 b 2
+-- 删除jsonb中的key
+select '{"a":1,"b":2}'::jsonb - 'a'; -- {"b":2}
+-- 判断key是否为顶层key
+select '{"a":1,"b":2, "c":{"d":4}}'::jsonb ? 'd'; -- false
+-- 获取json所有key
+select json_object_keys('{"a":1,"b":2}'); -- a b
+-- 删除json指定key
+select '{"a":1,"b":2, "c":{"d":4}}'::jsonb - 'a'; -- {"b": 2, "c": {"d": 4}}
+-- 删除json嵌套key
+select '{"a":1,"b":2, "c":{"d":4}}'::jsonb #- '{c,d}'::text[];</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_高级特性"><a class="link" href="#_高级特性">7. 高级特性</a></h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>with从句</p>
+</li>
+<li>
+<p>批量插入: insert into select from / insert into values (),() / COPY</p>
+</li>
+<li>
+<p>upsert:
+insert into &#8230;&#8203; on conflict do {NOTHING | update set &lt;colName&gt; = EXCLUDED.colName}</p>
+</li>
+<li>
+<p>insert/update/delete .. returning *</p>
+</li>
+<li>
+<p>select from &lt;table&gt; TABLESAMPLE {SYSTEM | BERNOULLI}</p>
+</li>
+<li>
+<p>string_agg() / array_agg()</p>
+</li>
+<li>
+<p>窗口函数</p>
+<div class="ulist">
+<ul>
+<li>
+<p>row_number() : <code>select row_number() OVER partition by &lt;colName&gt;</code>,eg: 1,2,3, 1</p>
+</li>
+<li>
+<p>rank() : 分组重复则序号相同, 但下一个分组内不同行的序号保持增长,eg: 1,1,3</p>
+</li>
+<li>
+<p>dense_rank() : 分组重复则序号相同, 下一个分组内不同行的序号继续增长,eg: 1,1,2</p>
+</li>
+<li>
+<p>lag(field,offset,defaultValue): 获取行偏移offset那行某个字段的数据(offset为正向上偏移,为负则相反)</p>
+</li>
+<li>
+<p>first_value(field): 取分组第一行数据</p>
+</li>
+<li>
+<p>last_value(field): 取分组最后一行数据</p>
+</li>
+<li>
+<p>nth_value(field,line): 取分组指定行数据</p>
+</li>
+<li>
+<p>别名: select &#8230;&#8203;[rank() over NAME] from &lt;table&gt; WINDOW &lt;NAME&gt; AS ()</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_monitor"><a class="link" href="#_monitor">8. Monitor</a></h2>
+<div class="sectionbody">
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><a href="https://www.postgresql.org/docs/current/monitoring-stats.html" class="bare">https://www.postgresql.org/docs/current/monitoring-stats.html</a></p>
+</div>
+</blockquote>
+</div>
+<div class="sect2">
+<h3 id="_pg_stat_activity"><a class="link" href="#_pg_stat_activity">8.1. pg_stat_activity</a></h3>
+<div class="paragraph">
+<p>查看实时连接.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. pg_stat_activity schema</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">列名</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">datid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据库id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">datname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据库名称</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">服务于这个连接的进程id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">usesysid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">连接的用户id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">usename</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">连接的用户名</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">application_name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">应用名称</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">client_addr</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">客户端ip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">client_hostname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">客户端主机名</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">client_port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">客户端端口号</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">backend_start</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">连接何时被启动</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xact_start</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">事务何时被启动</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">query_start</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">连接查询起始时间</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">state_change</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">state列修改时间</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wait_event_type</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">wait_event</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">state</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">连接状态:
+* active: 后台进程正在执行该SQL.
+* idle: 后台进程处于空闲状态, 等待后续客户端发出命令.
+* idle in transaction: 后台进程正在事务中.
+* idle in transaction(aborted): 事务中的部分SQL异常.
+* fastpath function call: 正在执行fast-path函数.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">query</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当前或上一次的sql语句</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">backend_xid</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">backend_xmin</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">backend_type</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-postgresql hljs" data-lang="postgresql">-- 查看活动会话
+select pid, client_addr, query_start, state, query, wait_event, wait_event_type
+from pg_stat_activity
+where datid is not null
+  and pid &lt;&gt; pg_backend_pid()
+order by query_start desc;
+
+-- 查看数据库连接数
+select datname, client_addr, count(*)
+from pg_stat_activity
+where pid &lt;&gt; pg_backend_pid()
+group by datname, client_addr
+order by 1, 2, 3 desc;
+
+-- 查看会话状态统计
+select datname,
+       count(*)                                                AS open,
+       count(*) filter ( where state = 'active' )              AS active,
+       count(*) filter ( where state = 'idle' )                AS idle,
+       count(*) filter ( where state = 'idle in transaction' ) AS idle_in_tx
+from pg_stat_activity
+where backend_type = 'client backend'
+group by rollup (1);
+
+-- 查看当前事务
+select pid, xact_start, now() - xact_start AS duration
+from pg_stat_activity
+where state like '%transaction%'
+order by 3 desc;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pg_stat_database"><a class="link" href="#_pg_stat_database">8.2. pg_stat_database</a></h3>
+<div class="paragraph">
+<p>查看数据库统计信息.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. pg_stat_database schema</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">列名</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">datid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据库id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">datname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据库名</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">numbackends</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当前打开的数据库连接数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xact_commit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">倾向于事务提交</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">xact_rollback</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">倾向于事务回滚</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">blks_read</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">缓冲未命中数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">blks_hit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">缓冲命中数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tup_returned</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">返回行数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tup_fetched</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">查询行数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tup_inserted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">插入行数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tup_updated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">更新行数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">tup_deleted</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">删除行数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">conflicts</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">temp_files</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">磁盘临时文件数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">temp_bytes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">磁盘临时文件大小</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deadlocks</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">死锁次数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">blk_read_time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IO读操作花费时间</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">blk_write_time</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IO写操作花费时间</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>blk_read_time/blk_write_time默认为空, 需要打开 <code>track_io_time</code> 参数, 可以使用 <code>pg_test_timing</code> 命令测试计时性能.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pg_stat_user_tables"><a class="link" href="#_pg_stat_user_tables">8.3. pg_stat_user_tables</a></h3>
+<div class="paragraph">
+<p>显示各个表的活动.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. pg_stat_user_tables schema</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">列名</th>
+<th class="tableblock halign-left valign-top">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">relid</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">表id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">schemaname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">schema名</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">relname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">表名</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">seq_scan</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">顺序扫描次数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">seq_tup_read</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">顺序扫描时元组读取个数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">idx_scan</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">索引使用次数</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">idx_tup_fetch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">索引元组返回个数</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="title">检测哪些表可能需要索引</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">select schemaname, relname, seq_scan, seq_tup_read, seq_tup_read / seq_scan as avg, idx_scan
+from pg_stat_user_tables
+where seq_scan &gt; 0
+order by seq_tup_read desc
+limit 25;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pg_stat_statements"><a class="link" href="#_pg_stat_statements">8.4. pg_stat_statements</a></h3>
+<div class="listingblock">
+<div class="title">查看耗時最多的sql</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">select round((100 * total_time / sum(total_time) over ())::numeric, 2) AS percent,
+       round(total_time::numeric, 2)                                   AS total,
+       calls,
+       round(mean_time::numeric, 2)                                    AS mean,
+       query
+from pg_stat_statements
+order by total_time desc
+limit 10;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_体系结构"><a class="link" href="#_体系结构">9. 体系结构</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_逻辑结构"><a class="link" href="#_逻辑结构">9.1. 逻辑结构</a></h3>
+<div class="literalblock">
+<div class="content">
+<pre>创建一个Database时会为这个Database创建一个名为public的默认schema.
+相同数据库不同schema可以拥有相同名称的table/index/view/sequence/function等</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_物理结构"><a class="link" href="#_物理结构">9.2. 物理结构</a></h3>
+<div class="sect3">
+<h4 id="_oid"><a class="link" href="#_oid">9.2.1. OID</a></h4>
+<div class="literalblock">
+<div class="content">
+<pre>OID,对象标识符,无符号4字节整数.所有的数据库对象由各自的OID管理</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>数据库对象OID保存在pg_database系统表里.</p>
+</li>
+<li>
+<p>表/索引/序列等对象OID保存在pg_class系统表里.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_表空间"><a class="link" href="#_表空间">9.2.2. 表空间</a></h4>
+<div class="literalblock">
+<div class="content">
+<pre>初始化数据库目录时会自动创建两个表空间: pg_global和pg_default</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>pg_global保存在global目录中, 用来保存系统表</p>
+</li>
+<li>
+<p>pg_default保存在base目录中, 默认数据库表空间</p>
+<div class="literalblock">
+<div class="content">
+<pre>每个数据库的oid都是base目录下的子目录, 表文件在所属数据库目录下以表OID命名.
+杜宇超过1GB大小的表文件则会自动切分为多个文件存储,以OID.&lt;seq&gt; 命名</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_进程结构"><a class="link" href="#_进程结构">9.3. 进程结构</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>postmaster</p>
+</li>
+<li>
+<p>postgres</p>
+</li>
+<li>
+<p>syslogger</p>
+</li>
+<li>
+<p>checkpointer</p>
+</li>
+<li>
+<p>bgwriter</p>
+</li>
+<li>
+<p>walwriter</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_内存结构"><a class="link" href="#_内存结构">9.4. 内存结构</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>本地内存</p>
+<div class="ulist">
+<ul>
+<li>
+<p>work_mem: ORDER BY/DISTINCT会用到</p>
+</li>
+<li>
+<p>maintenance_work_mem: VACUUM/REINDEX/CREATE INDEX会用到</p>
+</li>
+<li>
+<p>temp_buffers: 临时表操作会用到</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>共享内存</p>
+<div class="ulist">
+<ul>
+<li>
+<p>shared buffer pool: 将表/索引文件载入内存</p>
+</li>
+<li>
+<p>WAL buffer: WAL文件持久化缓冲区</p>
+</li>
+<li>
+<p>CommitLog buffer: commit log中保存事务的状态,保存在缓冲区</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_事务"><a class="link" href="#_事务">10. 事务</a></h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">create table tbl_mvcc
+(
+    id   bigserial primary key,
+    ival integer
+);
+insert into tbl_mvcc(ival) values (1);</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_脏读"><a class="link" href="#_脏读">10.1. 脏读</a></h3>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>一个事务看到了另外一个事务未提交的数据.
+(PostgreSQL下不可复现)</p>
+</div>
+</blockquote>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Dirty Read</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">console1</th>
+<th class="tableblock halign-left valign-top">console2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- MySQL
+set session transaction isolation level read uncommitted;
+start transaction;
+select * from tbl_mvcc where id = 1; -- 1</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">start transaction;
+update tbl_mvcc set ival = 10 where id = 1;</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">select * from tbl_mvcc where id = 1; -- 10</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_不可重复读"><a class="link" href="#_不可重复读">10.2. 不可重复读</a></h3>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>一个事务查询结果与第一次的结果不同.(受到其他已提交事务 <strong>UPDATE</strong> 的影响)</p>
+</div>
+</blockquote>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. Non-repeatable Read</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">console1</th>
+<th class="tableblock halign-left valign-top">console2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">begin transaction isolation level read committed;
+select * from tbl_mvcc where id = 1; -- 1</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">begin;
+update tbl_mvcc set ival = 10 where id = 1;
+end;</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">select * from tbl_mvcc where id = 1; -- 10</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_幻读"><a class="link" href="#_幻读">10.3. 幻读</a></h3>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>一个事务两次查询的结果集数量不一致.(受到其他已提交事务 <strong>INSERT/DELETE</strong> 的影响)</p>
+</div>
+</blockquote>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 6. Phantom Read</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">console1</th>
+<th class="tableblock halign-left valign-top">console2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">begin transaction isolation level read committed;
+select * from tbl_mvcc where id between 1 and 10;</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">begin;
+delete from tbl_mvcc where id &gt; 5 ;
+end;</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">-- 与之前结果相比少了一些数据
+select * from tbl_mvcc where id between 1 and 10;</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 7. Serialization Anomaly</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">console1</th>
+<th class="tableblock halign-left valign-top">console2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">begin transaction isolation level repeatable read;
+select ival from tbl_mvcc where id =1;</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">update tbl_mvcc set ival = 10 where id = 1;</code></pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">update tbl_mvcc set ival = 100 where id = 1;
+-- [40001] ERROR: could not serialize access due to concurrent update</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 8. 事务隔离级别</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">隔离级别</th>
+<th class="tableblock halign-left valign-top">脏读</th>
+<th class="tableblock halign-left valign-top">不可重复读</th>
+<th class="tableblock halign-left valign-top">幻读</th>
+<th class="tableblock halign-left valign-top">序列化异常</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read Uncommitted</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read Committed (PostgreSQL默认)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Repeatable Read (MySQL默认)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Serializable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_查看全局事务默认隔离级别"><a class="link" href="#_查看全局事务默认隔离级别">10.4. 查看全局事务默认隔离级别</a></h3>
+<div class="literalblock">
+<div class="content">
+<pre>select name,setting from pg_settings where name='default_transaction_isolation';</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_修改全局事务默认隔离级别"><a class="link" href="#_修改全局事务默认隔离级别">10.5. 修改全局事务默认隔离级别</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>修改postgresql.conf的default_transaction_isolation参数</p>
+</li>
+<li>
+<p><code>ALTER SYSTEM SET default_transaction_isolation TO 'REPEATABLE READ';</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_查看当前会话事务默认隔离级别"><a class="link" href="#_查看当前会话事务默认隔离级别">10.6. 查看当前会话事务默认隔离级别</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>SHOW transaction_isolation;</code></p>
+</li>
+<li>
+<p><code>select current_setting('transaction_isolation');</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_设置当前会话事务默认隔离级别"><a class="link" href="#_设置当前会话事务默认隔离级别">10.7. 设置当前会话事务默认隔离级别</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>set session characteristics as transaction isolation level REPEATABLE READ</code></p>
+</li>
+<li>
+<p><code>START|BEGIN TRANSACTION ISOLATION LEVEL READ UNCOMMITTED &#8230;&#8203; END</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_分区"><a class="link" href="#_分区">11. 分区</a></h2>
+<div class="sectionbody">
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>将一个表根据不同的规则分成多个块的行为, 称为分区, 每一个分区称为分区表.</p>
+</div>
+</blockquote>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>应用了分区规则的列会自动添加not null的约束.</p>
+</li>
+<li>
+<p>如果插入的值根据规则找不到匹配的分区, 则会报错.</p>
+</li>
+<li>
+<p>PostgreSQL 10之后才内置分区功能, 支持Range和List分区, 11之后支持Hash分区.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_优势"><a class="link" href="#_优势">11.1. 优势</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>每个分区表的索引相对于单表的索引大小会减小, 查询和更新的性能会提高</p>
+</li>
+<li>
+<p>删除特定范围的数据可以通过直接删除某个分区表实现</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+只有当表本身大小超过了物理内存的大小, 分区后才会受益.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_分区方式"><a class="link" href="#_分区方式">11.2. 分区方式</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Range分区</p>
+<div class="literalblock">
+<div class="content">
+<pre>根据某一列值的范围插入相应的分区表, 比如根据日期范围分区, 仅支持单个列.</pre>
+</div>
+</div>
+</li>
+<li>
+<p>List分区</p>
+<div class="literalblock">
+<div class="content">
+<pre>根据每个分区表的某一列值的集合分区. 支持多列/多表达式</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Hash分区</p>
+<div class="literalblock">
+<div class="content">
+<pre>根据某一列值的hash值分区</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sql"><a class="link" href="#_sql">11.3. SQL</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-postgresql hljs" data-lang="postgresql">-- 创建主表
+CREATE TABLE [ IF NOT EXISTS ] parent_table ( [
+  { column_name data_type [ COLLATE collation ] [ column_constraint [ ... ] ]
+ ] ) PARTITION BY { RANGE | LIST | HASH } ( { column_name | ( expression ) }
+-- 创建range型分区表
+CREATE TABLE partition_table_name PARTITION OF parent_table FOR VALUES FROM (start) TO (end);
+-- 创建list型分区表
+CREATE TABLE partition_table_name PARTITION OF parent_table FOR VALUES IN (val1, val2) ;
+-- 创建hash型分区表
+CREATE TABLE partition_table_name PARTITION OF parent_table FOR VALUES WITH (MODULUS 4, REMAINDER 3);
+
+-- 删除分区关系
+ALTER TABLE parent_table ATTACH PARTITION partition_table_name</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+update语句违反了当前分区键的约束会报错
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_清除wal日志"><a class="link" href="#_清除wal日志">12. 清除WAL日志</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>文档: <a href="https://www.postgresql.org/docs/current/pgarchivecleanup.html" class="bare">https://www.postgresql.org/docs/current/pgarchivecleanup.html</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pg_archivecleanup -d &lt;archive_location&gt; &lt;oldest_kept_walfile&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>如: <code>pg_archivecleanup -d /var/lib/postgresql/data/pg_wal 000000010000000000000036</code>
+会将 000000010000000000000001~000000010000000000000035所有文件删除</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<code>pg_archivecleanup -d . `ls -r | head -2 | tail -1`</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_查询优化"><a class="link" href="#_查询优化">13. 查询优化</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_逻辑优化"><a class="link" href="#_逻辑优化">13.1. 逻辑优化</a></h3>
+<div class="paragraph">
+<p>根据关系代数等价式优化查询</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>尽量将选择操作下推到叶子节点来做</p>
+</li>
+<li>
+<p>尽量在叶子节点上使用投影缩小中间结果</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_物理优化"><a class="link" href="#_物理优化">13.2. 物理优化</a></h3>
+<div class="paragraph">
+<p>通过代价估算的方式挑选代价比较低的物理路径</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pgbench"><a class="link" href="#_pgbench">14. pgbench</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>文档地址: <a href="https://www.postgresql.org/docs/current/pgbench.html" class="bare external" target="_blank" rel="noopener">https://www.postgresql.org/docs/current/pgbench.html</a></p>
+</div>
+<div class="paragraph">
+<p><code>pgbench</code> 命令是PostgreSQL自带的性能测试工具, 用于批量生产测试数据以及SQL性能测试.
+默认测试数据集由4张表组成, 可以通过 <code>-s</code> 参数设置数据量倍数, 默认数据量如下</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">表名</th>
+<th class="tableblock halign-left valign-top">数据量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pgbench_branches</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pgbench_tellers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pgbench_accounts</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pgbench_history</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2">
+<h3 id="_初始化数据集"><a class="link" href="#_初始化数据集">14.1. 初始化数据集</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pgbench -i -I dtgvpf -q -s 1000 benchtest</code></pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">参数说明:</div>
+<ul>
+<li>
+<p><code>-i</code> : 表明要进行数据初始化.</p>
+</li>
+<li>
+<p><code>-I</code> : 设置初始化步骤:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>d: 删除已经存在的测试表.</p>
+</li>
+<li>
+<p>t: 创建测试表.</p>
+</li>
+<li>
+<p>g: 生成测试数据.</p>
+</li>
+<li>
+<p>v: 执行 <code>VACUUM</code> .</p>
+</li>
+<li>
+<p>p: 创建主键.</p>
+</li>
+<li>
+<p>f: 创建外键.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>-q</code> : 每5秒数据输出一次进度, 否则每生成10万条数据输出一次.</p>
+</li>
+<li>
+<p><code>-s</code> : 设置测试数据量倍数, 如100则表示 <code>pgbench_accounts</code> 里会生成1000万条数据.</p>
+</li>
+<li>
+<p><code>benchtest</code> : 用于测试的数据库名, 示例中库名为 <code>benchtest</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sql性能测试"><a class="link" href="#_sql性能测试">14.2. SQL性能测试</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pgbench -b tpcb-like -c 100 -C -j 100 -M simple -v -P 5 -r -T 30 benchtest</code></pre>
+</div>
+</div>
+<div class="ulist">
+<div class="title">参数说明:</div>
+<ul>
+<li>
+<p><code>-b</code>: 运行内置脚本, 如果为自定义脚本, 替换为 <code>-f xxx.sql</code> 参数.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>tpcb-like: 执行一个事务块, 包括3条update, 1条select和1条insert语句.</p>
+</li>
+<li>
+<p>simple-update: 只执行3条update语句.</p>
+</li>
+<li>
+<p>select-only: 只执行1条select语句.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>-c</code> : 测试时建立的连接数量, 默认为1.</p>
+</li>
+<li>
+<p><code>-C</code> : 标识每次执行测试SQL时重新建立连接.</p>
+</li>
+<li>
+<p><code>-j</code> : pgbench线程数量.</p>
+</li>
+<li>
+<p><code>-M</code> : SQL模式: simple/extended/prepared.</p>
+</li>
+<li>
+<p><code>-v</code> : 标识测试前vacuum <code>pgbench_tellers</code> 和 <code>pgbench_branches</code> 表, 并truncate <code>pgbench_history</code> 表.</p>
+</li>
+<li>
+<p><code>-P</code> : 设置每隔几秒输出一次测试进度.</p>
+</li>
+<li>
+<p><code>-r</code> : 标识输出SQL平均执行耗时.</p>
+</li>
+<li>
+<p><code>-T</code> : 设置测试执行时间.</p>
+</li>
+<li>
+<p><code>-R</code> : 设置测试每秒发送事务数.</p>
+</li>
+<li>
+<p><code>benchtest</code> : 用于测试的数据库名, 示例中库名为 <code>benchtest</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_参考配置"><a class="link" href="#_参考配置">15. 参考配置</a></h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-conf hljs" data-lang="conf"># 固定参数
+listen_addresses = '*'
+superuser_reserved_connections = 10
+unix_socket_directories = '., /tmp'
+unix_socket_permissions = 0700
+tcp_keepalives_idle = 60
+tcp_keepalives_interval = 10
+tcp_keepalives_count = 10
+huge_pages = try
+dynamic_shared_memory_type = posix
+vacuum_cost_delay = 0
+vacuum_cost_limit = 10000
+bgwriter_delay = 10ms
+bgwriter_lru_maxpages = 1000
+bgwriter_lru_multiplier = 10.0
+bgwriter_flush_after = 512kB
+effective_io_concurrency = 0
+max_worker_processes = 256
+parallel_leader_participation = on
+old_snapshot_threshold = 6h
+wal_level = replica
+synchronous_commit = off
+full_page_writes = on
+wal_compression = on
+wal_buffers = 16MB
+wal_writer_delay = 10ms
+wal_writer_flush_after = 1MB
+checkpoint_timeout = 30min
+checkpoint_completion_target = 0.2
+checkpoint_flush_after = 256kB
+archive_mode = on
+archive_command = '/bin/date'
+max_wal_senders = 64
+max_replication_slots = 64
+hot_standby = on
+max_standby_archive_delay = 120s
+max_standby_streaming_delay = 120s
+wal_receiver_status_interval = 1s
+hot_standby_feedback = off
+max_logical_replication_workers = 64
+enable_partitionwise_join = on
+enable_partitionwise_aggregate = on
+random_page_cost = 1.1
+log_destination = 'csvlog'
+logging_collector = on
+log_directory = 'log'
+log_filename = 'postgresql-%a.log'
+log_truncate_on_rotation = on
+log_rotation_age = 1d
+log_rotation_size = 1GB
+log_min_duration_statement = 5s
+log_checkpoints = on
+log_connections = off
+log_disconnections = off
+log_error_verbosity = verbose
+log_lock_waits = on
+log_statement = 'ddl'
+log_temp_files = 256MB
+track_io_timing = on
+track_functions = pl
+autovacuum = on
+log_autovacuum_min_duration = 0
+autovacuum_vacuum_scale_factor = 0.02
+autovacuum_analyze_scale_factor = 0.01
+autovacuum_freeze_max_age = 1200000000
+autovacuum_multixact_freeze_max_age = 1250000000
+autovacuum_vacuum_cost_delay = 0ms
+idle_in_transaction_session_timeout = '6h'
+vacuum_freeze_table_age = 200000000
+vacuum_multixact_freeze_table_age = 200000000
+default_text_search_config = 'pg_catalog.english'
+shared_preload_libraries = 'pg_stat_statements'
+deadlock_timeout = 1s
+log_timezone = 'PRC'
+datestyle = 'iso, mdy'
+timezone = 'PRC'
+lc_messages = 'C'
+lc_monetary = 'C'
+lc_numeric = 'C'
+lc_time = 'C'
+
+# 动态参数(以16C64G为例)
+max_connections = 3200                 # 物理内存(GB)*1000*(1/4)/5
+shared_buffers = 16GB                  # IF use hugepage: 主机内存*(1/4)   ELSE: min(32GB, 主机内存*(1/4))
+max_prepared_transactions = 3200       # max_prepared_transactions=max_connections
+work_mem = 16MB                        # max(min(物理内存/4096, 64MB), 4MB)
+maintenance_work_mem = 1GB             # min( 8G, (主机内存*1/8)/max_parallel_maintenance_workers )
+autovacuum_work_mem = 1GB              # min( 8G, (主机内存*1/8)/autovacuum_max_workers )
+max_parallel_maintenance_workers = 8   # min( max(2, CPU核数/2) , 16 )
+max_parallel_workers_per_gather = 12   # min( max(2, CPU核数-4) , 24 )
+max_parallel_workers = 12              # max(2, CPU核数-4)
+max_wal_size = 32GB                    # shared_buffers*2
+min_wal_size = 8GB                     # shared_buffers/2
+max_sync_workers_per_subscription = 12 # min ( 32 , max(2, CPU核数-4) )
+effective_cache_size = 32GB            # 主机内存/2
+autovacuum_max_workers = 8             # max(min( 8 , CPU核数/2 ) , 5)</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2022-04-06 22:32:20 +0800
+</div>
+</div>
+<script src="js/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+<style>
+
+    .hljs-comment, .quoteblock blockquote, .quoteblock blockquote p {
+        font-style: normal;
+    }
+
+    .listingblock:hover .clipboard {
+        display: block;
+    }
+
+    .clipboard {
+        display: none;
+        border: 0;
+        font-size: .7em;
+        text-transform: uppercase;
+        font-weight: 400;
+        padding: 6px;
+        color: #999;
+        position: absolute;
+        cursor: pointer;
+        top: .425rem;
+        right: .1rem;
+        background: transparent;
+    }
+
+    code + .clipboard {
+        top: 2rem !important;
+    }
+
+    .clipboard:hover, .clipboard:focus, .clipboard:active {
+        outline: 0;
+        background-color: #eee9e6;
+    }
+</style>
+
+<script src="js/tocbot/tocbot.min.js" type="text/javascript"></script>
+<script src="js/toc.js" type="text/javascript"></script>
+<script src="https://cdn.bootcss.com/clipboard.js/2.0.4/clipboard.min.js"></script>
+<script src="js/clipboardInit.js" type="text/javascript"></script>
+</body>
+</html>

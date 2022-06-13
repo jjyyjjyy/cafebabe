@@ -1,0 +1,18 @@
+@startuml
+
+!include ../global/stylesheet.iuml
+
+interface SqlSession {
+}
+
+SqlSession <.. DefaultSqlSession
+SqlSession <.. SqlSessionManager
+SqlSessionFactory <.. SqlSessionManager
+SqlSession <.. SqlSessionTemplate
+
+note bottom of DefaultSqlSession: 非线程安全.
+note bottom of SqlSessionManager: 线程安全, 内部维护ThreadLocal变量管理SqlSession, 支持自动commit/rollback/close.
+note bottom of SqlSessionTemplate: 线程安全, 交由Spring的TransactionSynchronizationManager管理SqlSession.
+
+
+@enduml
