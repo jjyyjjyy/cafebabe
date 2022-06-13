@@ -29,6 +29,7 @@ image::http://resources-1252259164.file.myqcloud.com/images/kongfu.jpeg[]
 * link:Assembly.html[Assembly]
 
 .Ops
+* link:Nginx.html[Nginx]
 * link:Ubuntu.html[Ubuntu]
 * link:Vagrant.html[Vagrant]
 * link:Kubernetes.html[Kubernetes]

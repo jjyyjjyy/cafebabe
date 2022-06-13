@@ -1,0 +1,66 @@
+= Nginx
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: idea
+:sectlinks:
+:sectnums:
+:stem:
+:toc: left
+:toclevels: 3
+:toc-title: 目录
+:tabsize: 4
+:docinfo: shared
+
+== 安装
+
+[source,bash,role="primary"]
+.shell
+----
+export nginx_version="1.22.0"
+export nginx_package="nginx-${nginx_version}.tar.gz"
+export nginx_source_dir="/data"
+export nginx_source="${nginx_source_dir}/nginx"
+export nginx_dist="/usr/local/nginx"
+
+sudo apt install make libtool openssl
+sudo mkdir ${nginx_dist} -p && sudo chown `id -u`:`id -g` ${nginx_dist}
+sudo mkdir /data -p
+cd ${nginx_source_dir}
+sudo wget https://nginx.org/download/${nginx_package}
+sudo tar xvf ${nginx_package}
+sudo mv nginx-${nginx_version} nginx
+sudo chown `id -u`:`id -g` ${nginx_source}
+cd ${nginx_source}
+./configure
+make
+make install
+----
+
+[source,shell,role="secondary-nginx-docker-run"]
+.docker
+----
+docker run -d --net=host -v ./conf/:/etc/nginx/conf.d/ --name=nginx nginx:stable-alpine
+----
+
+[source,yaml,role="secondary-nginx-docker-compose"]
+.docker-compose
+----
+version: "3"
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:stable-alpine
+    volumes:
+      - ./conf/:/etc/nginx/conf.d/
+    network_mode: host
+----
+
+== 使用
+
+=== Nginx目录结构
+
+* sbin:
+* conf:
+* logs:
+* proxy_temp:
+* client_body_temp:

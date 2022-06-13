@@ -45,7 +45,7 @@
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>${asciidoctor.version}</version>
+                <version>${asciidoctor-maven-plugin.version}</version>
                 <configuration>
                     <sourceDirectory>${project.basedir}</sourceDirectory>
                     <backend>html5</backend>
