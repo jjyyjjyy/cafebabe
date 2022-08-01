@@ -44,7 +44,7 @@
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
         <asciidoctorj-diagram>2.2.3</asciidoctorj-diagram>
         <testcontainer.version>1.17.2</testcontainer.version>
-        <arthas.version>3.6.1</arthas.version>
+        <arthas.version>3.6.4</arthas.version>
         <javassist.version>3.29.0-GA</javassist.version>
         <logstash-logback.version>7.2</logstash-logback.version>
 
