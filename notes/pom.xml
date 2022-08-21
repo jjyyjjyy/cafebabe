@@ -68,6 +68,7 @@
                         <tabsize>4</tabsize>
                         <allow-uri-read/>
                         <stem/>
+                        <nofooter/>
                     </attributes>
                 </configuration>
                 <dependencies>
