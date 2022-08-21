@@ -24,31 +24,31 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- dependencies -->
-        <spring-boot.version>2.7.0</spring-boot.version>
-        <spring-cloud.version>2021.0.2</spring-cloud.version>
+        <spring-boot.version>2.7.3</spring-boot.version>
+        <spring-cloud.version>2021.0.3</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
-        <project-reactor.version>2020.0.19</project-reactor.version>
+        <project-reactor.version>2020.0.22</project-reactor.version>
         <mybatis.version>3.5.10</mybatis.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <guava.version>31.1-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.33</jmh.version>
         <disruptor.version>3.4.4</disruptor.version>
-        <nimbus-jose-jwt.version>9.23</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.24.2</nimbus-jose-jwt.version>
         <netty.version>4.1.75.Final</netty.version>
         <jol.version>0.16</jol.version>
-        <jcstress.version>0.14</jcstress.version>
-        <fastjson.version>1.2.80</fastjson.version>
+        <jcstress.version>0.15</jcstress.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <cglib.versin>3.3.0</cglib.versin>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
         <asciidoctorj-diagram>2.2.3</asciidoctorj-diagram>
         <testcontainer.version>1.17.2</testcontainer.version>
-        <arthas.version>3.6.1</arthas.version>
-        <javassist.version>3.29.0-GA</javassist.version>
+        <arthas.version>3.6.4</arthas.version>
+        <javassist.version>3.29.1-GA</javassist.version>
         <logstash-logback.version>7.2</logstash-logback.version>
 
-        <maven-complier-plugin.version>3.8.1</maven-complier-plugin.version>
+        <maven-complier-plugin.version>3.10.1</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
