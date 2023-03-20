@@ -1,0 +1,57 @@
+= Kafka
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: idea
+:sectlinks:
+:sectnums:
+:stem:
+:toc: left
+:toclevels: 3
+:toc-title: 目录
+:tabsize: 4
+:docinfo: shared
+
+== 介绍
+
+> Apache Kafka is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications.
+
+== 使用场景
+
+* 异步
+* 削峰填谷
+* 解耦
+
+== 基本概念
+
+* 主题
+* 分区
+* 消费者组
+* 主从
+
+== 数据可靠性
+
+Kafka Producer通过设置acks属性来控制数据可靠性级别.
+
+|===
+| acks | 说明 | 可靠性 | 效率
+
+| 0
+| 消息发送后无需确认.
+| 低
+| 高
+
+| 1
+| 消息发送后需Leader确认.
+| 中
+| 中
+
+| -1/all
+| 消息发送后需Leader和isr列表中的所有Follower节点确认.
+| 高
+| 低
+
+|===
+
+* *最多一次:* acks=0.
+* *至少一次:* acks=-1+分区副本>=2+isr列表应答的副本最少数量>=2.
+* *精确一次:* 幂等性(enable.idempotence=true)+ *至少一次*
