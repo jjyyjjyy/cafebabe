@@ -1,0 +1,52 @@
+@startuml
+
+title 启动入口: org.apache.rocketmq.broker.BrokerStartup#main
+
+BrokerStartup -> BrokerStartup : 创建BrokerController
+note left
+# 加载配置项, 配置来源:
+** --<key> <value> 配置项
+** -c指定配置文件
+# 校验NameServer地址
+# 校验从节点brokerId必须大于0
+# 加载logback日志配置: ${rocketmqHome}/conf/logback_broker.xml
+end note
+
+BrokerStartup -> BrokerController : initialize
+note left
+# 从文件中恢复Topic消息, 订阅关系和消费进度等信息
+end note
+
+BrokerController -> BrokerStartup
+BrokerStartup -> BrokerStartup : 注册shutdown回调, 调用BrokerController#shutdown
+
+BrokerStartup -> BrokerController : start
+
+BrokerController -> NettyRemotingServer : start
+note right
+# 启动messageStore
+# 启动Netty服务端, 接收外部请求并处理.
+end note
+
+NettyRemotingServer -> BrokerController
+BrokerController -> BrokerController : registerBrokerAll
+note right
+# 启动定时任务, 每30秒向NameServer上报心跳. 可通过registerNameServerPeriod配置上报间隔, 必须在10秒~60秒范围内.
+# 上报内容:
+* broker地址
+* brokerId
+* broker名称
+* 所属集群名称
+* 主节点地址
+* 主题配置数据
+end note
+BrokerController -> BrokerOuterAPI : registerBrokerAll
+note right: 遍历NameServer
+BrokerOuterAPI -> BrokerOuterAPI : registerBroker
+note right: 请求码103
+
+BrokerOuterAPI -> BrokerController
+
+BrokerController -> BrokerStartup
+
+@enduml

@@ -11,3 +11,29 @@
 :tabsize: 4
 :docinfo: shared
 
+== 特性
+
+== 路由管理
+
+=== 部署架构
+
+=== NameServer启动流程
+
+[plantuml,NameServerStartup,svg]
+....
+include::charts/rocketmq/NameServerStartup.puml[]
+....
+
+=== 路由信息管理
+
+[plantuml,RouteManagerInfo,svg]
+....
+include::charts/rocketmq/RouteManagerInfo.puml[]
+....
+
+=== Broker启动流程
+
+[plantuml,BrokerStartup,svg]
+....
+include::charts/rocketmq/BrokerStartup.puml[]
+....

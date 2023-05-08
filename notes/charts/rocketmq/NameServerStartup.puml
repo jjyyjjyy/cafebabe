@@ -1,0 +1,36 @@
+@startuml
+
+title 启动入口: org.apache.rocketmq.namesrv.NamesrvStartup#main0
+
+NamesrvStartup -> NamesrvStartup : 创建NamesrvController
+note left
+# 加载配置项, 配置来源:
+** --<key> <value> 配置项
+** -c指定配置文件, 默认使用${user.home}/namesrv/namesrv.properties
+# 加载logback日志配置: ${rocketmqHome}/conf/logback_namesrv.xml
+end note
+
+NamesrvStartup -> NamesrvController : initialize
+
+note left
+# 加载kv配置
+# 初始化NettyRemotingServer
+# 注册请求处理对象 `NettyRequestProcessor`
+# 初始化两个定时任务
+## 每10秒清理120秒内没上报心跳信息的broker
+## 每10分钟打印KV配置
+# 如果开启了SSL模式, 则加载证书配置
+end note
+
+NamesrvController -> NamesrvStartup
+NamesrvStartup -> NamesrvController : start
+
+NamesrvController -> NettyRemotingServer : start
+note right
+启动Netty服务端, 接收外部请求并处理.
+end note
+
+NettyRemotingServer -> NamesrvController
+NamesrvController -> NamesrvStartup
+
+@enduml
