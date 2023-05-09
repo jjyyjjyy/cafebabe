@@ -40,7 +40,7 @@
         <jcstress.version>0.16</jcstress.version>
         <fastjson.version>1.2.83</fastjson.version>
         <cglib.versin>3.3.0</cglib.versin>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
         <asciidoctorj-diagram>2.2.4</asciidoctorj-diagram>
         <testcontainer.version>1.17.6</testcontainer.version>
