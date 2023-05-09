@@ -13,9 +13,31 @@
 
 == 特性
 
-== 路由管理
+* 发布订阅(多生产者多消费者)
+* 顺序消息
+* 消息过滤
+* 高可用
+* 消息准实时送达
+* at least once
+* 消息回溯
+* 消息堆积
+* 定时消息
+* 消息重试
 
-=== 部署架构
+== 目录结构
+
+=== 源码
+
+[plantuml,SourceCodeDirectory4,svg]
+....
+include::charts/rocketmq/SourceCodeDirectory4.puml[]
+....
+
+=== Broker运行时
+
+== 部署架构
+
+== 路由管理
 
 === NameServer启动流程
 
@@ -25,6 +47,8 @@ include::charts/rocketmq/NameServerStartup.puml[]
 ....
 
 === 路由信息管理
+
+核心类为 `org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager` , 维护cluster, broker, topic信息.
 
 [plantuml,RouteManagerInfo,svg]
 ....
@@ -37,3 +61,30 @@ include::charts/rocketmq/RouteManagerInfo.puml[]
 ....
 include::charts/rocketmq/BrokerStartup.puml[]
 ....
+
+=== 路由删除
+
+==== 删除触发时机:
+
+* `RouteInfoManager#scanNotActiveBroker` : NameServer每10秒定时扫描brokerLiveTable, 如果最近一次的心跳包时间在120s之前, 则会剔除该Broker.
+* `BrokerController#unregisterBrokerAll` : Broker关闭时会向NameServer发送 `unregisterBroker[104]` 指令下线自己.
+
+==== Broker删除流程
+
+. 从 `brokerLiveTable` 中删除该Broker节点.
+. 从 `brokerAddrTable` 中根据brokerId删除节点.
+. 如果删除后该brokerName下无其他节点:
+.. 将整个brokerName节点列表删除.
+.. 从 `clusterAddrTable` 中删除该brokerName. 如果删除后该cluster下无其他brokerName, 则将该cluster删除.
+.. 从 `topicQueueTable` 中删除该broker下关联的所有topic路由.
+
+=== 路由发现
+
+RocketMQ客户端定时向NameServer拉取Topic路由信息.
+查找入口: `RouteInfoManager#pickupTopicRouteData`
+
+==== Topic路由信息组成
+
+. 从 `topicQueueTable` 中获取到各个Broker的Topic配置信息.
+. 从 `brokerAddrTable` 中获取到各个Broker的节点信息.
+. 如果NameServer支持顺序消息, 则从kv配置中获取该Topic的 `ORDER_TOPIC_CONFIG` 配置.

@@ -13,7 +13,7 @@ note left
 end note
 
 BrokerStartup -> BrokerController : initialize
-note left
+note right
 # 从文件中恢复Topic消息, 订阅关系和消费进度等信息
 end note
 
@@ -42,9 +42,16 @@ note right
 end note
 BrokerController -> BrokerOuterAPI : registerBrokerAll
 note right: 遍历NameServer
-BrokerOuterAPI -> BrokerOuterAPI : registerBroker
-note right: 请求码103
+BrokerOuterAPI -> "namesrv:RouteInfoManager" : registerBroker [103]
+note right
+# 更新clusterAddrTable
+# 更新brokerAddrTable当前broker节点信息, 先删后增
+# 如果Topic配置变更, 则更新topicQueueTable
+# 更新brokerLiveTable中的最近一次心跳时间
+# 如果当前上报的broker是从节点, 则找出主节点ip返回出去
+end note
 
+"namesrv:RouteInfoManager" -> BrokerOuterAPI
 BrokerOuterAPI -> BrokerController
 
 BrokerController -> BrokerStartup
