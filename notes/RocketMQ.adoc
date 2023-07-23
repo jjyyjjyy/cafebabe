@@ -30,7 +30,7 @@
 
 [plantuml,SourceCodeDirectory4,svg]
 ....
-include::charts/rocketmq/SourceCodeDirectory4.puml[]
+include::charts/rocketmq/SourceCodeDirectory.puml[]
 ....
 
 === Broker运行时

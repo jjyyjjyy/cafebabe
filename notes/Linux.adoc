@@ -1,0 +1,64 @@
+= Linux
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: idea
+:sectlinks:
+:sectnums:
+:stem:
+:toc: left
+:toclevels: 3
+:toc-title: 目录
+:tabsize: 4
+:docinfo: shared
+
+== 观测工具
+
+|===
+| 类型 | 系统级别 | 进程级别
+
+| 固定计数器
+a|
+* vmstat
+* mpstat
+* iostat
+* nstat
+* sar
+a|
+* ps
+* top
+* pmap
+
+| 剖析
+a|
+* perf
+* profile
+* Intel VTune Amplifier XE
+a|
+* grof
+* cachegrind
+* JFR
+
+| 跟踪
+a|
+* tcpdump
+* biosnoop
+* execsnoop
+* perf
+* perf trace
+* Ftrace
+* BCC
+* bpftrace
+a|
+* strace
+* gdb
+
+| 监测
+a|
+* sar
+* SNMP
+* PCP
+* Prometheus
+* collectd
+|
+
+|===

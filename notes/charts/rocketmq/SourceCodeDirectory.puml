@@ -1,0 +1,24 @@
+@startuml
+
+component RocketMQ [
+  <:open_file_folder:> **rocket-mq**
+  |_<:open_file_folder:> **acl** \t 权限控制模块
+  |_<:open_file_folder:> **broker** \t broker模块
+  |_<:open_file_folder:> **client** \t 消息客户端, 包含消息生产者和消息消费者相关类
+  |_<:open_file_folder:> **common** \t 公共包
+  |_<:open_file_folder:> **dev** \t 开发者信息
+  |_<:open_file_folder:> **distribution** \t 打包分发目录
+  |_<:open_file_folder:> **docs** \t 文档
+  |_<:open_file_folder:> **example** \t RocketMQ示例代码
+  |_<:open_file_folder:> **filter** \t 消息过滤相关基础类
+  |_<:open_file_folder:> **logging** \t 日志实现相关类
+  |_<:open_file_folder:> **namesrv** \t NameServer实现相关类
+  |_<:open_file_folder:> **openmessaging** \t 消息开放标准
+  |_<:open_file_folder:> **remoting** \t Netty远程通信模块
+  |_<:open_file_folder:> **srvutil** \t server工具类
+  |_<:open_file_folder:> **store** \t 消息存储实现相关类
+  |_<:open_file_folder:> **style** \t 代码checkstyle相关实现
+  |_<:open_file_folder:> **test** \t 测试相关类
+  |_<:open_file_folder:> **tools** \t 工具类
+]
+@enduml

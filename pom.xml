@@ -27,7 +27,7 @@
         <spring-boot.version>3.0.4</spring-boot.version>
         <spring-cloud.version>2022.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
-        <project-reactor.version>2022.0.5</project-reactor.version>
+        <project-reactor.version>2022.0.9</project-reactor.version>
         <mybatis.version>3.5.13</mybatis.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <guava.version>31.1-jre</guava.version>
@@ -35,14 +35,14 @@
         <jmh.version>1.36</jmh.version>
         <disruptor.version>3.4.4</disruptor.version>
         <nimbus-jose-jwt.version>9.31</nimbus-jose-jwt.version>
-        <netty.version>4.1.90.Final</netty.version>
+        <netty.version>4.1.95.Final</netty.version>
         <jol.version>0.17</jol.version>
         <jcstress.version>0.16</jcstress.version>
         <fastjson.version>1.2.83</fastjson.version>
         <cglib.versin>3.3.0</cglib.versin>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
-        <asciidoctorj-diagram>2.2.4</asciidoctorj-diagram>
+        <asciidoctorj-diagram>2.2.9</asciidoctorj-diagram>
         <testcontainer.version>1.17.6</testcontainer.version>
         <arthas.version>3.6.7</arthas.version>
         <javassist.version>3.29.2-GA</javassist.version>
