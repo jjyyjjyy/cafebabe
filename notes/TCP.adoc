@@ -392,6 +392,131 @@ note over A: [CLOSED]
 
 == 拥塞控制
 
+=== 窗口
+
+* stem:["rwnd"] : 发送方从收到的ACK中被告知的接收方缓冲区大小.
+* stem:["cwnd"] : 发送方经过拥塞控制算法计算出的拥塞窗口大小.
+* stem:["swnd"] : 发送方最终计算到的发送窗口大小. stem:["swnd"=min("rwnd","cwnd")]
+
+=== 基本阶段
+
+==== 慢启动
+
+. 第一次 `cwnd = 1` , 后续窗口加上收到的ACK个数.
+. 当发生丢包 (超时重传或收到重复ACK) 时, `cwnd` 重置为1, 重新进行慢启动.
+
+==== 拥塞避免
+
+. 设置 `ssthresh` 阈值为 `cwnd` 的一半.
+. `cwnd < ssthresh` 时, 仍然指数增长 `cwnd` .
+. `cwnd >= ssthresh` 时, 每收到 `cwnd` 个ACK时, `cwnd` 才会加1, 实现慢速线性增长.
+
+==== 快速恢复
+
+. 收到重复ACK时, 设置 `ssthresh` 阈值为 `cwnd` 的一半, 重置 `cwnd = cwnd / 2 + 重复ACK个数`. (快速重传)
+. 收到重传报文对应的ACK后, 重置 `cwnd = ssthresh` , 进行拥塞避免阶段.
+
+////
+
+[source,javascript]
+----
+option = {
+  xAxis: {
+    type: 'category',
+    boundaryGap: false
+  },
+  yAxis: {
+    type: 'value',
+    boundaryGap: [0, '10%']
+  },
+  visualMap: {
+    type: 'piecewise',
+    show: false,
+    dimension: 0,
+    seriesIndex: 0,
+    pieces: [
+      {
+        gt: 1,
+        lt: 4,
+        color: 'rgba(0, 0, 180, 0.4)'
+      },
+      {
+        gt: 7,
+        lt: 10,
+        color: 'rgba(0, 0, 180, 0.4)'
+      },
+      {
+        gt: 20,
+        lt: 22,
+        color: 'rgba(0, 0, 180, 0.4)'
+      },
+      {
+        gt: 23,
+        lt: 31,
+        color: 'rgba(0, 0, 180, 0.4)'
+      }
+    ]
+  },
+  series: [
+    {
+      type: 'line',
+      smooth: 0.6,
+      symbol: 'none',
+      lineStyle: {
+        color: '#5470C6',
+        width: 5
+      },
+      areaStyle: {},
+      data: [
+        ['1', 1],
+        ['2', 2],
+        ['3', 4],
+        ['4', 8],
+        ['5', 16],
+        ['6', 16],
+        ['7', 16],
+        ['8', 1],
+        ['9', 2],
+        ['10', 4],
+        ['11', 8],
+        ['12', 9],
+        ['13', 10],
+        ['14', 11],
+        ['15', 12],
+        ['16', 13],
+        ['17', 14],
+        ['18', 15],
+        ['19', 16],
+        ['20', 16],
+        ['21', 11],
+        ['22', 13],
+        ['23', 16],
+        ['24', 8],
+        ['25', 9],
+        ['26', 10],
+        ['27', 11],
+        ['28', 12],
+        ['29', 13],
+        ['30', 14],
+        ['31', 15],
+        ['32', 16]
+      ]
+    }
+  ]
+};
+----
+////
+
+[[img-sunset]]
+image::images/tcp/tcp_cc.png[title="TCP拥塞控制阶段"]
+
+==== 拥塞控制算法
+
+* Reno
+* NewReno
+* CUBIC
+* BBR
+
 == 工具
 
 === tcpdump
@@ -462,4 +587,3 @@ ss -n sport \< 1024
 ss -s
 
 ----
-
