@@ -78,7 +78,7 @@
 
 === 报文格式
 
-[packetdiag]
+[packetdiag,tcp-header,svg]
 ----
 packetdiag {
   colwidth = 32;
@@ -90,8 +90,7 @@ packetdiag {
   32-63: 序  列  号(SEQ);
   64-95: 确  认  应  答  号(ACK);
   96-99: 数  据  偏  移;
-  100-102: 保  留  位;
-  103: NS [rotate = 270];
+  100-103: 保  留  位;
   104: CWR [rotate = 270];
   105: ECE [rotate = 270];
   106: URG [rotate = 270];
@@ -103,22 +102,364 @@ packetdiag {
   112-127: 窗  口  大  小;
   128-143: 校  验  和;
   144-159: 紧  急  指  针;
-  160-191: 选  项 | 填  充;
+  160-191: 选  项   |   填  充;
   192-223: 数  据 [colheight = 3];
 }
 ----
 
 == TCP连接
 
-=== 三次握手
+=== 握手流程
 
-=== 四次挥手
+==== 标准三次握手流程
 
-=== 协议选项
+[plantuml,3whs,svg]
+----
+@startuml
+
+participant Client
+participant Server
+
+Server -> Server: bind()
+Server -> Server: listen()
+
+group 三次握手
+Client -> Server: SYN\nseq=x
+note over Client: [SYN_SENT]
+/note over Server: [SYN_RECV]
+note over Server
+Syn Queue
+end note
+Server -> Client: SYN, ACK\nseq=y, ack=x+1
+note over Client: [ESTABLISHED]
+Client -> Server: ACK\nseq=x+1, ack=y+1
+/note over Server: [ESTABLISHED]
+note over Server
+Accept Queue
+end note
+end
+
+Server -> Server: accept()
+Client -> Server: write()
+Server -> Server: read()
+
+@enduml
+----
+
+[NOTE]
+====
+* 如果发送SYN包没有收到ACK, 则会经过 stem:["RTO"] 秒后重传, 如果依然没有收到则会经过 stem:[2xx"RTO"] 秒后重传, 以此类推, 可以通过系统变量 `net.ipv4.tcp_syn_retries` 设置最大SYN包重传次数, `net.ipv4.tcp_synack_retries` 设置最大SYN+ACK包重传次数.
+* 当服务端收到SYN包后, 会检查 `半连接队列` 参数 `net.ipv4.tcp_max_syn_backlog`/`net.core.somaxconn`/`backlog` , 如果半连接数超过了这一阈值, 会拒绝该连接.
+* 响应ACK, 将连接加入到 `全连接队列` 时, 会检查 `全连接队列` 参数 `net.core.somaxconn`/`backlog` , 如果全连接数超过了这一阈值, 会拒绝该连接.
+* 建立连接后, 经过 (tcp_keepalive_time + net.ipv4.tcp_keepalive_intvl * net.ipv4.tcp_keepalive_probes) 秒后无响应则会关闭连接.
+* 建立后的连接收发包会固定在一个CPU核上进行.
+* 如果半连接队列/全连接队列满了, 会导致第一次握手SYN丢包或者第三次握手ACK"丢包"/收到RST包(设置了 `tcp_abort_on_overflow=1`), 一直重试.
+检查方式:
+** `ss -lnt`
+** `watch 'netstat -s | grep overflowed'`
+** `ss -antp | grep SYN-RECV | wc -l`
+====
+
+==== 双向同时握手
+
+[plantuml,simultaneous-connection-syn,svg]
+----
+@startuml
+
+!pragma teoz true
+
+participant A as "Client"
+participant B as "Server"
+
+A ->(30) B: SYN=1, seq=100\n
+& B ->(30) A: SYN=1, seq=300
+note over A: [SYN_SENT]
+/note over B: [SYN_SENT]
+note over B: [SYN_RECV]
+/note over A: [SYN_RECV]
+B -> A: SYN, ACK\nseq=300, ack=101
+A -> B: SYN, ACK\nseq=100, ack=301
+note over A: [ESTABLISHED]
+note over B: [ESTABLISHED]
+
+@enduml
+----
+
+==== Half Open (异常端发起握手)
+
+[plantuml,half-open-connection-discovery,svg]
+----
+@startuml
+
+hide footbox
+!pragma teoz true
+
+participant A as "Client\n [CLOSED]"
+participant B as "Server\n [ESTABLISHED]"
+
+A --> B: SYN\nseq=400
+note over A: [SYN_SENT]
+B -> A: ACK\nseq=300, ack=100
+A -> B: RST\nSEQ=100
+note over B: [CLOSED]
+A -> B: SYN\nseq=400
+note over B: [SYN_RECV]
+...三次握手...
+
+@enduml
+----
+
+==== Half Open (异常端收到报文)
+
+[plantuml,active-side-causes-half-open,svg]
+----
+@startuml
+
+hide footbox
+!pragma teoz true
+
+participant A as "Client\n [CLOSED]"
+participant B as "Server\n [ESTABLISHED]"
+
+B -> A: ACK\nseq=300, ack=100
+A -> B: RST\nSEQ=100
+note over B: [CLOSED]
+...三次握手...
+
+@enduml
+----
+
+==== 旧SYN包到达
+
+[plantuml,old-duplicate-syn-initiates,svg]
+----
+@startuml
+
+hide footbox
+!pragma teoz true
+
+participant A as "Client\n [LISTEN]"
+participant B as "Server\n [LISTEN]"
+
+A -> B: ACK\nseq=300, ack=100
+note over B: [SYN_RECV]
+B -> A: SYN, ACK\nseq=400,ack=301
+A -> B: RST\nSEQ=301
+note over B: [LISTEN]
+
+@enduml
+----
+
+==== TCP FastOpen (RFC 7413)
+
+`net.ipv4.tcp_fastopen = 3`
+
+[plantuml,tcp-fast-open,svg]
+----
+@startuml
+
+participant A as "Client"
+participant B as "Server"
+
+A -> B: SYN, CookieOpt=nil
+B -> A: SYN, ACK\nCookieOpt=C
+A -> B: ACK
+...建立另一条连接...
+A -> B: SYN, CookieOpt=C, DATA_A\nsyn=x
+B -> A: SYN, ACK\nsyn=y, ack=x+length(DATA_A)+1
+B -> A: PSH, ACK, DATA_B\nack=x+length(DATA_A)+1
+A -> B: ACK\nack=y+1
+A -> B: ACK\nack=y+leng(DATA_B)+1
+
+@enduml
+----
+
+=== 挥手流程
+
+==== 标准四次挥手流程
+
+[plantuml,4whs,svg]
+----
+@startuml
+
+hide footbox
+
+participant C as "Client\n[ESTABLISHED]"
+participant S as "Server\n[ESTABLISHED]"
+
+C -> C: close()
+C -> S: FIN,ACK\nseq=100, ack=300
+note over C: [FIN-WAIT-1]
+note over S: [CLOSE-WAIT]
+S -> C: ACK\nseq=300, ack=101
+note over C: [FIN-WAIT-2]
+S -> S: close()
+S -> C: FIN, ACK\nseq=300, ack=101
+note over C: [TIME-WAIT]
+C -> S: ACK\nseq=101, ack=301
+note over S: [CLOSED]
+C -> C: 2MSL (60s)
+note over C: [CLOSED]
+
+@enduml
+----
+
+==== 双向同时挥手
+
+[plantuml,simultaneous-close-sequence,svg]
+----
+@startuml
+
+hide footbox
+!pragma teoz true
+
+participant A as "Client\n[ESTABLISHED]"
+participant B as "Server\n[ESTABLISHED]"
+
+A ->(30) B: FIN, ACK. seq=100, ack=300\n
+& B ->(30) A: FIN, ACK. seq=300, ack=100
+note over A: [FIN-WAIT-1]
+/note over B: [FIN-WAIT-1]
+
+
+A ->(30) B: FIN, ACK. seq=101, ack=301\n
+& B ->(30) A: FIN, ACK. seq=301, ack=101
+note over A: [CLOSING]
+/note over B: [CLOSING]
+note over B: [TIME-WAIT]
+/note over A: [TIME-WAIT]
+...2MSL (60s)...
+note over A: [CLOSED]
+/note over B: [CLOSED]
+
+@enduml
+----
+
+==== 延迟确认 (默认开启)
+
+[plantuml,tcp-delay-ack,svg]
+----
+@startuml
+
+hide footbox
+
+participant A as "Client\n[ESTABLISHED]"
+participant B as "Server\n[ESTABLISHED]"
+
+A -> A: close()
+A -> B: FIN,ACK\nseq=100, ack=300
+note over B: [CLOSE-WAIT]
+B -> B: close()
+B -> A: FIN, ACK\nseq=300, ack=101
+note over A: [TIME-WAIT]
+A -> B: ACK\nseq=101, ack=301
+note over B: [CLOSED]
+A -> A: 2MSL (60s)
+note over A: [CLOSED]
+
+@enduml
+----
+
+==== so_linger
+
+[source,c]
+----
+struct linger so_linger;
+so_linger.l_onoff = 1;
+so_linger.l_linger = 0;
+setsockopt(s, SOL_SOCKET, SO_LINGER, &so_linger,sizeof(so_linger));
+----
+
+[plantuml,tcp-so-linger,svg]
+----
+@startuml
+
+hide footbox
+
+participant A as "Client\n[ESTABLISHED]"
+participant B as "Server\n[ESTABLISHED]"
+
+A -> A: close()
+A -> B: FIN,ACK\nseq=100, ack=300
+note over A: [FIN-WAIT-1]
+B -> B: close()
+B -> A: RST
+note over B: [CLOSED]
+note over A: [CLOSED]
+
+@enduml
+----
 
 == 拥塞控制
 
 == 工具
 
-== 常见问题及排查思路
+=== tcpdump
+
+[source,bash]
+----
+# 监听指定网卡
+tcpdump -i eth0
+
+# 监听指定端口
+tcpdump port 8080
+tcpdump portrange 8000-8100
+
+# 监听指定ip(段)
+tcpdump host 192.168.0.2
+tcpdump net 192.168.0.0/24
+
+# 监听指定来源/目标ip/端口的报文
+tcpdump dst 1.0.0.1
+tcpdump -nnvvS src 10.5.2.3 and dst port 3389
+tcpdump 'src 10.0.2.4 and (dst port 3389 or 22)'
+
+# 监听RST包
+tcpdump 'tcp[13] & 4!=0'tcpdump 'tcp[tcpflags] == tcp-rst'
+# 监听SYN和RST包
+tcpdump 'tcp[13] = 6'
+
+# 监听GET请求
+tcpdump -vvAls0 | grep 'GET'
+
+# 输出结果到指定文件
+tcpdump host 192.168.0.2 -w 02.cap
+
+----
+
+=== netstat
+
+[source,bash]
+----
+# 查看端口占用的进程
+sudo netstat -lnp | grep 22| awk '{print $NF}'
+
+# 查看进程使用的端口号:
+sudo netstat -atpn | grep <PID>
+
+# 查看tcp使用情况分析
+sudo netstat -st
+
+# 查看所有监听的unix socket
+sudo netstat -lx
+
+----
+
+=== ss
+
+[source,bash]
+----
+# 查看指定目标地址/端口的连接
+ss dst 192.168.0.2
+
+# 查看指定状态的socket
+ss state ESTABLISHED
+
+# 查看port小于1024的socket
+ss -n sport \< 1024
+
+# 查看tcp使用情况分析
+ss -s
+
+----
 
