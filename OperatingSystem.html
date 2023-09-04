@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <title>ComputerScience</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -212,7 +212,7 @@ $(globalSwitch);
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="CompilerSystem.svg" alt="Diagram" width="2493" height="300">
+<img src="CompilerSystem.svg" alt="Diagram" width="2491" height="300">
 </div>
 <div class="title">Figure 1. 程序编译流程</div>
 </div>
@@ -272,7 +272,7 @@ $(globalSwitch);
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="StorageDeviceLevel.svg" alt="Diagram" width="176" height="823">
+<img src="StorageDeviceLevel.svg" alt="Diagram" width="176" height="827">
 </div>
 </div>
 </div>
@@ -636,16 +636,11 @@ $(globalSwitch);
 </div>
 </div>
 </div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2020-09-07 19:06:53 +0800
-</div>
-</div>
 <script src="js/highlight/highlight.min.js"></script>
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 <script type="text/x-mathjax-config">

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<title>TCP</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="js/highlight/styles/idea.min.css">
+<style>
+.hidden {
+  display: none;
+}
+
+.switch {
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: #666;
+  display: inline-block;
+}
+
+.switch--item {
+  text-align: center;
+  min-width: 40px;
+  padding: 5px;
+  background-color: #ffffff;
+  color: #666;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+  border-width: 0 0 0 1px;
+  border-style: solid;
+  border-color: #666;
+}
+
+.switch--item.selected {
+  background-color: #666;
+  color: #ffffff;
+}
+
+</style>
+<script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+  $('.primary').each(function () {
+    primary = $(this);
+    createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+    primary.children('.title').remove();
+    primary.siblings('div[class*="secondary"]')
+      .each(function (idx, node) {
+        secondary = $(node);
+        switchItem = createSwitchItem(secondary, primary.children('.switch'));
+        switchItem.content.addClass('hidden');
+        primary.append(switchItem.content);
+        secondary.remove();
+      });
+  });
+}
+
+function createBlockSwitch(primary) {
+  blockSwitch = $('<div class="switch"></div>');
+  primary.prepend(blockSwitch);
+  return blockSwitch;
+}
+
+function findPrimary(secondary) {
+  candidate = secondary.prev();
+  while (!candidate.is('.primary')) {
+    candidate = candidate.prev();
+  }
+  return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+  blockName = block.children('.title').text();
+  content = block.children('.content').first().append(block.next('.colist'));
+  item = $('<div class="switch--item">' + blockName + '</div>');
+  item.on('click', '', content, function (e) {
+    $(this).addClass('selected');
+    $(this).siblings().removeClass('selected');
+    e.data.siblings('.content').addClass('hidden');
+    e.data.removeClass('hidden');
+  });
+  blockSwitch.append(item);
+  return {'item': item, 'content': content};
+}
+
+function globalSwitch() {
+  $('.switch--item').each(function () {
+    $(this).off('click');
+    $(this).on('click', function () {
+      selectedText = $(this).text()
+      selectedIndex = $(this).index()
+      $(".switch--item").filter(function () {
+        return ($(this).text() === selectedText)
+      }).each(function () {
+        $(this).addClass('selected');
+        $(this).siblings().removeClass('selected');
+        selectedContent = $(this).parent().siblings(".content").eq(selectedIndex)
+        selectedContent.removeClass('hidden');
+        selectedContent.siblings().addClass('hidden');
+      });
+    });
+  });
+}
+
+$(addBlockSwitches);
+$(globalSwitch);
+
+</script>
+
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>TCP</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">目录</div>
+<ul class="sectlevel1">
+<li><a href="#_协议分层模型">1. 协议分层模型</a></li>
+<li><a href="#_tcp协议简介">2. TCP协议简介</a>
+<ul class="sectlevel2">
+<li><a href="#_报文格式">2.1. 报文格式</a></li>
+</ul>
+</li>
+<li><a href="#_tcp连接">3. TCP连接</a>
+<ul class="sectlevel2">
+<li><a href="#_握手流程">3.1. 握手流程</a>
+<ul class="sectlevel3">
+<li><a href="#_标准三次握手流程">3.1.1. 标准三次握手流程</a></li>
+<li><a href="#_双向同时握手">3.1.2. 双向同时握手</a></li>
+<li><a href="#_half_open_异常端发起握手">3.1.3. Half Open (异常端发起握手)</a></li>
+<li><a href="#_half_open_异常端收到报文">3.1.4. Half Open (异常端收到报文)</a></li>
+<li><a href="#_旧syn包到达">3.1.5. 旧SYN包到达</a></li>
+<li><a href="#_tcp_fastopen_rfc_7413">3.1.6. TCP FastOpen (RFC 7413)</a></li>
+</ul>
+</li>
+<li><a href="#_挥手流程">3.2. 挥手流程</a>
+<ul class="sectlevel3">
+<li><a href="#_标准四次挥手流程">3.2.1. 标准四次挥手流程</a></li>
+<li><a href="#_双向同时挥手">3.2.2. 双向同时挥手</a></li>
+<li><a href="#_延迟确认_默认开启">3.2.3. 延迟确认 (默认开启)</a></li>
+<li><a href="#_so_linger">3.2.4. so_linger</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_拥塞控制">4. 拥塞控制</a>
+<ul class="sectlevel2">
+<li><a href="#_窗口">4.1. 窗口</a></li>
+<li><a href="#_基本阶段">4.2. 基本阶段</a>
+<ul class="sectlevel3">
+<li><a href="#_慢启动">4.2.1. 慢启动</a></li>
+<li><a href="#_拥塞避免">4.2.2. 拥塞避免</a></li>
+<li><a href="#_快速恢复">4.2.3. 快速恢复</a></li>
+<li><a href="#_拥塞控制算法">4.2.4. 拥塞控制算法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_工具">5. 工具</a>
+<ul class="sectlevel2">
+<li><a href="#_tcpdump">5.1. tcpdump</a></li>
+<li><a href="#_netstat">5.2. netstat</a></li>
+<li><a href="#_ss">5.3. ss</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_协议分层模型"><a class="link" href="#_协议分层模型">1. 协议分层模型</a></h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">OSI参考模型</th>
+<th class="tableblock halign-left valign-top">TCP/IP参考模型</th>
+<th class="tableblock halign-left valign-top">常见协议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">应用层</p></td>
+<td class="tableblock halign-left valign-top" rowspan="3"><p class="tableblock">应用层</p></td>
+<td class="tableblock halign-left valign-top" rowspan="3"><p class="tableblock">HTTP FTP SMTP SSH</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">表示层</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">会话层</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">传输层</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">传输层</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TCP UDP RTP SCTP</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">网络层</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">互联网层</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">IP ICMP</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">数据链路层</p></td>
+<td class="tableblock halign-left valign-top" rowspan="2"><p class="tableblock">网络接口层</p></td>
+<td class="tableblock halign-left valign-top" rowspan="2"><p class="tableblock">IEEE802.3 IEEE802.11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">物理层</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. 数据包格式</caption>
+<colgroup>
+<col style="width: 10%;">
+<col style="width: 10%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top">以太网首部</th>
+<th class="tableblock halign-center valign-top">IP首部</th>
+<th class="tableblock halign-center valign-top">TCP首部</th>
+<th class="tableblock halign-center valign-top">HTTP请求/响应头</th>
+<th class="tableblock halign-center valign-top">数据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top" rowspan="3"><p class="tableblock">L2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">L3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">L4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">L7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">应用程序</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock">&lt;20字节&gt;</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">&lt;20~60字节&gt;</p></td>
+<td class="tableblock halign-center valign-top" colspan="2"><p class="tableblock">&lt;MSS&gt;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top" colspan="4"><p class="tableblock">&lt;MTU: 1500/9000&gt;</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tcp协议简介"><a class="link" href="#_tcp协议简介">2. TCP协议简介</a></h2>
+<div class="sectionbody">
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><code>TCP</code> 是一种面向连接的、可靠的、有序的、基于字节流的传输层通信协议. [RFC9293]</p>
+</div>
+</blockquote>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>面向连接: 确认通信设备间连接的开始和结束, 同时通过拥塞控制机制保障端到端的高可靠通信.</p>
+</li>
+<li>
+<p>可靠的: 通过ACK确认机制确保数据传输完成.</p>
+</li>
+<li>
+<p>有序的: 通过SEQ机制对收到的分段顺序进行管理.</p>
+</li>
+<li>
+<p>基于字节流: 无边界.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_报文格式"><a class="link" href="#_报文格式">2.1. 报文格式</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre>Failed to generate image: Could not find the 'packetdiag', 'packetdiag3' executable in PATH; add it to the PATH or specify its location using the 'packetdiag' document attribute
+packetdiag {
+  colwidth = 32;
+  node_height = 60;
+  default_fontsize = 16;
+
+  0-15: 发  送  方  口  号;
+  16-31: 目  的  地  端 口  号;
+  32-63: 序  列  号(SEQ);
+  64-95: 确  认  应  答  号(ACK);
+  96-99: 数  据  偏  移;
+  100-103: 保  留  位;
+  104: CWR [rotate = 270];
+  105: ECE [rotate = 270];
+  106: URG [rotate = 270];
+  107: ACK [rotate = 270];
+  108: PSH [rotate = 270];
+  109: RST [rotate = 270];
+  110: SYN [rotate = 270];
+  111: FIN [rotate = 270];
+  112-127: 窗  口  大  小;
+  128-143: 校  验  和;
+  144-159: 紧  急  指  针;
+  160-191: 选  项   |   填  充;
+  192-223: 数  据 [colheight = 3];
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tcp连接"><a class="link" href="#_tcp连接">3. TCP连接</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_握手流程"><a class="link" href="#_握手流程">3.1. 握手流程</a></h3>
+<div class="sect3">
+<h4 id="_标准三次握手流程"><a class="link" href="#_标准三次握手流程">3.1.1. 标准三次握手流程</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="3whs.svg" alt="3whs" width="294" height="632">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="ulist">
+<ul>
+<li>
+<p>如果发送SYN包没有收到ACK, 则会经过 \$"RTO"\$ 秒后重传, 如果依然没有收到则会经过 \$2xx"RTO"\$ 秒后重传, 以此类推, 可以通过系统变量 <code>net.ipv4.tcp_syn_retries</code> 设置最大SYN包重传次数, <code>net.ipv4.tcp_synack_retries</code> 设置最大SYN+ACK包重传次数.</p>
+</li>
+<li>
+<p>当服务端收到SYN包后, 会检查 <code>半连接队列</code> 参数 <code>net.ipv4.tcp_max_syn_backlog</code>/<code>net.core.somaxconn</code>/<code>backlog</code> , 如果半连接数超过了这一阈值, 会拒绝该连接.</p>
+</li>
+<li>
+<p>响应ACK, 将连接加入到 <code>全连接队列</code> 时, 会检查 <code>全连接队列</code> 参数 <code>net.core.somaxconn</code>/<code>backlog</code> , 如果全连接数超过了这一阈值, 会拒绝该连接.</p>
+</li>
+<li>
+<p>建立连接后, 经过 (tcp_keepalive_time + net.ipv4.tcp_keepalive_intvl * net.ipv4.tcp_keepalive_probes) 秒后无响应则会关闭连接.</p>
+</li>
+<li>
+<p>建立后的连接收发包会固定在一个CPU核上进行.</p>
+</li>
+<li>
+<p>如果半连接队列/全连接队列满了, 会导致第一次握手SYN丢包或者第三次握手ACK"丢包"/收到RST包(设置了 <code>tcp_abort_on_overflow=1</code>), 一直重试.
+检查方式:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>ss -lnt</code></p>
+</li>
+<li>
+<p><code>watch 'netstat -s | grep overflowed'</code></p>
+</li>
+<li>
+<p><code>ss -antp | grep SYN-RECV | wc -l</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_双向同时握手"><a class="link" href="#_双向同时握手">3.1.2. 双向同时握手</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="simultaneous-connection-syn.svg" alt="simultaneous connection syn" width="273" height="396">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_half_open_异常端发起握手"><a class="link" href="#_half_open_异常端发起握手">3.1.3. Half Open (异常端发起握手)</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="half-open-connection-discovery.svg" alt="half open connection discovery" width="265" height="403">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_half_open_异常端收到报文"><a class="link" href="#_half_open_异常端收到报文">3.1.4. Half Open (异常端收到报文)</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="active-side-causes-half-open.svg" alt="active side causes half open" width="255" height="243">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_旧syn包到达"><a class="link" href="#_旧syn包到达">3.1.5. 旧SYN包到达</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="old-duplicate-syn-initiates.svg" alt="old duplicate syn initiates" width="239" height="282">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_tcp_fastopen_rfc_7413"><a class="link" href="#_tcp_fastopen_rfc_7413">3.1.6. TCP FastOpen (RFC 7413)</a></h4>
+<div class="paragraph">
+<p><code>net.ipv4.tcp_fastopen = 3</code></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="tcp-fast-open.svg" alt="tcp fast open" width="305" height="459">
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_挥手流程"><a class="link" href="#_挥手流程">3.2. 挥手流程</a></h3>
+<div class="sect3">
+<h4 id="_标准四次挥手流程"><a class="link" href="#_标准四次挥手流程">3.2.1. 标准四次挥手流程</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="4whs.svg" alt="4whs" width="269" height="597">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_双向同时挥手"><a class="link" href="#_双向同时挥手">3.2.2. 双向同时挥手</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="simultaneous-close-sequence.svg" alt="simultaneous close sequence" width="333" height="409">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_延迟确认_默认开启"><a class="link" href="#_延迟确认_默认开启">3.2.3. 延迟确认 (默认开启)</a></h4>
+<div class="imageblock">
+<div class="content">
+<img src="tcp-delay-ack.svg" alt="tcp delay ack" width="269" height="482">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_so_linger"><a class="link" href="#_so_linger">3.2.4. so_linger</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c hljs" data-lang="c">struct linger so_linger;
+so_linger.l_onoff = 1;
+so_linger.l_linger = 0;
+setsockopt(s, SOL_SOCKET, SO_LINGER, &amp;so_linger,sizeof(so_linger));</code></pre>
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="tcp-so-linger.svg" alt="tcp so linger" width="269" height="344">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_拥塞控制"><a class="link" href="#_拥塞控制">4. 拥塞控制</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_窗口"><a class="link" href="#_窗口">4.1. 窗口</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>\$"rwnd"\$ : 发送方从收到的ACK中被告知的接收方缓冲区大小.</p>
+</li>
+<li>
+<p>\$"cwnd"\$ : 发送方经过拥塞控制算法计算出的拥塞窗口大小.</p>
+</li>
+<li>
+<p>\$"swnd"\$ : 发送方最终计算到的发送窗口大小. \$"swnd"=min("rwnd","cwnd")\$</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_基本阶段"><a class="link" href="#_基本阶段">4.2. 基本阶段</a></h3>
+<div class="sect3">
+<h4 id="_慢启动"><a class="link" href="#_慢启动">4.2.1. 慢启动</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>第一次 <code>cwnd = 1</code> , 后续窗口加上收到的ACK个数.</p>
+</li>
+<li>
+<p>当发生丢包 (超时重传或收到重复ACK) 时, <code>cwnd</code> 重置为1, 重新进行慢启动.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_拥塞避免"><a class="link" href="#_拥塞避免">4.2.2. 拥塞避免</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>设置 <code>ssthresh</code> 阈值为 <code>cwnd</code> 的一半.</p>
+</li>
+<li>
+<p><code>cwnd &lt; ssthresh</code> 时, 仍然指数增长 <code>cwnd</code> .</p>
+</li>
+<li>
+<p><code>cwnd &gt;= ssthresh</code> 时, 每收到 <code>cwnd</code> 个ACK时, <code>cwnd</code> 才会加1, 实现慢速线性增长.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_快速恢复"><a class="link" href="#_快速恢复">4.2.3. 快速恢复</a></h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>收到重复ACK时, 设置 <code>ssthresh</code> 阈值为 <code>cwnd</code> 的一半, 重置 <code>cwnd = cwnd / 2 + 重复ACK个数</code>. (快速重传)</p>
+</li>
+<li>
+<p>收到重传报文对应的ACK后, 重置 <code>cwnd = ssthresh</code> , 进行拥塞避免阶段.</p>
+</li>
+</ol>
+</div>
+<div id="img-sunset" class="imageblock">
+<div class="content">
+<img src="images/tcp/tcp_cc.png" alt="tcp cc">
+</div>
+<div class="title">Figure 1. TCP拥塞控制阶段</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_拥塞控制算法"><a class="link" href="#_拥塞控制算法">4.2.4. 拥塞控制算法</a></h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Reno</p>
+</li>
+<li>
+<p>NewReno</p>
+</li>
+<li>
+<p>CUBIC</p>
+</li>
+<li>
+<p>BBR</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_工具"><a class="link" href="#_工具">5. 工具</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_tcpdump"><a class="link" href="#_tcpdump">5.1. tcpdump</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 监听指定网卡
+tcpdump -i eth0
+
+# 监听指定端口
+tcpdump port 8080
+tcpdump portrange 8000-8100
+
+# 监听指定ip(段)
+tcpdump host 192.168.0.2
+tcpdump net 192.168.0.0/24
+
+# 监听指定来源/目标ip/端口的报文
+tcpdump dst 1.0.0.1
+tcpdump -nnvvS src 10.5.2.3 and dst port 3389
+tcpdump 'src 10.0.2.4 and (dst port 3389 or 22)'
+
+# 监听RST包
+tcpdump 'tcp[13] &amp; 4!=0'tcpdump 'tcp[tcpflags] == tcp-rst'
+# 监听SYN和RST包
+tcpdump 'tcp[13] = 6'
+
+# 监听GET请求
+tcpdump -vvAls0 | grep 'GET'
+
+# 输出结果到指定文件
+tcpdump host 192.168.0.2 -w 02.cap</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_netstat"><a class="link" href="#_netstat">5.2. netstat</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 查看端口占用的进程
+sudo netstat -lnp | grep 22| awk '{print $NF}'
+
+# 查看进程使用的端口号:
+sudo netstat -atpn | grep &lt;PID&gt;
+
+# 查看tcp使用情况分析
+sudo netstat -st
+
+# 查看所有监听的unix socket
+sudo netstat -lx</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ss"><a class="link" href="#_ss">5.3. ss</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 查看指定目标地址/端口的连接
+ss dst 192.168.0.2
+
+# 查看指定状态的socket
+ss state ESTABLISHED
+
+# 查看port小于1024的socket
+ss -n sport \&lt; 1024
+
+# 查看tcp使用情况分析
+ss -s</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="js/highlight/highlight.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [["\\$", "\\$"]],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: { equationNumbers: { autoNumber: "none" } }
+})
+MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
+  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
+    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
+      data.math.root.display = "block"
+    }
+    return data
+  })
+})
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+<style>
+
+    .hljs-comment, .quoteblock blockquote, .quoteblock blockquote p {
+        font-style: normal;
+    }
+
+    .listingblock:hover .clipboard {
+        display: block;
+    }
+
+    .clipboard {
+        display: none;
+        border: 0;
+        font-size: .7em;
+        text-transform: uppercase;
+        font-weight: 400;
+        padding: 6px;
+        color: #999;
+        position: absolute;
+        cursor: pointer;
+        top: .425rem;
+        right: .1rem;
+        background: transparent;
+    }
+
+    code + .clipboard {
+        top: 2rem !important;
+    }
+
+    .clipboard:hover, .clipboard:focus, .clipboard:active {
+        outline: 0;
+        background-color: #eee9e6;
+    }
+</style>
+
+<script src="js/tocbot/tocbot.min.js" type="text/javascript"></script>
+<script src="js/toc.js" type="text/javascript"></script>
+<script src="https://cdn.bootcss.com/clipboard.js/2.0.4/clipboard.min.js"></script>
+<script src="js/clipboardInit.js" type="text/javascript"></script>
+</body>
+</html>

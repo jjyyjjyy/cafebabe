@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <title>Penguin&#8217;s Homeland</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -210,6 +210,9 @@ $(globalSwitch);
 <li>
 <p><a href="RabbitMQ.html">Spring AMQP</a></p>
 </li>
+<li>
+<p><a href="RocketMQ.html">RocketMQ</a></p>
+</li>
 </ul>
 </div>
 <div class="ulist">
@@ -255,16 +258,11 @@ $(globalSwitch);
 </div>
 </div>
 </div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2022-06-13 22:09:55 +0800
-</div>
-</div>
 <script src="js/highlight/highlight.min.js"></script>
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 <script type="text/x-mathjax-config">

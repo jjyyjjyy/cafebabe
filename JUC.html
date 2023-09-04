@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.17">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <title>JUC</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -322,11 +322,118 @@ $(globalSwitch);
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="imageblock">
+<div class="listingblock">
+<div class="title">Java并发思维导图</div>
 <div class="content">
-<img src="JUC.svg" alt="Diagram" width="2508" height="3162">
+<pre>Failed to generate image: PlantUML preprocessing failed: [From &lt;input&gt; (line 8) ]
+
+@startmindmap
+
+
+
+
+...
+... ( skipping 110 lines )
+...
+    roundcorner 8
+
+    NoteFontName Roboto Condensed
+    NoteFontStyle Italic
+
+}
+
+&lt;style&gt;
+  mindmapDiagram {
+    node {
+      BackgroundColor #FFF
+      LineColor #000
+    }
+  }
+&lt;/style&gt;
+
+
+* JUC
+
+left
+^^^^^
+ Syntax Error?
+
+@startmindmap
+
+!include ../global/stylesheet.iuml
+!include ../global/mindmap.iuml
+
+* JUC
+
+left
+
+** 1. 多线程基础
+*** 创建线程的方式
+**** 继承Thread
+**** 实现Runnable接口, 创建Thread对象
+**** 实现Callable接口, 创建FutureTask对象
+*** 关闭线程的方式
+**** 设置关闭标志位
+**** 中断线程
+*** 线程状态流转
+**** NEW
+**** RUNNABLE
+**** WAITING
+**** TIMED_WAITING
+**** BLOCKED
+**** TERMINATED
+*** volatile
+*** synchronized
+*** JMM
+** 锁
+*** 互斥锁
+*** 读写锁
+*** Condition
+** CAS
+*** 实现原理
+*** ABA问题解决
+*** CAS工具类
+**** AtomicInteger
+**** AtomicLong
+**** AtomicBoolean
+**** AtomicReference
+**** AtomicIntegerArray
+**** AtomicLongArray
+**** AtomicReferenceArray
+**** AtomicIntegerFieldUpdater
+**** AtomicLongFieldUpdater
+**** LongAddr
+
+right
+
+** 并发工具类
+*** Semaphore
+*** CountDownLatch
+*** CyclicBarrier
+*** Exchanger
+*** Phaser
+** 并发容器
+*** BlockingQueue
+*** BlockingDeque
+*** CopyOnWrite
+*** ConcurrentLinkedQueue
+*** ConcurrentLinkedDeque
+*** ConcurrentHashMap
+*** ConcurrentSkipListMap
+** 线程池
+*** 线程池类型
+*** 线程池关闭
+*** 线程调度流程
+*** 实现
+**** ThreadPoolExecutor
+**** ScheduledThreadPoolExecutor
+**** ForkJoinPool
+** 异步
+*** Future
+*** CompletableFuture
+
+@endmindmap</pre>
 </div>
-<div class="title">Figure 1. Java并发思维导图</div>
 </div>
 </div>
 </div>
@@ -512,9 +619,9 @@ public class ThreadC implements Callable&lt;String&gt; {
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="ThreadState.svg" alt="Diagram" width="2208" height="1066">
+<img src="ThreadState.svg" alt="Diagram" width="2216" height="1066">
 </div>
-<div class="title">Figure 2. 线程状态流转图</div>
+<div class="title">Figure 1. 线程状态流转图</div>
 </div>
 </div>
 </div>
@@ -1065,11 +1172,71 @@ LongAddr求和的时候没有对单元加锁, 所以取值操作只满足最终�
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_reentrantlock"><a class="link" href="#_reentrantlock">7.1. ReentrantLock</a></h3>
-<div class="imageblock">
+<div class="listingblock">
+<div class="title">ReentrantLock类图</div>
 <div class="content">
-<img src="ReentrantLock.svg" alt="Diagram" width="1750" height="1010">
+<pre>Failed to generate image: PlantUML preprocessing failed: [From &lt;input&gt; (line 18) ]
+
+@startuml
+
+
+
+
+...
+... ( skipping 111 lines )
+...
+
+    NoteFontName Roboto Condensed
+    NoteFontStyle Italic
+
+}
+
+interface Lock {
+  + void lock();
+  + void lockInterruptibly() throws InterruptedException;
+  + boolean tryLock();
+  + boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+  + void unlock();
+  + Condition newCondition();
+}
+class ReentrantLock
+Lock &lt;.. ReentrantLock
+
+class AbstractOwnableSynchronizer
+class AbstractQueuedSynchronizer
+class ReentrantLock.Sync
+^^^^^
+ Bad hierarchy for class ReentrantLock.Sync
+
+@startuml
+
+!include ../../charts/global/stylesheet.iuml
+
+interface Lock {
+  + void lock();
+  + void lockInterruptibly() throws InterruptedException;
+  + boolean tryLock();
+  + boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
+  + void unlock();
+  + Condition newCondition();
+}
+class ReentrantLock
+Lock &lt;.. ReentrantLock
+
+class AbstractOwnableSynchronizer
+class AbstractQueuedSynchronizer
+class ReentrantLock.Sync
+class ReentrantLock.NonfairSync
+class ReentrantLock.FairSync
+AbstractOwnableSynchronizer &lt;|-- AbstractQueuedSynchronizer
+AbstractQueuedSynchronizer &lt;|-- ReentrantLock.Sync
+ReentrantLock.Sync &lt;|-- ReentrantLock.NonfairSync
+ReentrantLock.Sync &lt;|-- ReentrantLock.FairSync
+
+ReentrantLock -&gt; ReentrantLock.Sync
+
+@enduml</pre>
 </div>
-<div class="title">Figure 3. ReentrantLock类图</div>
 </div>
 <div class="ulist">
 <div class="title">ReentrantLock与synchronized对比</div>
@@ -1439,11 +1606,78 @@ LongAddr求和的时候没有对单元加锁, 所以取值操作只满足最终�
 <div class="paragraph">
 <p><code>ReentrantReadWriteLock</code> 实现了读写/写写互斥, 但是读读不互斥.</p>
 </div>
-<div class="imageblock">
+<div class="listingblock">
+<div class="title">ReentrantReadWriteLock类图</div>
 <div class="content">
-<img src="ReentrantReadWriteLock.svg" alt="Diagram" width="1660" height="852">
+<pre>Failed to generate image: PlantUML preprocessing failed: [From &lt;input&gt; (line 19) ]
+
+@startuml
+
+
+
+
+...
+... ( skipping 112 lines )
+...
+    NoteFontName Roboto Condensed
+    NoteFontStyle Italic
+
+}
+
+class AbstractQueuedSynchronizer
+
+class ReentrantReadWriteLock {
+  + ReentrantReadWriteLock.ReadLock  readLock();
+  + ReentrantReadWriteLock.WriteLock writeLock();
+}
+
+class ReentrantReadWriteLock.Sync {
+  # int tryAcquireShared(int);
+  # boolean tryReleaseShared(int);
+  # boolean tryAcquire(int);
+  # boolean tryRelease(int);
+  boolean readerShouldBlock();
+  boolean writerShouldBlock();
+}
+^^^^^
+ Bad hierarchy for class ReentrantReadWriteLock.Sync
+
+@startuml
+
+!include ../../charts/global/stylesheet.iuml
+
+class AbstractQueuedSynchronizer
+
+class ReentrantReadWriteLock {
+  + ReentrantReadWriteLock.ReadLock  readLock();
+  + ReentrantReadWriteLock.WriteLock writeLock();
+}
+
+class ReentrantReadWriteLock.Sync {
+  # int tryAcquireShared(int);
+  # boolean tryReleaseShared(int);
+  # boolean tryAcquire(int);
+  # boolean tryRelease(int);
+  boolean readerShouldBlock();
+  boolean writerShouldBlock();
+}
+class ReentrantReadWriteLock.NonfairSync {
+  boolean readerShouldBlock();
+  boolean writerShouldBlock();
+}
+class ReentrantReadWriteLock.FairSync {
+  boolean readerShouldBlock();
+  boolean writerShouldBlock();
+}
+
+AbstractQueuedSynchronizer &lt;|-- ReentrantReadWriteLock.Sync
+ReentrantReadWriteLock.Sync &lt;|-- ReentrantReadWriteLock.NonfairSync
+ReentrantReadWriteLock.Sync &lt;|-- ReentrantReadWriteLock.FairSync
+
+ReentrantReadWriteLock -&gt; ReentrantReadWriteLock.Sync
+
+@enduml</pre>
 </div>
-<div class="title">Figure 4. ReentrantReadWriteLock类图</div>
 </div>
 <div class="paragraph">
 <p><code>ReentrantReadWriteLock</code> 内部将state高16位维护持有共享锁线程的重入次数, 低16位维护持有排他锁线程的重入次数, 这是为了CAS无法同时对两个变量操作.<br>
@@ -4027,7 +4261,7 @@ public class DelayQueue&lt;E extends Delayed&gt; extends AbstractQueue&lt;E&gt; 
 <h3 id="_线程池状态"><a class="link" href="#_线程池状态">10.3. 线程池状态</a></h3>
 <div class="imageblock">
 <div class="content">
-<img src="ThreadPoolState.svg" alt="Diagram" width="829" height="766">
+<img src="ThreadPoolState.svg" alt="Diagram" width="827" height="766">
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -5181,16 +5415,11 @@ public class MCSLock implements Lock {
 </div>
 </div>
 </div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2021-11-19 11:05:32 +0800
-</div>
-</div>
 <script src="js/highlight/highlight.min.js"></script>
 <script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>
 <script type="text/x-mathjax-config">

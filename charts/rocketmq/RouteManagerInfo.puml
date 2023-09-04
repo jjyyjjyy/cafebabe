@@ -1,0 +1,84 @@
+@startuml
+
+title "路由信息存储类: org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager"
+
+json "Map<String/* clusterName */, Set<String/* brokerName */>> clusterAddrTable" as clusterAddrTable {
+	"DefaultCluster": ["broker-a"]
+}
+
+note top of clusterAddrTable
+=== cluster-broker关联数据
+存储集群下所有的broker名称(各个主节点的broker名称不同, 从节点与主节点broker名称一致)
+end note
+
+
+json "Map<String/* brokerName */, BrokerData> brokerAddrTable" as brokerAddrTable {
+ 	"broker-a": {
+ 		"brokerAddrs": {
+ 			"0": "127.0.0.1:10911"
+ 		},
+ 		"brokerName": "broker-a",
+ 		"cluster": "DefaultCluster"
+ 	}
+}
+
+note top of brokerAddrTable
+=== Broker信息
+* broker名称和所属集群名称.
+* broker下节点列表, id为0的是Master节点.
+end note
+
+
+json "Map<String/* brokerAddr */, BrokerLiveInfo> brokerLiveTable" as brokerLiveTable {
+	"127.0.0.1:10911": {
+		"channel": {
+			"active": true,
+			"inputShutdown": false,
+			"open": true,
+			"outputShutdown": false,
+			"registered": true,
+			"shutdown": false,
+			"writable": true
+		},
+		"dataVersion": {
+			"counter": 1,
+			"timestamp": 1683556032204
+		},
+		"haServerAddr": "127.0.0.1:10912",
+		"lastUpdateTimestamp": 1683557542510
+	}
+}
+
+note top of brokerLiveTable
+=== 每个Broker节点信息
+end note
+
+
+json "Map<String/* topic */, Map<String /* brokerName */ , QueueData>> topicQueueTable" AS topicQueueTable {
+	"SELF_TEST_TOPIC": {
+		"broker-a": {
+			"brokerName": "broker-a",
+			"perm": 6,
+			"readQueueNums": 1,
+			"topicSysFlag": 0,
+			"writeQueueNums": 1
+		}
+	},
+	"TBW102": {
+		"broker-a": {
+			"brokerName": "broker-a",
+			"perm": 7,
+			"readQueueNums": 8,
+			"topicSysFlag": 0,
+			"writeQueueNums": 8
+		}
+	}
+}
+
+note top of topicQueueTable
+=== Topic-Broker关联数据
+存储每个topic在各个broker的配置数据
+end note
+
+
+@enduml
