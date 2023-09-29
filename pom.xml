@@ -43,7 +43,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
         <asciidoctorj-diagram>2.2.13</asciidoctorj-diagram>
-        <testcontainer.version>3.0.1</testcontainer.version>
+        <testcontainer.version>3.0.3</testcontainer.version>
         <arthas.version>3.7.1</arthas.version>
         <javassist.version>3.29.2-GA</javassist.version>
         <logstash-logback.version>7.4</logstash-logback.version>
