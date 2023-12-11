@@ -121,6 +121,12 @@ $(globalSwitch);
 <div id="toctitle">目录</div>
 <ul class="sectlevel1">
 <li><a href="#_观测工具">1. 观测工具</a></li>
+<li><a href="#_perf">2. perf</a>
+<ul class="sectlevel2">
+<li><a href="#_安装">2.1. 安装</a></li>
+<li><a href="#_命令">2.2. 命令</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -272,6 +278,68 @@ $(globalSwitch);
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_perf"><a class="link" href="#_perf">2. perf</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_安装"><a class="link" href="#_安装">2.1. 安装</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">sudo apt install -y bison flex libelf-dev libnewt-dev libdw-dev libaudit-dev libiberty-dev libunwind-dev \
+          libcap-dev libzstd-dev liblzma-dev libnuma-dev libssl-dev systemtap-sdt-dev libbabeltrace-ctf-dev \
+          libperl-dev libtraceevent-dev \
+          binutils-dev gcc-multilib \
+          python3-dev \
+          libgtk2.0-dev git
+
+git clone --depth 1 --filter=blob:none --sparse https://github.com/torvalds/linux.git
+cd linux
+git sparse-checkout set tools scripts arch
+git fetch --depth 1 origin v6.2
+export PERF_EXEC_PATH=$PWD/tools/perf
+nice make -C $PERF_EXEC_PATH -j $(nproc) PYTHON=/usr/bin/python3
+
+sudo mkdir -p d3-flame-graph
+sudo wget https://cdn.jsdelivr.net/npm/d3-flame-graph/dist/templates/d3-flamegraph-base.html -O /usr/share/d3-flame-graph/d3-flamegraph-base.html</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_命令"><a class="link" href="#_命令">2.2. 命令</a></h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># 列出可追踪的事件
+perf list
+perf list 'sched:*'
+
+# 列出当前可用的动态探查器
+perf probe -l
+
+# Counting Mode: 统计一段时间内发生的指定事件次数
+# 统计所有CPU(-a参数, 默认)上的事件次数, 持续10s
+perf stat -a -- sleep 10
+# 统计所有CPU(-a参数, 默认)上的事件次数, by CPU展示, 持续10s
+perf stat -a -A -- sleep 10
+# 统计pid200上的事件次数, 持续10s
+perf stat -p 200 -- sleep 10
+# 统计cycles事件次数, 1秒输出一次, 持续10s
+perf stat -a -e cycles -I 1000 -- sleep 10
+
+# Sampling Mode
+# 采集top命令在CPU上的函数栈信息, 采样频率为100Hz
+perf record -F 100 top
+# 采集pid200在CPU上的函数栈信息, 采样频率为100Hz, 持续10s
+perf record -F 100 -p 200 --call-graph dwarf sleep 10
+# 采集最热的进程名和区段
+perf record -F 50 -ns comm,dso
+
+# 火焰图
+sudo env PERF_EXEC_PATH=/path/to/perf $PERF_EXEC_PATH/perf script flamegraph -a -F 99 -g -p 47 sleep 10</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>

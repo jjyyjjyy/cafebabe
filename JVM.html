@@ -193,7 +193,16 @@ $(globalSwitch);
 <li><a href="#_parallel">12.2. Parallel</a></li>
 <li><a href="#_parnew">12.3. ParNew</a></li>
 <li><a href="#_cms">12.4. CMS</a></li>
-<li><a href="#_g1">12.5. G1</a></li>
+<li><a href="#_g1">12.5. G1</a>
+<ul class="sectlevel3">
+<li><a href="#_region">12.5.1. Region</a></li>
+<li><a href="#_cardtable">12.5.2. CardTable</a></li>
+<li><a href="#_rememberset">12.5.3. RememberSet</a></li>
+<li><a href="#_三色标记">12.5.4. 三色标记</a></li>
+<li><a href="#_并发标记">12.5.5. 并发标记</a></li>
+<li><a href="#_g1主要回收流程">12.5.6. G1主要回收流程</a></li>
+</ul>
+</li>
 <li><a href="#_zgc">12.6. ZGC</a></li>
 </ul>
 </li>
@@ -1552,25 +1561,89 @@ JDK9默认收集器
 </table>
 </div>
 <div class="paragraph">
-<p>G1将堆划分为多个大小相等的独立区域, 每个区域可以根据需要扮演Eden/Survivor/Old/Humongous空间.<br>
-使用 <code>-XX:+UseG1GC</code> 启动G1收集器.</p>
+<p>使用 <code>-XX:+UseG1GC</code> 启动G1收集器.</p>
 </div>
+<div class="sect3">
+<h4 id="_region"><a class="link" href="#_region">12.5.1. Region</a></h4>
+<div class="paragraph">
+<p>G1将堆划分为多个大小相等的独立区域, 每个区域可以根据需要扮演Eden/Survivor/Old/Humongous空间.<br>
+每个region大小限制在1MB~32MB之间, 通过 <code>-XX:G1HeapRegionSize</code> 参数指定.<br>
+如果不指定, 则默认为 <code>min(32MB, max(round(Xmx/2048), 1MB))</code> , 如果计算出来超过32MB.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cardtable"><a class="link" href="#_cardtable">12.5.2. CardTable</a></h4>
+<div class="paragraph">
+<p>CardTable是用来记录跨代引用关系的数据结构( <code>point-out</code> : 描述我指向谁). JVM全局维护一个bitmap数组, 大小为Xmx/512B, 每一位标识地址在 <code>n*512</code> 到 <code>(n+1)*512-1</code> 区域的内存页.<br>
+如果该区域存在Old区引用Young区对象则为1, 否则为0.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rememberset"><a class="link" href="#_rememberset">12.5.3. RememberSet</a></h4>
+<div class="paragraph">
+<p>每个region存在一个RememberSet, 存储有哪些Region引用当前Region的对象, 以及这些指针在CardTable的范围内.<br>
+如old区obj1.field = Young区的obj2, 则obj2所处的region的RememberSet会记录obj1所处region的地址, 以及obj1在region中的card索引号(从0开始).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_三色标记"><a class="link" href="#_三色标记">12.5.4. 三色标记</a></h4>
+<div class="paragraph">
+<p>在标记过程中从GC Root对象开始遍历所有引用对象, 使用三种颜色标识对象是否需要回收:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>黑色: 表示对象及其所有引用已被遍历过, 且该对象存活. 如果有其他对象引用该黑色对象, 则无需再次遍历.</p>
+</li>
+<li>
+<p>灰色: 表示对象被遍历到, 但其还有引用对象没被遍历到.</p>
+</li>
+<li>
+<p>白色: 表示对象没被遍历到, 即对象不可达需要被回收.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_并发标记"><a class="link" href="#_并发标记">12.5.5. 并发标记</a></h4>
+<div class="paragraph">
+<p>原始快照(SATB): 为解决并发标记过程中Mutator线程修改了遍历中或者遍历过的对象引用, 在并发标记过程中, 将灰色对象被Mutator线程删除白色对象引用时记录下该灰色对象, 待并发标记阶段结束后,<br>
+再重新遍历一次灰色对象及其 <strong>原始的</strong> 引用对象集合.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_g1主要回收流程"><a class="link" href="#_g1主要回收流程">12.5.6. G1主要回收流程</a></h4>
 <div class="olist arabic">
-<div class="title">G1回收流程</div>
+<div class="title">YoungGC</div>
 <ol class="arabic">
 <li>
-<p>初始标记: 单线程标记 <code>GC Roots</code> 对象.</p>
+<p>遍历RootSet和Young区的RememberSet对象.</p>
 </li>
 <li>
-<p>并发标记: 从 <code>GC Roots</code> 对象开始遍历整个对象图.</p>
+<p>将根对象和RememberSet中的对象和他们引用的对象复制到Survivor区.</p>
 </li>
 <li>
-<p>最终标记: 修正并发标记期间, 因用户程序继续运作而导致标记变动的那部分对象的标记记录.</p>
-</li>
-<li>
-<p>筛选回收: 将回收的Region存活下来的对象复制到空的Region中再清空原来的Region.</p>
+<p>清理Eden和CardTable, 重新构建Young区的RememberSet.</p>
 </li>
 </ol>
+</div>
+<div class="olist arabic">
+<div class="title">MixGC</div>
+<ol class="arabic">
+<li>
+<p>初始标记(STW): 标记 <code>GC Roots</code> 对象.</p>
+</li>
+<li>
+<p>并发标记: 从 <code>GC Roots</code> 对象开始遍历整个对象图(三色标记: 黑色为存活对象, 灰色为遍历中对象, 白色为待回收对象).</p>
+</li>
+<li>
+<p>最终标记(STW): 修正并发标记期间, 因用户程序继续运作而导致标记变动的那部分对象的标记记录.</p>
+</li>
+<li>
+<p>筛选回收(STW): 计算每个待回收old region的代价找到回收收益最高的若干region, 和所有的young region一起回收, 将存活下来的对象复制到空的Region中再清空原来的Region.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1624,24 +1697,28 @@ JDK11新增的收集器
 <p>事务型应用, 关注低延迟. <code>CMS/G1/ZGC</code></p>
 </li>
 <li>
-<p>客户端/嵌入式设备应用, 关注内存占用.</p>
+<p>客户端/嵌入式设备应用, 关注内存占用. <code>Serial</code></p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_永远不要把堆内存的大小设置的比机器物理内存大"><a class="link" href="#_永远不要把堆内存的大小设置的比机器物理内存大">13.2. 永远不要把堆内存的大小设置的比机器物理内存大</a></h3>
-<div class="literalblock">
-<div class="content">
-<pre>Full GC时JVM会访问整个堆的内容, 内存交换会拖慢GC的速度. 使用-Xms和-Xmx分别设置堆内存的最小值和最大值.
-默认64位JVM堆内存初始值为取512MB和物理内存大小1/64二者中的最小值, 最大值取32G和物理内存大小1/4二者中的最小值.</pre>
-</div>
+<div class="paragraph">
+<p>Full GC时JVM会访问整个堆的内容, 内存交换会拖慢GC的速度. 使用-Xms和-Xmx分别设置堆内存的最小值和最大值.<br>
+默认64位JVM堆内存初始值为取512MB和物理内存大小1/64二者中的最小值, 最大值取32G和物理内存大小1/4二者中的最小值.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_调整新生代与老年代的大小"><a class="link" href="#_调整新生代与老年代的大小">13.3. 调整新生代与老年代的大小</a></h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>G1GC不设置Xmn, 让JVM自动调整新生代和老年代的大小</p>
+</li>
+<li>
+<p>新生代大小设置参数, 后者优先级更高</p>
 <div class="ulist">
-<div class="title">新生代大小设置参数, 后者优先级更高</div>
 <ul>
 <li>
 <p>-XX:NewRatio 设置新生代与老年代的比例, 默认值为2. 默认情况下新生代大小初始值等于 <code>初始堆大小/(1+NewRatio)</code></p>
@@ -1656,6 +1733,9 @@ JDK11新增的收集器
 <p>-Xmn 同时设置新生代的初始值和最大值</p>
 </li>
 </ul>
+</div>
+</li>
+</ol>
 </div>
 </div>
 </div>
