@@ -99,14 +99,14 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>spring-release</id>
-            <name>Spring Release</name>
-            <url>https://repo.spring.io/release</url>
-        </pluginRepository>
-        <pluginRepository>
             <id>asciidoctor</id>
             <name>bintray</name>
             <url>http://dl.bintray.com</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-release</id>
+            <name>Spring Release</name>
+            <url>https://repo.spring.io/release</url>
         </pluginRepository>
     </pluginRepositories>
 </project>

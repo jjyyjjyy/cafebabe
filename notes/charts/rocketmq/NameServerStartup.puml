@@ -8,13 +8,14 @@ note left
 ** --<key> <value> 配置项
 ** -c指定配置文件, 默认使用${user.home}/namesrv/namesrv.properties
 # 加载logback日志配置: ${rocketmqHome}/conf/logback_namesrv.xml
+# 封装配置至 `NamesrvConfig` 和 `NettyServerConfig` 类中
 end note
 
 NamesrvStartup -> NamesrvController : initialize
 
 note left
 # 加载kv配置
-# 初始化NettyRemotingServer
+# 初始化 `NettyRemotingServer` , 默认端口9876
 # 注册请求处理对象 `NettyRequestProcessor`
 # 初始化两个定时任务
 ## 每10秒清理120秒内没上报心跳信息的broker

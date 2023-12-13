@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -ex
+
 NOTE_DIR=$(pwd)
 TMP_DIR=/tmp/blog/
 ORIGIN_ADDRESS=git@github.com:jjyyjjyy/tech.git

@@ -1106,7 +1106,21 @@ PostgreSQL索引类型有哪些?::
 * brin
 * gist ...
 
-== RabbitMQ
+== 消息队列
+
+=== RocketMQ
+
+[qanda]
+为什么自动创建的topic只会在一个broker上创建, 且只有4个队列?::
+当Producer查询TBW路由信息时会设置队列数为min(TBW默认队列数8, Producer默认自动创建队列数4)=4, 然后向一个Broker发送消息, Broker收到消息后新建Topic路由, 并上报给NameServer, 下一次Producer定时拉取NameServer配置时就会同步更新这个只有一个Broker的Topic路由信息.
+如果消息发送很多很快时会发送给所有的Broker, 则NameServer上收到所有的Broker上报路由信息.
+如何将消息发送至指定的MessageQueue?::
+实现MessageSelector接口, 生产者使用 `send` 发送消息时传第二个参数.
+RocketMQ故障延迟机制?::
+* 如果未启用故障延迟机制, 则只会在发送消息失败重试时会规避上一次失败的Broker.
+* 如果启用了故障延迟机制, 则会根据发送latency在一定时间内一直规避上一次失败的Broker.
+
+=== RabbitMQ
 
 [qanda]
 AMQP协议的流程?::
@@ -1156,7 +1170,7 @@ rabbitmq消息的状态?::
 * delta: 消息索引和消息内容都在磁盘上.
 alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, beta和gamma状态需要一次I/O.
 
-== Kafka
+=== Kafka
 
 [qanda]
 生产者acks值含义?::
