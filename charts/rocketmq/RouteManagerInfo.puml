@@ -7,8 +7,9 @@ json "Map<String/* clusterName */, Set<String/* brokerName */>> clusterAddrTable
 }
 
 note top of clusterAddrTable
-=== cluster-broker关联数据
+=== clusterAddrTable: cluster-broker关联数据
 存储集群下所有的broker名称(各个主节点的broker名称不同, 从节点与主节点broker名称一致)
+key为集群名称，value为该集群下的所有Broker名称集合.
 end note
 
 
@@ -23,7 +24,8 @@ json "Map<String/* brokerName */, BrokerData> brokerAddrTable" as brokerAddrTabl
 }
 
 note top of brokerAddrTable
-=== Broker信息
+=== brokerAddrTable: Broker信息
+key为Broker名称，value为BrokerData:
 * broker名称和所属集群名称.
 * broker下节点列表, id为0的是Master节点.
 end note
@@ -50,7 +52,8 @@ json "Map<String/* brokerAddr */, BrokerLiveInfo> brokerLiveTable" as brokerLive
 }
 
 note top of brokerLiveTable
-=== 每个Broker节点信息
+=== brokerLiveTable: 每个Broker节点信息
+key为Broker地址，value为Broker发送心跳信息记录对象BrokerLiveInfo.
 end note
 
 
@@ -76,7 +79,7 @@ json "Map<String/* topic */, Map<String /* brokerName */ , QueueData>> topicQueu
 }
 
 note top of topicQueueTable
-=== Topic-Broker关联数据
+=== topicQueueTable: Topic-Broker关联数据
 存储每个topic在各个broker的配置数据
 end note
 

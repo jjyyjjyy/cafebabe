@@ -120,49 +120,74 @@ $(globalSwitch);
 <div id="toc" class="toc2">
 <div id="toctitle">目录</div>
 <ul class="sectlevel1">
-<li><a href="#_特性">1. 特性</a></li>
-<li><a href="#_目录结构">2. 目录结构</a>
+<li><a href="#_rocketmq特性">1. RocketMQ特性</a></li>
+<li><a href="#_架构">2. 架构</a>
 <ul class="sectlevel2">
-<li><a href="#_源码">2.1. 源码</a></li>
-<li><a href="#_broker运行时">2.2. Broker运行时</a></li>
+<li><a href="#_消息消费模型">2.1. 消息消费模型</a></li>
+<li><a href="#_部署架构">2.2. 部署架构</a></li>
+<li><a href="#_名词解释">2.3. 名词解释</a></li>
 </ul>
 </li>
-<li><a href="#_部署架构">3. 部署架构</a></li>
-<li><a href="#_路由管理">4. 路由管理</a>
+<li><a href="#_目录结构">3. 目录结构</a>
+<ul class="sectlevel2">
+<li><a href="#_源码">3.1. 源码</a></li>
+</ul>
+</li>
+<li><a href="#_topic路由管理">4. Topic路由管理</a>
 <ul class="sectlevel2">
 <li><a href="#_nameserver启动流程">4.1. NameServer启动流程</a></li>
-<li><a href="#_路由信息管理">4.2. 路由信息管理</a></li>
-<li><a href="#_broker启动流程">4.3. Broker启动流程</a></li>
-<li><a href="#_路由删除">4.4. 路由删除</a>
+<li><a href="#_broker启动流程">4.2. Broker启动流程</a></li>
+<li><a href="#_broker注册流程">4.3. Broker注册流程</a></li>
+<li><a href="#_topic路由信息管理">4.4. Topic路由信息管理</a></li>
+<li><a href="#_topic路由删除">4.5. Topic路由删除</a>
 <ul class="sectlevel3">
-<li><a href="#_删除触发时机">4.4.1. 删除触发时机:</a></li>
-<li><a href="#_broker删除流程">4.4.2. Broker删除流程</a></li>
+<li><a href="#_删除触发时机">4.5.1. 删除触发时机</a></li>
+<li><a href="#_broker删除流程">4.5.2. Broker删除流程</a></li>
 </ul>
 </li>
-<li><a href="#_路由发现">4.5. 路由发现</a>
-<ul class="sectlevel3">
-<li><a href="#_topic路由信息组成">4.5.1. Topic路由信息组成</a></li>
+<li><a href="#_topic路由发现">4.6. Topic路由发现</a></li>
 </ul>
 </li>
+<li><a href="#_消息发送">5. 消息发送</a>
+<ul class="sectlevel2">
+<li><a href="#_发送示例代码">5.1. 发送示例代码</a></li>
+<li><a href="#_producer启动流程">5.2. Producer启动流程</a></li>
+<li><a href="#_消息发送流程">5.3. 消息发送流程</a></li>
 </ul>
 </li>
+<li><a href="#_源码调试">6. 源码调试</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_特性"><a class="link" href="#_特性">1. 特性</a></h2>
+<h2 id="_rocketmq特性"><a class="link" href="#_rocketmq特性">1. RocketMQ特性</a></h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>发布订阅(多生产者多消费者)</p>
+<p>广播消息</p>
+</li>
+<li>
+<p>消息过滤</p>
+</li>
+<li>
+<p>批量发送</p>
 </li>
 <li>
 <p>顺序消息</p>
 </li>
 <li>
-<p>消息过滤</p>
+<p>延迟消息</p>
+</li>
+<li>
+<p>事务消息</p>
+</li>
+<li>
+<p>消息重试</p>
+</li>
+<li>
+<p>消息回溯</p>
 </li>
 <li>
 <p>高可用</p>
@@ -171,81 +196,130 @@ $(globalSwitch);
 <p>消息准实时送达</p>
 </li>
 <li>
-<p>at least once</p>
-</li>
-<li>
-<p>消息回溯</p>
-</li>
-<li>
-<p>消息堆积</p>
-</li>
-<li>
-<p>定时消息</p>
-</li>
-<li>
-<p>消息重试</p>
+<p>Dashboard</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_目录结构"><a class="link" href="#_目录结构">2. 目录结构</a></h2>
+<h2 id="_架构"><a class="link" href="#_架构">2. 架构</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_源码"><a class="link" href="#_源码">2.1. 源码</a></h3>
+<h3 id="_消息消费模型"><a class="link" href="#_消息消费模型">2.1. 消息消费模型</a></h3>
+<div id="img-rocketmq_model_message" class="imageblock">
+<div class="content">
+<img src="images/rocketmq/rocketmq_model_message.png" alt="rocketmq model message">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_部署架构"><a class="link" href="#_部署架构">2.2. 部署架构</a></h3>
+<div id="img-rocketmq_model_deploy" class="imageblock">
+<div class="content">
+<img src="images/rocketmq/rocketmq_model_deploy.png" alt="rocketmq model deploy">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_名词解释"><a class="link" href="#_名词解释">2.3. 名词解释</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Producer: 发送消息的角色.</p>
+</li>
+<li>
+<p>Consumer: 消费消息的角色, 支持集群模式和广播模式两种消费方式.</p>
+</li>
+<li>
+<p>Broker: Producer和Consumer交互, 负责收发消息, 存储消息.</p>
+</li>
+<li>
+<p>NameServer: 是Broker的注册中心, Broker在启动时向所有的NameServer注册, 生产者Producer和消费者Consumer可以从NameServer中获取所有注册的Broker列表和Topic路由信息.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_目录结构"><a class="link" href="#_目录结构">3. 目录结构</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_源码"><a class="link" href="#_源码">3.1. 源码</a></h3>
 <div class="imageblock">
 <div class="content">
 <img src="SourceCodeDirectory4.svg" alt="SourceCodeDirectory4" width="602" height="368">
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_broker运行时"><a class="link" href="#_broker运行时">2.2. Broker运行时</a></h3>
-
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_部署架构"><a class="link" href="#_部署架构">3. 部署架构</a></h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="_路由管理"><a class="link" href="#_路由管理">4. 路由管理</a></h2>
+<h2 id="_topic路由管理"><a class="link" href="#_topic路由管理">4. Topic路由管理</a></h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_nameserver启动流程"><a class="link" href="#_nameserver启动流程">4.1. NameServer启动流程</a></h3>
 <div class="imageblock">
 <div class="content">
-<img src="NameServerStartup.svg" alt="NameServerStartup" width="1055" height="444">
+<img src="NameServerStartup.svg" alt="NameServerStartup" width="1055" height="459">
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_路由信息管理"><a class="link" href="#_路由信息管理">4.2. 路由信息管理</a></h3>
+<h3 id="_broker启动流程"><a class="link" href="#_broker启动流程">4.2. Broker启动流程</a></h3>
+<div class="imageblock">
+<div class="content">
+<img src="BrokerStartup.svg" alt="BrokerStartup" width="2695" height="1378">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_broker注册流程"><a class="link" href="#_broker注册流程">4.3. Broker注册流程</a></h3>
 <div class="paragraph">
-<p>核心类为 <code>org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager</code> , 维护cluster, broker, topic信息.</p>
+<p><code>[NameServer] RouteInfoManager</code></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>加写锁.</p>
+</li>
+<li>
+<p>将cluster-broker名称加入到 <code>clusterAddrTable</code> 中.</p>
+</li>
+<li>
+<p>遍历Broker的地址信息集合, 如果地址一致但是BrokerId不一致则删除旧的信息, 保证同一个地址在map集合中只能有一条数据. 将brokerId-broker地址加入到 <code>brokerAddrTable</code> 中.</p>
+</li>
+<li>
+<p>将Broker加入到brokerLiveTable中, 并记录收到注册请求的时间戳, 在进行心跳检测的时候需要根据这个时间戳来判断是否在规定时间内未收到Broker的请求.</p>
+</li>
+<li>
+<p>如果是首次注册或者数据发生变更, 则将topic信息保存到 <code>topicQueueTable</code> 中.</p>
+</li>
+<li>
+<p>如果发送请求的Broker不是Master, 需要获取其所属的Master地址设置到BrokerLiveInfo中并返回给Broker.</p>
+</li>
+<li>
+<p>释放锁.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_topic路由信息管理"><a class="link" href="#_topic路由信息管理">4.4. Topic路由信息管理</a></h3>
+<div class="paragraph">
+<p>核心类为 <code>org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager</code> , 接收到Broker注册然后维护cluster, broker, topic信息.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="RouteManagerInfo.svg" alt="RouteManagerInfo" width="2266" height="417">
+<img src="RouteManagerInfo.svg" alt="RouteManagerInfo" width="2266" height="432">
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_broker启动流程"><a class="link" href="#_broker启动流程">4.3. Broker启动流程</a></h3>
-<div class="imageblock">
-<div class="content">
-<img src="BrokerStartup.svg" alt="BrokerStartup" width="1675" height="743">
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_路由删除"><a class="link" href="#_路由删除">4.4. 路由删除</a></h3>
+<h3 id="_topic路由删除"><a class="link" href="#_topic路由删除">4.5. Topic路由删除</a></h3>
 <div class="sect3">
-<h4 id="_删除触发时机"><a class="link" href="#_删除触发时机">4.4.1. 删除触发时机:</a></h4>
+<h4 id="_删除触发时机"><a class="link" href="#_删除触发时机">4.5.1. 删除触发时机</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -258,7 +332,7 @@ $(globalSwitch);
 </div>
 </div>
 <div class="sect3">
-<h4 id="_broker删除流程"><a class="link" href="#_broker删除流程">4.4.2. Broker删除流程</a></h4>
+<h4 id="_broker删除流程"><a class="link" href="#_broker删除流程">4.5.2. Broker删除流程</a></h4>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -288,27 +362,249 @@ $(globalSwitch);
 </div>
 </div>
 <div class="sect2">
-<h3 id="_路由发现"><a class="link" href="#_路由发现">4.5. 路由发现</a></h3>
+<h3 id="_topic路由发现"><a class="link" href="#_topic路由发现">4.6. Topic路由发现</a></h3>
 <div class="paragraph">
-<p>RocketMQ客户端定时向NameServer拉取Topic路由信息.
-查找入口: <code>RouteInfoManager#pickupTopicRouteData</code></p>
+<p>查找入口: <code>RouteInfoManager#pickupTopicRouteData</code> :
+. 从 <code>topicQueueTable</code> 中获取到各个Broker的Topic配置信息.
+. 从 <code>brokerAddrTable</code> 中获取到各个Broker的节点信息.
+. 如果NameServer支持顺序消息, 则从kv配置中获取该Topic的 <code>ORDER_TOPIC_CONFIG</code> 配置.</p>
 </div>
-<div class="sect3">
-<h4 id="_topic路由信息组成"><a class="link" href="#_topic路由信息组成">4.5.1. Topic路由信息组成</a></h4>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_消息发送"><a class="link" href="#_消息发送">5. 消息发送</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_发送示例代码"><a class="link" href="#_发送示例代码">5.1. 发送示例代码</a></h3>
+<div class="listingblock">
+<div class="title">Producer.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">public class Producer {
+    public static final int MESSAGE_COUNT = 1000;
+    public static final String PRODUCER_GROUP = "please_rename_unique_group_name";
+    public static final String DEFAULT_NAMESRVADDR = "127.0.0.1:9876";
+    public static final String TOPIC = "TopicTest";
+    public static final String TAG = "TagA";
+
+    public static void main(String[] args) throws MQClientException, InterruptedException {
+        DefaultMQProducer producer = new DefaultMQProducer(PRODUCER_GROUP);
+        producer.setNamesrvAddr(DEFAULT_NAMESRVADDR);
+        producer.start();
+
+        for (int i = 0; i &lt; MESSAGE_COUNT; i++) {
+            try {
+
+                /*
+                 * Create a message instance, specifying topic, tag and message body.
+                 */
+                Message msg = new Message(TOPIC /* Topic */,
+                    TAG /* Tag */,
+                    ("Hello RocketMQ " + i).getBytes(RemotingHelper.DEFAULT_CHARSET) /* Message body */
+                );
+
+                /*
+                 * Call send message to deliver message to one of brokers.
+                 */
+                SendResult sendResult = producer.send(msg);
+                /*
+                 * There are different ways to send message, if you don't care about the send result,you can use this way
+                 * {@code
+                 * producer.sendOneway(msg);
+                 * }
+                 */
+
+                /*
+                 * if you want to get the send result in a asynchronize way, you can use this send method
+                 * {@code
+                 *
+                 *  producer.send(msg, new SendCallback() {
+                 *  @Override
+                 *  public void onSuccess(SendResult sendResult) {
+                 *      // do something
+                 *  }
+                 *
+                 *  @Override
+                 *  public void onException(Throwable e) {
+                 *      // do something
+                 *  }
+                 *});
+                 *
+                 *}
+                 */
+
+                System.out.printf("%s%n", sendResult);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        producer.shutdown();
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_producer启动流程"><a class="link" href="#_producer启动流程">5.2. Producer启动流程</a></h3>
+<div class="paragraph">
+<p>入口: <code>DefaultMQProducerImpl#start</code></p>
+</div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>从 <code>topicQueueTable</code> 中获取到各个Broker的Topic配置信息.</p>
+<p>检查ProducerGroup名称是否包含特殊字符.</p>
 </li>
 <li>
-<p>从 <code>brokerAddrTable</code> 中获取到各个Broker的节点信息.</p>
+<p>如果用户没有设置instanceName, 则设置为 <code>PID#System.nanoTime()</code>.</p>
 </li>
 <li>
-<p>如果NameServer支持顺序消息, 则从kv配置中获取该Topic的 <code>ORDER_TOPIC_CONFIG</code> 配置.</p>
+<p>创建 <code>MQClientInstance</code> , 用于和NameServer和Broker通信, 并put至全局的 <code>MQClientManager</code> 中, key为clientID(IP@InstanceName).</p>
+</li>
+<li>
+<p>启动 <code>MQClientInstance</code> :</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>启动和NameServer通信的client.</p>
+</li>
+<li>
+<p>启动定时任务: 每2分钟获取一次最新的NameServer地址.</p>
+</li>
+<li>
+<p>启动 <code>PullMessageService</code> .</p>
+</li>
+<li>
+<p>启动 <code>RebalanceService</code> .</p>
+</li>
+<li>
+<p>启动 <code>defaultMQProducer</code> .</p>
+</li>
+<li>
+<p>向所有的Master Broker发送心跳包, 包含自己的clientID和producerGroupName.</p>
+</li>
+</ol>
+</div>
 </li>
 </ol>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_消息发送流程"><a class="link" href="#_消息发送流程">5.3. 消息发送流程</a></h3>
+<div class="paragraph">
+<p>入口: <code>DefaultMQProducerImpl#sendDefaultImpl</code></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>如果发送批量消息, 则会将Collection编码成一条消息.</p>
+</li>
+<li>
+<p>校验消息</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>校验Topic合法性.</p>
+</li>
+<li>
+<p>校验body长度不能为空且不能超过4MB.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>根据Topic查询路由信息:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>从本地 <code>topicPublishInfoTable</code> 查询.</p>
+</li>
+<li>
+<p>如果没有则从NameServer查询( <code>RequestCode.GET_ROUTEINFO_BY_TOPIC</code> )并更新到本地 <code>topicPublishInfoTable</code> 中.</p>
+</li>
+<li>
+<p>如果还是没有则用默认topic <code>TBW102</code> 查询路由信息.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>如果最终没有Topic路由信息则抛出异常 <code>No route info of this topic</code> .</p>
+</li>
+<li>
+<p>根据topic和brokerName选择一个MessageQueue(轮训), 如果MessageQueue为空则不会发送消息.</p>
+</li>
+<li>
+<p>根据brokerName找到Master节点的ip地址.</p>
+</li>
+<li>
+<p>如果消息体大于4KB则会做zlib压缩并打 <code>0x1</code> tag.</p>
+</li>
+<li>
+<p>如果属于事务消息则会打 <code>0x100</code> tag.</p>
+</li>
+<li>
+<p>如果存在Hook, 则会执行 <code>sendMessageBefore</code> 方法.</p>
+</li>
+<li>
+<p>设置消息header.</p>
+</li>
+<li>
+<p>发送消息.</p>
+</li>
+<li>
+<p>如果是异步发送, 待接口返回后回调sendCallback.</p>
+</li>
+<li>
+<p>如果消息发送失败, 则会重试(同步发送重试三次, 其他不会), 每次重试会规避上次发送失败的Broker. 如果开启 <code>sendLatencyFaultEnable</code> , 则根据latency会在一段时间内不会向该Broker发送消息.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_源码调试"><a class="link" href="#_源码调试">6. 源码调试</a></h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>下载源码: <code>git clone <a href="https://github.com/apache/rocketmq.git" class="bare">https://github.com/apache/rocketmq.git</a> --branch 4.9.x --single-branch</code></p>
+</li>
+<li>
+<p>创建RocketMQ目录及配置:</p>
+<div class="imageblock">
+<div class="content">
+<img src="rocketmq_debug_dir.svg" alt="rocketmq debug dir" width="345" height="203">
+</div>
+</div>
+</li>
+<li>
+<p>配置文件均从源码distribution目录拷贝, broker.conf加以下配置:</p>
+<div class="listingblock">
+<div class="title">broker.conf</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-conf hljs" data-lang="conf">storePathRootDir=/path/to/rocketmq/broker/store
+namesrvAddr=localhost:9876
+autoCreateTopicEnable=false</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>设置环境变量 <code>ROCKETMQ_HOME=/path/to/rocketmq/nameserver</code> .</p>
+</li>
+<li>
+<p>启动NameServer.</p>
+</li>
+<li>
+<p>添加Broker启动参数 <code>-c /path/to/rocketmq/broker/conf/broker.conf</code> 并启动.</p>
+</li>
+<li>
+<p>注释掉 <code>org.apache.rocketmq.example.quickstart.Producer</code> <code>producer.setNamesrvAddr(DEFAULT_NAMESRVADDR);</code> 这行代码并启动.</p>
+</li>
+<li>
+<p>注释掉 <code>org.apache.rocketmq.example.quickstart.Consumer</code> <code>consumer.setNamesrvAddr(DEFAULT_NAMESRVADDR);</code> 这行代码并启动.</p>
+</li>
+</ol>
 </div>
 </div>
 </div>

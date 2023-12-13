@@ -10,11 +10,22 @@ note left
 # 校验NameServer地址
 # 校验从节点brokerId必须大于0
 # 加载logback日志配置: ${rocketmqHome}/conf/logback_broker.xml
+# 封装配置至 `BrokerConfig` , `NettyServerConfig`, `NettyClientConfig`, `MessageStoreConfig` 类中.
 end note
 
 BrokerStartup -> BrokerController : initialize
 note right
 # 从文件中恢复Topic消息, 订阅关系和消费进度等信息
+** 加载config/topics.json文件到 `TopicConfigManager#topicConfigTable` 中.
+** 加载config/consumerOffset.json文件到 `ConsumerOffsetManager#offsetTable` 中.
+** 加载config/subscriptionGroup.json文件到 `SubscriptionGroupManager#subscriptionGroupTable` 中.
+** 加载config/consumerFilter.json文件到 `ConsumerFilterManager#filterDataByTopic` 中.
+# 创建DefaultMessageStore
+# 创建NettyRemotingServer, 默认端口10911
+# 为接口处理Processor创建各自的线程池
+# 创建一些定时任务
+# 初始化TransactionalMessageCheckService
+# 注册RPCHook
 end note
 
 BrokerController -> BrokerStartup
@@ -22,13 +33,48 @@ BrokerStartup -> BrokerStartup : 注册shutdown回调, 调用BrokerController#sh
 
 BrokerStartup -> BrokerController : start
 
+BrokerController -> DefaultMessageStore : start
+note right
+# 启动ReputMessageService
+# 启动HAService
+# 启动ScheduleMessageService
+# 启动FlushConsumerQueueService
+# 启动CommitLog
+# 启动StoreStatsService
+# 创建abort文件
+# 创建一些定时任务
+** 每10秒清除commitlog和consumequeuue文件
+** 每10分钟检查一次MessageStore
+** 如果开启MessageStore debug, 则每秒保存一次jstack
+** 每10秒检查一次磁盘利用率
+end note
+DefaultMessageStore -> BrokerController
+
 BrokerController -> NettyRemotingServer : start
 note right
-# 启动messageStore
 # 启动Netty服务端, 接收外部请求并处理.
 end note
-
 NettyRemotingServer -> BrokerController
+
+BrokerController -> FileWatchService : start
+note right
+监听TLS证书文件, 如果有变化则重新加载
+end note
+FileWatchService -> BrokerController
+
+BrokerController -> BrokerOuterAPI : start
+BrokerOuterAPI -> BrokerController
+
+BrokerController -> PullRequestHoldService : start
+PullRequestHoldService -> BrokerController
+
+BrokerController -> ClientHousekeepingService : start
+note right
+每10秒剔除120内没有发送数据的Consumer/Producer链接.
+end note
+ClientHousekeepingService -> BrokerController
+
+BrokerController -> BrokerController : 启动TransactionalMessageCheckService
 BrokerController -> BrokerController : registerBrokerAll
 note right
 # 启动定时任务, 每30秒向NameServer上报心跳. 可通过registerNameServerPeriod配置上报间隔, 必须在10秒~60秒范围内.
@@ -40,9 +86,9 @@ note right
 * 主节点地址
 * 主题配置数据
 end note
+
 BrokerController -> BrokerOuterAPI : registerBrokerAll
-note right: 遍历NameServer
-BrokerOuterAPI -> "namesrv:RouteInfoManager" : registerBroker [103]
+BrokerOuterAPI -> "[NameServer] RouteInfoManager" : registerBroker [103]
 note right
 # 更新clusterAddrTable
 # 更新brokerAddrTable当前broker节点信息, 先删后增
@@ -51,8 +97,11 @@ note right
 # 如果当前上报的broker是从节点, 则找出主节点ip返回出去
 end note
 
-"namesrv:RouteInfoManager" -> BrokerOuterAPI
+"[NameServer] RouteInfoManager" -> BrokerOuterAPI
 BrokerOuterAPI -> BrokerController
+
+BrokerController -> BrokerFastFailure : start
+BrokerFastFailure -> BrokerController
 
 BrokerController -> BrokerStartup
 

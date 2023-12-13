@@ -129,12 +129,17 @@ $(globalSwitch);
 <li><a href="#_spring">7. Spring</a></li>
 <li><a href="#_redis">8. Redis</a></li>
 <li><a href="#_database">9. Database</a></li>
-<li><a href="#_rabbitmq">10. RabbitMQ</a></li>
-<li><a href="#_kafka">11. Kafka</a></li>
-<li><a href="#_docker">12. Docker</a></li>
-<li><a href="#_网络">13. 网络</a></li>
-<li><a href="#_linux">14. Linux</a></li>
-<li><a href="#_分布式">15. 分布式</a></li>
+<li><a href="#_消息队列">10. 消息队列</a>
+<ul class="sectlevel2">
+<li><a href="#_rocketmq">10.1. RocketMQ</a></li>
+<li><a href="#_rabbitmq">10.2. RabbitMQ</a></li>
+<li><a href="#_kafka">10.3. Kafka</a></li>
+</ul>
+</li>
+<li><a href="#_docker">11. Docker</a></li>
+<li><a href="#_网络">12. 网络</a></li>
+<li><a href="#_linux">13. Linux</a></li>
+<li><a href="#_分布式">14. 分布式</a></li>
 </ul>
 </div>
 </div>
@@ -4038,8 +4043,39 @@ $(globalSwitch);
 </div>
 </div>
 <div class="sect1">
-<h2 id="_rabbitmq"><a class="link" href="#_rabbitmq">10. RabbitMQ</a></h2>
+<h2 id="_消息队列"><a class="link" href="#_消息队列">10. 消息队列</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_rocketmq"><a class="link" href="#_rocketmq">10.1. RocketMQ</a></h3>
+<div class="qlist qanda">
+<ol>
+<li>
+<p><em>为什么自动创建的topic只会在一个broker上创建, 且只有4个队列?</em></p>
+<p>当Producer查询TBW路由信息时会设置队列数为min(TBW默认队列数8, Producer默认自动创建队列数4)=4, 然后向一个Broker发送消息, Broker收到消息后新建Topic路由, 并上报给NameServer, 下一次Producer定时拉取NameServer配置时就会同步更新这个只有一个Broker的Topic路由信息.<br>
+如果消息发送很多很快时会发送给所有的Broker, 则NameServer上收到所有的Broker上报路由信息.</p>
+</li>
+<li>
+<p><em>如何将消息发送至指定的MessageQueue?</em></p>
+<p>实现MessageSelector接口, 生产者使用 <code>send</code> 发送消息时传第二个参数.</p>
+</li>
+<li>
+<p><em>RocketMQ故障延迟机制?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>如果未启用故障延迟机制, 则只会在发送消息失败重试时会规避上一次失败的Broker.</p>
+</li>
+<li>
+<p>如果启用了故障延迟机制, 则会根据发送latency在一定时间内一直规避上一次失败的Broker.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rabbitmq"><a class="link" href="#_rabbitmq">10.2. RabbitMQ</a></h3>
 <div class="qlist qanda">
 <ol>
 <li>
@@ -4229,10 +4265,8 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </ol>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_kafka"><a class="link" href="#_kafka">11. Kafka</a></h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_kafka"><a class="link" href="#_kafka">10.3. Kafka</a></h3>
 <div class="qlist qanda">
 <ol>
 <li>
@@ -4287,8 +4321,9 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_docker"><a class="link" href="#_docker">12. Docker</a></h2>
+<h2 id="_docker"><a class="link" href="#_docker">11. Docker</a></h2>
 <div class="sectionbody">
 <div class="qlist qanda">
 <ol>
@@ -4352,7 +4387,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_网络"><a class="link" href="#_网络">13. 网络</a></h2>
+<h2 id="_网络"><a class="link" href="#_网络">12. 网络</a></h2>
 <div class="sectionbody">
 <div class="qlist qanda">
 <ol>
@@ -4557,7 +4592,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_linux"><a class="link" href="#_linux">14. Linux</a></h2>
+<h2 id="_linux"><a class="link" href="#_linux">13. Linux</a></h2>
 <div class="sectionbody">
 <div class="qlist qanda">
 <ol>
@@ -4621,7 +4656,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_分布式"><a class="link" href="#_分布式">15. 分布式</a></h2>
+<h2 id="_分布式"><a class="link" href="#_分布式">14. 分布式</a></h2>
 <div class="sectionbody">
 <div class="qlist qanda">
 <ol>
