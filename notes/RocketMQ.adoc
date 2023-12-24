@@ -27,6 +27,13 @@
 
 == 架构
 
+=== 名词解释
+
+* Producer: 发送消息的角色.
+* Consumer: 消费消息的角色, 支持集群模式和广播模式两种消费方式.
+* Broker: Producer和Consumer交互, 负责收发消息, 存储消息.
+* NameServer: 是Broker的注册中心, Broker在启动时向所有的NameServer注册, 生产者Producer和消费者Consumer可以从NameServer中获取所有注册的Broker列表和Topic路由信息.
+
 === 消息消费模型
 
 [[img-rocketmq_model_message]]
@@ -37,16 +44,8 @@ image::images/rocketmq/rocketmq_model_message.png[]
 [[img-rocketmq_model_deploy]]
 image::images/rocketmq/rocketmq_model_deploy.png[]
 
-=== 名词解释
 
-* Producer: 发送消息的角色.
-* Consumer: 消费消息的角色, 支持集群模式和广播模式两种消费方式.
-* Broker: Producer和Consumer交互, 负责收发消息, 存储消息.
-* NameServer: 是Broker的注册中心, Broker在启动时向所有的NameServer注册, 生产者Producer和消费者Consumer可以从NameServer中获取所有注册的Broker列表和Topic路由信息.
-
-== 目录结构
-
-=== 源码
+== 源码目录结构
 
 [plantuml,SourceCodeDirectory4,svg]
 ....
@@ -220,6 +219,116 @@ public class Producer {
 . 发送消息.
 . 如果是异步发送, 待接口返回后回调sendCallback.
 . 如果消息发送失败, 则会重试(同步发送重试三次, 其他不会), 每次重试会规避上次发送失败的Broker. 如果开启 `sendLatencyFaultEnable` , 则根据latency会在一段时间内不会向该Broker发送消息.
+
+
+== 消息存储
+
+消息储存入口: `org.apache.rocketmq.store.DefaultMessageStore#asyncPutMessage`
+
+=== 文件结构
+
+* commitlog: 存放所有主题消息的目录, 文件名为起始偏移地址, 顺序写满单文件1G后继续写写到下一个文件, 对应代码中MappedFile对象.
+* config:
+** consumerFilter.json: 消费者Topic过滤信息.
+** consumerOffset.json: 消费者消费偏移量进度数据.
+** delayOffset.json: 延迟队列进度数据.
+** subscriptionGroup.json: 消费者组的配置信息.
+** topics.json: 主题配置信息.
+* consumequeue: 为方便消费者按Topic-Queue-Tag消费消息, 按每个Topic/QueueId新建目录, 在每个目录下存储消息在CommitLog中的偏移地址(8字节), 消息大小(4字节)和tag的哈希码(8字节), 单文件30w*20KB=5.72MB.
+* index: 存储消息索引数据的文件目录, 存储: key哈希码, 消息在commitlog中偏移量, 与第一条消息的时间错差值, 前一个索引编号.
+* checkpoint: 存储CommitLog, ConsumeQueue, Index文件各自最近一次刷盘的时间戳.
+* lock: 文件锁.
+* abort: 如果存在abort文件, 说明Broker异常退出.
+
+=== 刷盘策略
+
+* 同步刷盘: Broker收到消息后, 写入内存再提交刷盘任务, 将待提交的数据(write到flush指针范围)批量写到硬盘再返回.
+* 异步刷盘: Broker收到消息后, 写入内存后直接返回, 另起一个500ms的定时线程将pagecache写入硬盘.
+
+=== transientStorePoolEnable机制
+
+为了缓解pagecache在高并发场景下的读写压力, RocketMQ可以开启 `transientStorePoolEnable=true` .
+Broker收到消息后写入到堆外内存后直接返回, 然后异步将堆外内存的增量数据同步到pagecache, 最后异步写入到硬盘中.
+如果进程异常退出, pagecache中的数据会写入到硬盘不会丢失, 但是堆外内存的数据会丢失.
+
+=== 消息存储格式
+
+入口: `org.apache.rocketmq.store.CommitLog.MessageExtEncoder#encode` 和 `org.apache.rocketmq.store.CommitLog.DefaultAppendMessageCallback#doAppend`
+
+=== 索引文件同步
+
+reputService线程对比发现有新消息写入到commitlog文件后, 会从commitlog中读取读取数据写入到consumequeue和index文件中, 然后更新checkpoint.
+
+* reputService线程工作入口: `org.apache.rocketmq.store.DefaultMessageStore.ReputMessageService#doReput` .
+* consumequeue保存入口(异步刷盘): `org.apache.rocketmq.store.DefaultMessageStore.CommitLogDispatcherBuildConsumeQueue#dispatch` .
+* index保存入口(写满文件才会主动刷盘): `org.apache.rocketmq.store.DefaultMessageStore.CommitLogDispatcherBuildIndex#dispatch` .
+* checkpoint保存入口: `org.apache.rocketmq.store.StoreCheckpoint#flush` .
+
+=== 过期文件删除机制
+
+RocketMQ每10秒钟执行一次commitlog/consumequeue文件过期检查定时任务, 符合以下条件时会从倒数第二个文件扫描到第一个文件, 扫描出 `fileReservedTime(默认72小时)` 时间内未写入过的文件并删除:
+
+* 当前时间为凌晨4点.
+* 磁盘分区使用率达到85%.
+* 人工提交删除任务.
+
+== 消息消费
+
+=== push消费者启动流程
+
+. 启动Consumer, 保存订阅关系到 `subscriptionInner` , 并从 `pullRequestQueue` 阻塞队列拉取消费请求.
+. 启动 `ConsumeMessageConcurrentlyService` , 每15分钟将未消费完的消息返还给Broker.
+. 如果是广播消费模式, 则从本地加载offset.
+. 启动 `MQClientInstance` .
+.. 建立和Broker的链接.
+.. 启动一个定时任务, 每2分钟重新获取一次NameServer的地址.
+.. 启动 `PullMessageService` .
+.. 启动 `RebalanceServiceImpl` : 每20秒对每个消费的Topic获取消费队列, 如果和上次不同, 则会停止未分配给自己的queue和消费新增的queue, 然后立即转成 `PullRequest` 对象放到 `pullRequestQueue` 中让consumer开始消费, 消费完后继续将 `PullRequest` 对象放到队列里.
+.. 启动 `DefaultMQProducerImpl` .
+. 立即执行一次rebalance.
+
+=== 消息消费流程
+
+消费入口: `org.apache.rocketmq.client.impl.consumer.PullMessageService#run`
+
+. 从 `pullRequestQueue` 阻塞队列拉取消费请求.
+. 根据consumerGroup名称找到 `DefaultMQPushConsumerImpl` 处理对象.
+. 判断如果queue被dropped, 则说明该队列被rebalance到别的消费者里了, 立即返回.
+. 如果队列中待处理的消息大于1000条或者大于100MB, 则延迟50ms后再消费.
+. 如果是并发消费模式, 且offset最小最大之差大于2000, 则延迟50ms后再消费.
+. 根据Broker名称找到节点ip地址, 拉取消息 `org.apache.rocketmq.client.impl.MQClientAPIImpl#pullMessage` .
+. 进入拉取消息成功的回调: `org.apache.rocketmq.client.consumer.PullCallback#onSuccess` .
+. 更新下一次PullRequest的offset.
+. 如果没有拉取到消息列表, 则重复执行一次PullRequest任务.
+. 将消息列表放入TreeMap中按offset排好序.
+. 将消息列表按consumeMessageBatchMaxSize(默认为1)分区, 提交到消费线程池中.
+. 执行消费前置hook: `org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl#executeHookBefore` .
+. 执行应用消费逻辑: `org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently#consumeMessage` .
+. 执行消费后置hook: `org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl#executeHookAfter` .
+. 从processQueue中删除已消费的消息列表.
+. 如果消费失败: 广播模式下只打印日志, 集群模式下将消息重新发送到Broker延迟队列中, 如果发送失败则将消息在本地5秒后重新消费.
+. 如果消费成功: 更新offsetTable. 如果processQueue中不存在其他待消费的消息, 则提交最大的offset, 否则提交最小的offset.
+. 定时任务每10秒将offsetTable数据持久化, 广播模式下持久化到本地 `.rocketmq_offsets` 文件中, 集群模式下提交到Broker保存.
+. 将PullRequest重新放入队列中重复执行下一次拉取消息任务.
+
+=== 消费者负载均衡机制
+
+消费者通过指定 `org.apache.rocketmq.client.consumer.AllocateMessageQueueStrategy` 来控制负载均衡机制.
+
+
+=== 延迟消息消费流程
+
+. RocketMQ支持 `1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h` 18个延迟级别, 每个延迟级别对应一个 `SCHEDULE_TOPIC_XXXX` 下的队列, 和一个定时任务.
+. 延迟消息发送到Broker中后, 将原topic, tag, queueId设置到properties中, 然后根据延迟级别保存到 `SCHEDULE_TOPIC_XXXX` topic中.
+. Broker中的定时任务会扫描queue中所有的消息, 判断当前时间和消息存储时间的差值, 如果等于延迟时间则将消息重新保存到原Topic的queue中等待消费者拉取消费.
+
+=== 消息过滤机制
+
+RocketMQ支持表达式过滤(可以细分为tag和sql92过滤方式)和类过滤方式.
+
+* tag: Producer指定发送消息的tag, 消费者根据tag过滤表达式拉取消息, 多个tag用 `|` 分隔, 通配用 `*` .
+* sql92: Producer指定发送消息的property, 消费者设置sql表达式过滤, 如 `xxx is not null and xxx > 0` .
+* classFilter: 部署filterServer, 在其中实现 `MessageFilter` 接口. 消费者指定 `MessageFilter` 全限定名, Broker会远程调用filterServer判断是否消费.
 
 
 == 源码调试

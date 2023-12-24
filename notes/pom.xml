@@ -82,7 +82,12 @@
                     <dependency>
                         <groupId>org.asciidoctor</groupId>
                         <artifactId>asciidoctorj-diagram</artifactId>
-                        <version>${asciidoctorj-diagram}</version>
+                        <version>${asciidoctorj-diagram.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctorj-diagram-plantuml</artifactId>
+                        <version>${asciidoctorj-diagram-plantuml.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

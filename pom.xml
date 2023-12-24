@@ -42,7 +42,8 @@
         <cglib.versin>3.3.0</cglib.versin>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <spring-doc-resources.version>0.2.5</spring-doc-resources.version>
-        <asciidoctorj-diagram>2.2.13</asciidoctorj-diagram>
+        <asciidoctorj-diagram.version>2.2.13</asciidoctorj-diagram.version>
+        <asciidoctorj-diagram-plantuml.version>1.2023.12</asciidoctorj-diagram-plantuml.version>
         <testcontainer.version>3.0.4</testcontainer.version>
         <arthas.version>3.7.1</arthas.version>
         <javassist.version>3.29.2-GA</javassist.version>
