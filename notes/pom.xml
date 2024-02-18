@@ -6,39 +6,60 @@
 
     <parent>
         <groupId>me.jy.java</groupId>
-        <artifactId>tech</artifactId>
+        <artifactId>cafebabe</artifactId>
         <version>1.0.0</version>
     </parent>
     <artifactId>notes</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>io.spring.docresources</groupId>
-            <artifactId>spring-doc-resources</artifactId>
-            <version>${spring-doc-resources.version}</version>
-            <type>zip</type>
+            <groupId>rubygems</groupId>
+            <artifactId>asciidoctor-kroki</artifactId>
+            <version>${asciidoctor-kroki.version}</version>
+            <type>gem</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>rubygems</groupId>
+                    <artifactId>asciidoctor</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>rubygems</groupId>
+                    <artifactId>thread_safe</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>rubygems</groupId>
+                    <artifactId>concurrent-ruby</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>mavengems</id>
+            <url>mavengem:https://rubygems.org</url>
+        </repository>
+    </repositories>
+
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.jruby.maven</groupId>
+                <artifactId>mavengem-wagon</artifactId>
+                <version>2.0.0</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <groupId>org.jruby.maven</groupId>
+                <artifactId>gem-maven-plugin</artifactId>
+                <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <id>unpack-doc-resources</id>
                         <goals>
-                            <goal>unpack-dependencies</goal>
+                            <goal>initialize</goal>
                         </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <includeGroupIds>io.spring.docresources</includeGroupIds>
-                            <includeArtifactIds>spring-doc-resources</includeArtifactIds>
-                            <includeTypes>zip</includeTypes>
-                            <excludeTransitive>true</excludeTransitive>
-                            <outputDirectory>${project.build.directory}/generated-docs/</outputDirectory>
-                        </configuration>
+                        <phase>initialize</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -46,12 +67,26 @@
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
                 <version>${asciidoctor-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-html-documentation</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>spring-html</backend>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <sourceDirectory>${project.basedir}</sourceDirectory>
                     <backend>html5</backend>
                     <requires>
                         <require>asciidoctor-diagram</require>
+                        <require>asciidoctor-kroki</require>
                     </requires>
+                    <gemPath>${project.build.directory}/rubygems</gemPath>
                     <attributes>
                         <docinfo>shared</docinfo>
                         <stylesdir>css/</stylesdir>
@@ -73,6 +108,11 @@
                 </configuration>
                 <dependencies>
                     <dependency>
+                        <groupId>io.spring.asciidoctor.backends</groupId>
+                        <artifactId>spring-asciidoctor-backends</artifactId>
+                        <version>${spring-asciidoctor-backends.version}</version>
+                    </dependency>
+                    <dependency>
                         <groupId>io.github.jjyy</groupId>
                         <artifactId>asciidoctor-block-switch</artifactId>
                         <version>1.1.0</version>
@@ -92,26 +132,8 @@
                 </dependencies>
             </plugin>
         </plugins>
+
     </build>
 
-    <repositories>
-        <repository>
-            <id>spring-repo</id>
-            <name>Spring Repository</name>
-            <url>https://repo.spring.io/release</url>
-        </repository>
-    </repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>asciidoctor</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>spring-release</id>
-            <name>Spring Release</name>
-            <url>https://repo.spring.io/release</url>
-        </pluginRepository>
-    </pluginRepositories>
 </project>

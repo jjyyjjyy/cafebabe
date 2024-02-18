@@ -949,7 +949,7 @@ static final class FairSync extends Sync {
 
 ==== StampedLock例子
 
-[StampedLockDemo,java]
+[source,java]
 .filename.java
 ----
 include::../basic-knowledge/src/main/java/me/jy/lang/thread/juc/StampedLockDemo.java[]

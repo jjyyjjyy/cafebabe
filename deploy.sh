@@ -2,9 +2,10 @@
 
 set -ex
 
-NOTE_DIR=$(pwd)
+PROJECT_DIR=$(pwd)
+PROJECT_NAME=$(basename ${PROJECT_DIR})
 TMP_DIR=/tmp/blog/
-ORIGIN_ADDRESS=git@github.com:jjyyjjyy/tech.git
+ORIGIN_ADDRESS=git@github.com:jjyyjjyy/${PROJECT_NAME}.git
 ORIGIN_BRANCH=gh-pages
 
 rm -rf ${TMP_DIR} && mkdir -p ${TMP_DIR}
@@ -14,8 +15,8 @@ git remote add origin ${ORIGIN_ADDRESS}
 git fetch -p
 git checkout ${ORIGIN_BRANCH}
 
-cd ${NOTE_DIR}/notes || return
-mvn clean asciidoctor:process-asciidoc
+cd ${PROJECT_DIR}/notes || return
+mvn clean initialize asciidoctor:process-asciidoc
 cp -r target/generated-docs/** ${TMP_DIR}
 
 cd ${TMP_DIR} || return

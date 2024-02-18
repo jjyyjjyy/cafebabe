@@ -44,10 +44,11 @@
             <artifactId>junit-platform-launcher</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.playtika.testcontainers</groupId>
-            <artifactId>testcontainers-common</artifactId>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 </project>

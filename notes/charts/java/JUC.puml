@@ -5,7 +5,7 @@
 
 * JUC
 
-left
+left side
 
 ** 1. 多线程基础
 *** 创建线程的方式
@@ -44,7 +44,7 @@ left
 **** AtomicLongFieldUpdater
 **** LongAddr
 
-right
+right side
 
 ** 并发工具类
 *** Semaphore
