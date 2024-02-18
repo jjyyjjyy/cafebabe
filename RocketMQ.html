@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <title>RocketMQ</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="js/highlight/styles/idea.min.css">
+<script src="js/setup.js"></script><script defer src="js/site.js"></script>
+
 <style>
 .hidden {
   display: none;
@@ -123,16 +125,12 @@ $(globalSwitch);
 <li><a href="#_rocketmq特性">1. RocketMQ特性</a></li>
 <li><a href="#_架构">2. 架构</a>
 <ul class="sectlevel2">
-<li><a href="#_消息消费模型">2.1. 消息消费模型</a></li>
-<li><a href="#_部署架构">2.2. 部署架构</a></li>
-<li><a href="#_名词解释">2.3. 名词解释</a></li>
+<li><a href="#_名词解释">2.1. 名词解释</a></li>
+<li><a href="#_消息消费模型">2.2. 消息消费模型</a></li>
+<li><a href="#_部署架构">2.3. 部署架构</a></li>
 </ul>
 </li>
-<li><a href="#_目录结构">3. 目录结构</a>
-<ul class="sectlevel2">
-<li><a href="#_源码">3.1. 源码</a></li>
-</ul>
-</li>
+<li><a href="#_源码目录结构">3. 源码目录结构</a></li>
 <li><a href="#_topic路由管理">4. Topic路由管理</a>
 <ul class="sectlevel2">
 <li><a href="#_nameserver启动流程">4.1. NameServer启动流程</a></li>
@@ -155,7 +153,26 @@ $(globalSwitch);
 <li><a href="#_消息发送流程">5.3. 消息发送流程</a></li>
 </ul>
 </li>
-<li><a href="#_源码调试">6. 源码调试</a></li>
+<li><a href="#_消息存储">6. 消息存储</a>
+<ul class="sectlevel2">
+<li><a href="#_文件结构">6.1. 文件结构</a></li>
+<li><a href="#_刷盘策略">6.2. 刷盘策略</a></li>
+<li><a href="#_transientstorepoolenable机制">6.3. transientStorePoolEnable机制</a></li>
+<li><a href="#_消息存储格式">6.4. 消息存储格式</a></li>
+<li><a href="#_索引文件同步">6.5. 索引文件同步</a></li>
+<li><a href="#_过期文件删除机制">6.6. 过期文件删除机制</a></li>
+</ul>
+</li>
+<li><a href="#_消息消费">7. 消息消费</a>
+<ul class="sectlevel2">
+<li><a href="#_push消费者启动流程">7.1. push消费者启动流程</a></li>
+<li><a href="#_消息消费流程">7.2. 消息消费流程</a></li>
+<li><a href="#_消费者负载均衡机制">7.3. 消费者负载均衡机制</a></li>
+<li><a href="#_延迟消息消费流程">7.4. 延迟消息消费流程</a></li>
+<li><a href="#_消息过滤机制">7.5. 消息过滤机制</a></li>
+</ul>
+</li>
+<li><a href="#_源码调试">8. 源码调试</a></li>
 </ul>
 </div>
 </div>
@@ -206,23 +223,7 @@ $(globalSwitch);
 <h2 id="_架构"><a class="link" href="#_架构">2. 架构</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_消息消费模型"><a class="link" href="#_消息消费模型">2.1. 消息消费模型</a></h3>
-<div id="img-rocketmq_model_message" class="imageblock">
-<div class="content">
-<img src="images/rocketmq/rocketmq_model_message.png" alt="rocketmq model message">
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_部署架构"><a class="link" href="#_部署架构">2.2. 部署架构</a></h3>
-<div id="img-rocketmq_model_deploy" class="imageblock">
-<div class="content">
-<img src="images/rocketmq/rocketmq_model_deploy.png" alt="rocketmq model deploy">
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_名词解释"><a class="link" href="#_名词解释">2.3. 名词解释</a></h3>
+<h3 id="_名词解释"><a class="link" href="#_名词解释">2.1. 名词解释</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -240,17 +241,30 @@ $(globalSwitch);
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_消息消费模型"><a class="link" href="#_消息消费模型">2.2. 消息消费模型</a></h3>
+<div id="img-rocketmq_model_message" class="imageblock">
+<div class="content">
+<img src="images/rocketmq/rocketmq_model_message.png" alt="rocketmq model message">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_部署架构"><a class="link" href="#_部署架构">2.3. 部署架构</a></h3>
+<div id="img-rocketmq_model_deploy" class="imageblock">
+<div class="content">
+<img src="images/rocketmq/rocketmq_model_deploy.png" alt="rocketmq model deploy">
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_目录结构"><a class="link" href="#_目录结构">3. 目录结构</a></h2>
+<h2 id="_源码目录结构"><a class="link" href="#_源码目录结构">3. 源码目录结构</a></h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_源码"><a class="link" href="#_源码">3.1. 源码</a></h3>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="SourceCodeDirectory4.svg" alt="SourceCodeDirectory4" width="602" height="368">
-</div>
+<img src="https://kroki.io/plantuml/svg/eNqVVN1OE0EUvu9T7PVGX4AYwwtAol4qaZbtoW66u1NnBgKJF4tmaU0JooJVkZ8KhCZIK0GptkhfpmdmeQunnV1_LpzCzWbm5Hzfd875zuwk4w7l84Gfy7kkKJMQQm7dJ24J-NQ962HOsu5MkDKE-TnPh_wc8QtAJ-5atk1HObeDJ7atkp7m_5PmuL5tW4-4JbafX71fF2tHWD0XzQZu102wWUpKQDVSn8djXN9Txadq51Wx3MbWJ1HtyOP2LQtXY1w_1mG5sTvoHiVRjK9XdUR9k68_VERufcf4TJ72jEIkCEiohTD-jPGpYjcBCrCQZl9E-PKV0hn0G0rWiPEYp97sPPcyKfHizbCL6oqikFst_LlpxBOXpbi3FdHYN-XCohOUfdDpmfnyoDu4rA16-3Jv2QRWd55ZpaeZ9Cuid6BHibtd2YjGDNQnxaIXFlOO-iH269jakWtfrmVH6ATAaDrhaXV5AHQB6A0YhkHFwZy_qtALdBGJjUuxV8HKiomAQkD4b-w0cL6U9D_KZu0q-jC0euzuqvqV0-lTYbr-ziHGnTGVM04o_FPxyTt81rxB74wvZc5rr93H4JZG0dTBEZeJggPLnt23WtLevJYuJ8RPF_RPpzO5SQgL6m_0C3toAdY=" alt="SourceCodeDirectory4">
 </div>
 </div>
 </div>
@@ -260,17 +274,17 @@ $(globalSwitch);
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_nameserver启动流程"><a class="link" href="#_nameserver启动流程">4.1. NameServer启动流程</a></h3>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="NameServerStartup.svg" alt="NameServerStartup" width="1055" height="459">
+<img src="https://kroki.io/plantuml/svg/eNqNlF1PE0EUhu_3V0wCVwQW8MKPhjQk3phojLGJt3ap07Lp7k6ZnTYiMZGPFqytbSppFUHd0EKjkQVJSsvS8Gd2Zrf_wmF3W9Ci4WomZ-d955znnNlZnUiYpFVFEIhMFAho2aT5Js02aGk3BBBOiFJKis1DEaNYEhJ1QdQkFeo4Iz7214hnkBpRJVmbEoQ_o2AiDP6KhADd-Eyt0yB8H2kEI0WBWNAQgUCBcSKMAJr_5na7vWzR6R70jM448Ldsp8FOyyFhbAxMTMwk4WIYzGQkJQ3DYHDW-xhjhXV6sBWoquu21eIe1kf3oG53z53N5uhSWodYnEcqfD0ZlNRfxRRGKYiJDPVBKgpKzEmxJKs16HnNtw2B0aU-lQeeTwxp8cng5PO-2UsOl7scLru7WV_orh-D6GX9cTkRBbRS4DFIyGIE4gzE_bhzZNntnwLUXoALPv8BfEmSM5Y1mciSIr_iimGuyYyfyEVgY4fuv6OFanD7U6giImsJP4so6FNzfph8Iu7dvXObi9hxk-YKrnnCjlZofc0p56jZcY-MgcdCGurkCYcDdR3h6NV77Hbdbn_nvWG1lm1ZNG8II9zRLE1POfsV1s5yt-lbF3uay7Jfht3OszyHvuqeHNvnBls2na21OYySfGL6QrqR61W-srcfaPHw4bPL2vZW2JdtevaGD7V9motEHrGmQc9K4zybTz4J11y2O3uBYgjyFaRDg3zDRnjv61-Gw8AHCq9pWE7ME8F_kt5htl3kwHgvxgF732CbLVqv9labQSc6Lb8Z4tVKrrnjulRvVLIwy435z-I3Yrj69A==" alt="NameServerStartup">
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_broker启动流程"><a class="link" href="#_broker启动流程">4.2. Broker启动流程</a></h3>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="BrokerStartup.svg" alt="BrokerStartup" width="2695" height="1378">
+<img src="https://kroki.io/plantuml/svg/eNqdV21PG0cQ_u5fcQr9FDkGGqlSURQlIaIg5YUCUj9EUTnOa3Px2efcS9q0amUgxoZgMAkFBwPBYAJNE2wKImCH-M949-7-Reduz-f3xOkX2ze7-8zs88zMjW_ICispalBwuRReERCDkzk8f4Cje3hpt48RJb-HDbPcJPJIIhdASvCxZ0ISA0jy3LK-Rq3j4a4gy4dcrjobc-U6U2_oY3A8jYsFau0XQ4okCgKSXCFRQYyAfIqri8Hz2_rFhRFNaBeHRubczdCfZHOPFJJ9rsuXmStXrgXQ0-vMtSesoKLrjLPXWuTIQgwfrtunVmPl4imgku2M8XbhHhtEo0h6giS8kcebEWehXFzU56e16XN6uSEvLkWNTBFn98uFxR4nKkH0T7BcgKzt4dIa9dDHfPN7hZpBMYj-6ObEkK_b3vmzTdavQDCA5Kf03Sg9p8eOmXGHCB_vH2fczPg9pChPaYS2tWLsF3gUUqrGu0iWWT8aVUQJVQC0o2L57L3HhUJexqS0rSBV6kETPsQrPCvwvyGqg8T7J00hgBNKH2CSqR2cTYyJYZ4jp3EylXMz-uGOkYri6LF2XMQvFsCsn5zrpTQuvNHez5VLGdhlCkKZ46wQuxUTQfY8ksUQxcbxPDNu4dJL3GVDcCupS6maxtgJAY0z1s0a8eBLVoNIuu_zyUhpxO2vW61Ai9bT51BldULmJD6s8GLoB0lUw43Ao40bKthNJzsJfoAXFMiRNsHT1YoDn_V0m1XYW08t2mzsLru0biMfqwpKbXY4a1YejaCgqPAhP00yqK5iSj_Mav_koN57e77v7TWVPyuQRbMB4OwzLTk7DPkNeKJEYXDymR57q60_0wol7eA5Odp2PJTPIuVCGqqPrJ2Wi0U8n7GWNvH-c7ywOiaxIZnlTG5YwY6wfxJxATMWnjMDJccHeHZhZLh_UBQDTXlck7aNveXLrYdCy5Oq4hV_CeH0lp6fgSzOz2grB43wXZVtnVWQ1UNbB9lCD-dAXbXRvjuCwqqz2WGFrg3ebLSMQl_2qgJqc2BAUOXJShr9qCK1aUe_GAzyyh3RX4U0I4TbKnLNXktbdkKUFKefttUbkpzklnp7tP0X5CxqvMpylg_oh9Ak7Ix_DLGoyMaqHMDxWePFa7IbIa_3AJe8y9QlsVk8b6bJ1gb-GIFQ6wj1ognV74aYXgESOC6XNvH7FAV5BFxzgbqwalxou1NaOoXjf0MSaIuxasa10q2F-K1Fb1FonxPd2k42EkAf1KGbgdojK6c4u2rMHOi5D-RoGp-f0lKs6e2tnHQcITQV9BOrcJO2yq3C09LLOPlu7M6onpsqn7-hcrltFcjGHF5KQVED6UYsQVbztLVV42ty0XFw1HZfhUZ3c3jICa3B3DHcsCoII2bOycqgKHgbb9xmuWN4-mIeFFUZBRAK22K04bSSg3huBUqj99sePBsl_2YsNpeNyBT5K08Sh9BbK2XbDc3Xq3JIMl5-gryo0b-9368kuq6V0Yz8YqfuEE1Cfl4GvejSTUFolf617cNtVulVi6HkcnVaK5_Nk3mYuWb0D8ceBi_ljMi6XopV4Ksbh5HEi146YdFDxtqJsb4CaUsHuo0Di_8_vzM_9YUZnD4BCTzWS8_yMRvFh-cwZjJ0crPnxMrjkLe6kkxo-3l4JHMRfLRlpGe1T1nHWD4r0oHSAQCLsZOyx1JL5o7ebzVl0Mxmc0lcelAl4yEzIsLSUMgn2uPDpSYU5kFvz9WH9bKQ9AnUMwdvDxPX65WsIcZZoNd37PjiJZ5LUCO9Mp39gPJoHMe3cXIR72yZaluNwxpaKAvQQACR9m0L2Rr6rBdVK493-CfUDgMPVAjZiOilZdrGaWZAFoHajicaGJUV9lMQkso5sz71PPcJxwqOXHxYL63AcAA2vFisUehLxDYJ9r_7FbUNsLIywPKCWjMwNK98JWhlWHLdgIvBn77_AMSMa0k=" alt="BrokerStartup">
 </div>
 </div>
 </div>
@@ -310,9 +324,9 @@ $(globalSwitch);
 <div class="paragraph">
 <p>核心类为 <code>org.apache.rocketmq.namesrv.routeinfo.RouteInfoManager</code> , 接收到Broker注册然后维护cluster, broker, topic信息.</p>
 </div>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="RouteManagerInfo.svg" alt="RouteManagerInfo" width="2266" height="432">
+<img src="https://kroki.io/plantuml/svg/eNqlVltPE0EUfu78isk-qSllWyngRgigkJAAXlr1wRgytENZ2e7W3dkSYkgAQUEpoIFIFE1INBITKUQTq6j8mW67PPkXnNnZbrdb8BLTl5nvXObM-b452x6DIJ2YWQUAIhMFQ8H-XKxuHJSPdipzRevDljW_Wz04lKCmZyIoh1ITOKJrqUlMsvciKspiQ89TwCRYVse1yHW2GqSrYaSiDNYFAO4amgqFYZS7mCC6rGZaz8GUYhoE6yM0HJ5rDcMEJnXjmK5Nerbu7ppzbzqtJ9GYggWIjCYQ3gch4TIeR6ZCLnGbIMHbAk_WgoQ7YAYAVSMYEi0HtfGmDKCrq6sJlGpIC09kLX605zYqm_uVwh7gzTl--bD640259KSyPFvZXq6-WHBd1wvVd_tnrPWFcul9uXRoP56vzn8JmMulgrW-Eoblw1VuL5dWPd9Gx1n70aezYBJPl0tf-Znc8vPbSh4pJqawXXzrVUMP4gX1-bJQq7W-FAFYTUPWC3AiOw0EhCFPcBkR1O2aGqkIYJQJGKr3XXL2NYB5GTUsJIh0KURjHRGR_qJSVLwQjQrMNBP2BbFKmKOXkxtTHs1B4ql5Jkh3oEqH7QAmuVfl0ndb7W-fr9X1pkig1jHuZD1boY23Dl77SYp4TpQazq619Nze2Q1DOU3TiYyureIwYvVz-9-xxIr3sTQk553XV2OK7YNMeZjzZoLdZ9yw5k4gVcWKuw0JKEVoGN0S3cRhB5LVnEkSEyZJa1MqtYwjxXBNWg6rDb50KpzqrOOMzK6N0w0hxonOU7pMnPtwV-BIheJpysRNrBuypno1pzRT5QKJ8mAi03FFUDbHoPbO8_F4u3g-FhPbvDQTKIH1PG9rszZjguOkUJZu5OiJONmUsCPeFotHRXCaAL3m-wToYRKsFNfotOBcugPhBDFu71uvZpvEaK09PZ6ds44e2J8_8ih7b9_6vmkVv9gHO436-JO4aM1yytFVHYbB0QDD8JqJTeyMhm4e4wCu4noTQcxRXKJ_aGA02Z9IjiavXB28VFNcw8QI_e7xM2MO61kKt9ckhNLOKSNm1vDxzU5PTBsDCspQVKxLCDd4M_qBowAh2XcrKsb-q6aOk2vq_KeaOt2agioKNNRRUQCTYJIBLX2nfbG4yJwoa3uXf6D4VegUOl4sVL_vuf4-kfTQNf2X8AvQCBzq" alt="RouteManagerInfo">
 </div>
 </div>
 </div>
@@ -563,7 +577,284 @@ $(globalSwitch);
 </div>
 </div>
 <div class="sect1">
-<h2 id="_源码调试"><a class="link" href="#_源码调试">6. 源码调试</a></h2>
+<h2 id="_消息存储"><a class="link" href="#_消息存储">6. 消息存储</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>消息储存入口: <code>org.apache.rocketmq.store.DefaultMessageStore#asyncPutMessage</code></p>
+</div>
+<div class="sect2">
+<h3 id="_文件结构"><a class="link" href="#_文件结构">6.1. 文件结构</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>commitlog: 存放所有主题消息的目录, 文件名为起始偏移地址, 顺序写满单文件1G后继续写写到下一个文件, 对应代码中MappedFile对象.</p>
+</li>
+<li>
+<p>config:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>consumerFilter.json: 消费者Topic过滤信息.</p>
+</li>
+<li>
+<p>consumerOffset.json: 消费者消费偏移量进度数据.</p>
+</li>
+<li>
+<p>delayOffset.json: 延迟队列进度数据.</p>
+</li>
+<li>
+<p>subscriptionGroup.json: 消费者组的配置信息.</p>
+</li>
+<li>
+<p>topics.json: 主题配置信息.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>consumequeue: 为方便消费者按Topic-Queue-Tag消费消息, 按每个Topic/QueueId新建目录, 在每个目录下存储消息在CommitLog中的偏移地址(8字节), 消息大小(4字节)和tag的哈希码(8字节), 单文件30w*20KB=5.72MB.</p>
+</li>
+<li>
+<p>index: 存储消息索引数据的文件目录, 存储: key哈希码, 消息在commitlog中偏移量, 与第一条消息的时间错差值, 前一个索引编号.</p>
+</li>
+<li>
+<p>checkpoint: 存储CommitLog, ConsumeQueue, Index文件各自最近一次刷盘的时间戳.</p>
+</li>
+<li>
+<p>lock: 文件锁.</p>
+</li>
+<li>
+<p>abort: 如果存在abort文件, 说明Broker异常退出.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_刷盘策略"><a class="link" href="#_刷盘策略">6.2. 刷盘策略</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>同步刷盘: Broker收到消息后, 写入内存再提交刷盘任务, 将待提交的数据(write到flush指针范围)批量写到硬盘再返回.</p>
+</li>
+<li>
+<p>异步刷盘: Broker收到消息后, 写入内存后直接返回, 另起一个500ms的定时线程将pagecache写入硬盘.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_transientstorepoolenable机制"><a class="link" href="#_transientstorepoolenable机制">6.3. transientStorePoolEnable机制</a></h3>
+<div class="paragraph">
+<p>为了缓解pagecache在高并发场景下的读写压力, RocketMQ可以开启 <code>transientStorePoolEnable=true</code> .
+Broker收到消息后写入到堆外内存后直接返回, 然后异步将堆外内存的增量数据同步到pagecache, 最后异步写入到硬盘中.
+如果进程异常退出, pagecache中的数据会写入到硬盘不会丢失, 但是堆外内存的数据会丢失.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_消息存储格式"><a class="link" href="#_消息存储格式">6.4. 消息存储格式</a></h3>
+<div class="paragraph">
+<p>入口: <code>org.apache.rocketmq.store.CommitLog.MessageExtEncoder#encode</code> 和 <code>org.apache.rocketmq.store.CommitLog.DefaultAppendMessageCallback#doAppend</code></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_索引文件同步"><a class="link" href="#_索引文件同步">6.5. 索引文件同步</a></h3>
+<div class="paragraph">
+<p>reputService线程对比发现有新消息写入到commitlog文件后, 会从commitlog中读取读取数据写入到consumequeue和index文件中, 然后更新checkpoint.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>reputService线程工作入口: <code>org.apache.rocketmq.store.DefaultMessageStore.ReputMessageService#doReput</code> .</p>
+</li>
+<li>
+<p>consumequeue保存入口(异步刷盘): <code>org.apache.rocketmq.store.DefaultMessageStore.CommitLogDispatcherBuildConsumeQueue#dispatch</code> .</p>
+</li>
+<li>
+<p>index保存入口(写满文件才会主动刷盘): <code>org.apache.rocketmq.store.DefaultMessageStore.CommitLogDispatcherBuildIndex#dispatch</code> .</p>
+</li>
+<li>
+<p>checkpoint保存入口: <code>org.apache.rocketmq.store.StoreCheckpoint#flush</code> .</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_过期文件删除机制"><a class="link" href="#_过期文件删除机制">6.6. 过期文件删除机制</a></h3>
+<div class="paragraph">
+<p>RocketMQ每10秒钟执行一次commitlog/consumequeue文件过期检查定时任务, 符合以下条件时会从倒数第二个文件扫描到第一个文件, 扫描出 <code>fileReservedTime(默认72小时)</code> 时间内未写入过的文件并删除:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>当前时间为凌晨4点.</p>
+</li>
+<li>
+<p>磁盘分区使用率达到85%.</p>
+</li>
+<li>
+<p>人工提交删除任务.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_消息消费"><a class="link" href="#_消息消费">7. 消息消费</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_push消费者启动流程"><a class="link" href="#_push消费者启动流程">7.1. push消费者启动流程</a></h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>启动Consumer, 保存订阅关系到 <code>subscriptionInner</code> , 并从 <code>pullRequestQueue</code> 阻塞队列拉取消费请求.</p>
+</li>
+<li>
+<p>启动 <code>ConsumeMessageConcurrentlyService</code> , 每15分钟将未消费完的消息返还给Broker.</p>
+</li>
+<li>
+<p>如果是广播消费模式, 则从本地加载offset.</p>
+</li>
+<li>
+<p>启动 <code>MQClientInstance</code> .</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>建立和Broker的链接.</p>
+</li>
+<li>
+<p>启动一个定时任务, 每2分钟重新获取一次NameServer的地址.</p>
+</li>
+<li>
+<p>启动 <code>PullMessageService</code> .</p>
+</li>
+<li>
+<p>启动 <code>RebalanceServiceImpl</code> : 每20秒对每个消费的Topic获取消费队列, 如果和上次不同, 则会停止未分配给自己的queue和消费新增的queue, 然后立即转成 <code>PullRequest</code> 对象放到 <code>pullRequestQueue</code> 中让consumer开始消费, 消费完后继续将 <code>PullRequest</code> 对象放到队列里.</p>
+</li>
+<li>
+<p>启动 <code>DefaultMQProducerImpl</code> .</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>立即执行一次rebalance.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_消息消费流程"><a class="link" href="#_消息消费流程">7.2. 消息消费流程</a></h3>
+<div class="paragraph">
+<p>消费入口: <code>org.apache.rocketmq.client.impl.consumer.PullMessageService#run</code></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>从 <code>pullRequestQueue</code> 阻塞队列拉取消费请求.</p>
+</li>
+<li>
+<p>根据consumerGroup名称找到 <code>DefaultMQPushConsumerImpl</code> 处理对象.</p>
+</li>
+<li>
+<p>判断如果queue被dropped, 则说明该队列被rebalance到别的消费者里了, 立即返回.</p>
+</li>
+<li>
+<p>如果队列中待处理的消息大于1000条或者大于100MB, 则延迟50ms后再消费.</p>
+</li>
+<li>
+<p>如果是并发消费模式, 且offset最小最大之差大于2000, 则延迟50ms后再消费.</p>
+</li>
+<li>
+<p>根据Broker名称找到节点ip地址, 拉取消息 <code>org.apache.rocketmq.client.impl.MQClientAPIImpl#pullMessage</code> .</p>
+</li>
+<li>
+<p>进入拉取消息成功的回调: <code>org.apache.rocketmq.client.consumer.PullCallback#onSuccess</code> .</p>
+</li>
+<li>
+<p>更新下一次PullRequest的offset.</p>
+</li>
+<li>
+<p>如果没有拉取到消息列表, 则重复执行一次PullRequest任务.</p>
+</li>
+<li>
+<p>将消息列表放入TreeMap中按offset排好序.</p>
+</li>
+<li>
+<p>将消息列表按consumeMessageBatchMaxSize(默认为1)分区, 提交到消费线程池中.</p>
+</li>
+<li>
+<p>执行消费前置hook: <code>org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl#executeHookBefore</code> .</p>
+</li>
+<li>
+<p>执行应用消费逻辑: <code>org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently#consumeMessage</code> .</p>
+</li>
+<li>
+<p>执行消费后置hook: <code>org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl#executeHookAfter</code> .</p>
+</li>
+<li>
+<p>从processQueue中删除已消费的消息列表.</p>
+</li>
+<li>
+<p>如果消费失败: 广播模式下只打印日志, 集群模式下将消息重新发送到Broker延迟队列中, 如果发送失败则将消息在本地5秒后重新消费.</p>
+</li>
+<li>
+<p>如果消费成功: 更新offsetTable. 如果processQueue中不存在其他待消费的消息, 则提交最大的offset, 否则提交最小的offset.</p>
+</li>
+<li>
+<p>定时任务每10秒将offsetTable数据持久化, 广播模式下持久化到本地 <code>.rocketmq_offsets</code> 文件中, 集群模式下提交到Broker保存.</p>
+</li>
+<li>
+<p>将PullRequest重新放入队列中重复执行下一次拉取消息任务.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_消费者负载均衡机制"><a class="link" href="#_消费者负载均衡机制">7.3. 消费者负载均衡机制</a></h3>
+<div class="paragraph">
+<p>消费者通过指定 <code>org.apache.rocketmq.client.consumer.AllocateMessageQueueStrategy</code> 来控制负载均衡机制.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_延迟消息消费流程"><a class="link" href="#_延迟消息消费流程">7.4. 延迟消息消费流程</a></h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>RocketMQ支持 <code>1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h</code> 18个延迟级别, 每个延迟级别对应一个 <code>SCHEDULE_TOPIC_XXXX</code> 下的队列, 和一个定时任务.</p>
+</li>
+<li>
+<p>延迟消息发送到Broker中后, 将原topic, tag, queueId设置到properties中, 然后根据延迟级别保存到 <code>SCHEDULE_TOPIC_XXXX</code> topic中.</p>
+</li>
+<li>
+<p>Broker中的定时任务会扫描queue中所有的消息, 判断当前时间和消息存储时间的差值, 如果等于延迟时间则将消息重新保存到原Topic的queue中等待消费者拉取消费.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_消息过滤机制"><a class="link" href="#_消息过滤机制">7.5. 消息过滤机制</a></h3>
+<div class="paragraph">
+<p>RocketMQ支持表达式过滤(可以细分为tag和sql92过滤方式)和类过滤方式.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>tag: Producer指定发送消息的tag, 消费者根据tag过滤表达式拉取消息, 多个tag用 <code>|</code> 分隔, 通配用 <code>*</code> .</p>
+</li>
+<li>
+<p>sql92: Producer指定发送消息的property, 消费者设置sql表达式过滤, 如 <code>xxx is not null and xxx &gt; 0</code> .</p>
+</li>
+<li>
+<p>classFilter: 部署filterServer, 在其中实现 <code>MessageFilter</code> 接口. 消费者指定 <code>MessageFilter</code> 全限定名, Broker会远程调用filterServer判断是否消费.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_源码调试"><a class="link" href="#_源码调试">8. 源码调试</a></h2>
 <div class="sectionbody">
 <div class="olist arabic">
 <ol class="arabic">
@@ -572,9 +863,9 @@ $(globalSwitch);
 </li>
 <li>
 <p>创建RocketMQ目录及配置:</p>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="rocketmq_debug_dir.svg" alt="rocketmq debug dir" width="345" height="203">
+<img src="https://kroki.io/plantuml/svg/eNqdkDsOwjAQRHufwrWLuI8QygUooEXIcpwNIH82rJeIgsPjfEpIQT1v34y2yWyJnzEI4TAOmCCxPKHzwIejPAspdzUOkEx_D2B6DB1QvZdK6cHyTTNqmuH4UKrAb_MDTzZCBhqBZm6DdJj6lVk4GfDaWufN7KCxepW1G4KW0P9Ts9xVU_CtfY2X8g1xZiQo5otoIHXTZz-7MHLY" alt="rocketmq_debug_dir">
 </div>
 </div>
 </li>

@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <title>Interview</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="js/highlight/styles/idea.min.css">
+<script src="js/setup.js"></script><script defer src="js/site.js"></script>
+
 <style>
 .hidden {
   display: none;
@@ -4067,6 +4069,32 @@ $(globalSwitch);
 </li>
 <li>
 <p>如果启用了故障延迟机制, 则会根据发送latency在一定时间内一直规避上一次失败的Broker.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>什么情况下会导致消息重复消费?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>消费者提交offset前宕机.</p>
+</li>
+<li>
+<p>消费过程中rebalance, 消费中的queue被分配给其他消费者, 则此刻未提交的消息会被其他消费者消费一次.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>push和pull消费模式区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>pull: 消费客户端手动调用pull拉取消息, 消费完手动提交offset.</p>
+</li>
+<li>
+<p>push: 消费客户端注册消息消费的回调. 消费完会自动提交offset并拉取下一批消息继续消费.</p>
 </li>
 </ul>
 </div>

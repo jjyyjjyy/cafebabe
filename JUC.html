@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <title>JUC</title>
 <link rel="stylesheet" href="css/spring.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="js/highlight/styles/idea.min.css">
+<script src="js/setup.js"></script><script defer src="js/site.js"></script>
+
 <style>
 .hidden {
   display: none;
@@ -322,118 +324,11 @@ $(globalSwitch);
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="listingblock">
-<div class="title">Java并发思维导图</div>
+<div class="imageblock kroki">
 <div class="content">
-<pre>Failed to generate image: PlantUML preprocessing failed: [From &lt;input&gt; (line 8) ]
-
-@startmindmap
-
-
-
-
-...
-... ( skipping 110 lines )
-...
-    roundcorner 8
-
-    NoteFontName Roboto Condensed
-    NoteFontStyle Italic
-
-}
-
-&lt;style&gt;
-  mindmapDiagram {
-    node {
-      BackgroundColor #FFF
-      LineColor #000
-    }
-  }
-&lt;/style&gt;
-
-
-* JUC
-
-left
-^^^^^
- Syntax Error?
-
-@startmindmap
-
-!include ../global/stylesheet.iuml
-!include ../global/mindmap.iuml
-
-* JUC
-
-left
-
-** 1. 多线程基础
-*** 创建线程的方式
-**** 继承Thread
-**** 实现Runnable接口, 创建Thread对象
-**** 实现Callable接口, 创建FutureTask对象
-*** 关闭线程的方式
-**** 设置关闭标志位
-**** 中断线程
-*** 线程状态流转
-**** NEW
-**** RUNNABLE
-**** WAITING
-**** TIMED_WAITING
-**** BLOCKED
-**** TERMINATED
-*** volatile
-*** synchronized
-*** JMM
-** 锁
-*** 互斥锁
-*** 读写锁
-*** Condition
-** CAS
-*** 实现原理
-*** ABA问题解决
-*** CAS工具类
-**** AtomicInteger
-**** AtomicLong
-**** AtomicBoolean
-**** AtomicReference
-**** AtomicIntegerArray
-**** AtomicLongArray
-**** AtomicReferenceArray
-**** AtomicIntegerFieldUpdater
-**** AtomicLongFieldUpdater
-**** LongAddr
-
-right
-
-** 并发工具类
-*** Semaphore
-*** CountDownLatch
-*** CyclicBarrier
-*** Exchanger
-*** Phaser
-** 并发容器
-*** BlockingQueue
-*** BlockingDeque
-*** CopyOnWrite
-*** ConcurrentLinkedQueue
-*** ConcurrentLinkedDeque
-*** ConcurrentHashMap
-*** ConcurrentSkipListMap
-** 线程池
-*** 线程池类型
-*** 线程池关闭
-*** 线程调度流程
-*** 实现
-**** ThreadPoolExecutor
-**** ScheduledThreadPoolExecutor
-**** ForkJoinPool
-** 异步
-*** Future
-*** CompletableFuture
-
-@endmindmap</pre>
+<img src="https://kroki.io/plantuml/svg/eNp1VF1T00AUfc-viK8dp4z_gPQDLbYF2zI8OkuyNDvd7tbNRqlPoIIfjEUdBwRn-BArPEiBYQTbgvwZNmn_hWk2lZTiW845957dvbn3jlocMF5GxCiDiqLcQUTHtgHVaHSkiOkMwCMWr2JomRDyKLLL-LaQIF3qSkQdn4orCoazXLWQAT0mot6LquL7htu6dPeXxVbL3Zn32Igq3nwV7Zak3Y1XzmpTnK_0lIjqtvect5cFk0FgSEY0Nt3aUc4mBMxg6NTqYmX3bmAh48Rhs3O8E46OA4yHo8dsbjNYAFbpOkMViyfdtYNb79Jp_HEvGjLA2X4tLteuLt5L6er3gbMaZPk2gcG7U2d-wfm10Ln4KQOzyWn5kZvKZrVYOinRtJYqpLL3JSikMsnE4wEqlp6IP0wmAj2Zy6SyWkFi9SnFgCMMfWBViW4yStBz6NdLHc9kepXvfl7w4VXrk7Na76POYVssrfdRnBIDcURJLyGu5ZXrAoralvthySe0mNZda3S_fens7YqlE5mp5cVZXSyeucdteUeN0zLSU4TDImRhKk1JMYxjlGIISJjKwVnIINHhLVYaY6B602-I_OcwpAQ2YwhiY6piAD58u2HNP8MwmKIwVDRD_Syap2Ll48DT1Tz0hsCkDAY1tQlP0GckDbhuSqqqY-_dgDEkD1CTc7oJSFAoddIElv_Zt280xfq-L8Uw1UuIFB_Z0IYDTAI-sfsnVqoTZJoh3sdEt5lXDZ5GpASN69ybStijrzwAlpnxdsIgmy-hShpZXCpBszvH26HW95BXEbG5PMjJ6QlxnaOXovXDG5H-5MiGCzrdn-dJr0WSc1C3OQ1-SF43oWFjaPwvYIyy0jhFpKf4lTx_4RzUfX859cGDyhUMeW8zBKwyCr0lFuzBv6U9B6A=" alt="Java并发思维导图">
 </div>
+<div class="title">Figure 1. Java并发思维导图</div>
 </div>
 </div>
 </div>
@@ -617,11 +512,11 @@ public class ThreadC implements Callable&lt;String&gt; {
 </li>
 </ul>
 </div>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="ThreadState.svg" alt="Diagram" width="2216" height="1066">
+<img src="https://kroki.io/plantuml/svg/eNq9Uk9LwzAcvedTxNscrLt7kE1XpLh1MCs7iEjX_lyzZUlIU6TevCmICs7dRPwGggdRD34ZN-e3MO3-0DkFTx4CyXsv7_3ySClUrlRRjyK0QphHIx-wYRTblLdcWgxVTCEMAJRBEk1ANA09oWLsQ-hJIhThDKG9_D4uFNaxbTaRXum-sWvblr2F13AagWbnQiQ0u1Gtb26blYSNmRdIzsgx-O8vZ8PLwWf_BM34b04Z7fjiSWuHpw-JfG4uSTtQ-k6zbDkaQIwrwJxhSlgXYZzH9VYHPGUcuUTlVlPECSS4vtHhhE2RKve6O5EQXCqD6r2Ggfk48UJT4-xgv4ZonBzGU9MFrEzpD1kRE67s5iYDZTLnr9OZjtmoWXbZSbuTERsNnkePN-O3q_H9-cfr9ej2blFu1czKwZ_aoJy1lxtZQkMKIDLwUlkTaj78wgT_WlumqiRWf1KESppNfvIXSo36VQ==" alt="线程状态流转图">
 </div>
-<div class="title">Figure 1. 线程状态流转图</div>
+<div class="title">Figure 2. 线程状态流转图</div>
 </div>
 </div>
 </div>
@@ -1172,71 +1067,11 @@ LongAddr求和的时候没有对单元加锁, 所以取值操作只满足最终�
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_reentrantlock"><a class="link" href="#_reentrantlock">7.1. ReentrantLock</a></h3>
-<div class="listingblock">
-<div class="title">ReentrantLock类图</div>
+<div class="imageblock kroki">
 <div class="content">
-<pre>Failed to generate image: PlantUML preprocessing failed: [From &lt;input&gt; (line 18) ]
-
-@startuml
-
-
-
-
-...
-... ( skipping 111 lines )
-...
-
-    NoteFontName Roboto Condensed
-    NoteFontStyle Italic
-
-}
-
-interface Lock {
-  + void lock();
-  + void lockInterruptibly() throws InterruptedException;
-  + boolean tryLock();
-  + boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
-  + void unlock();
-  + Condition newCondition();
-}
-class ReentrantLock
-Lock &lt;.. ReentrantLock
-
-class AbstractOwnableSynchronizer
-class AbstractQueuedSynchronizer
-class ReentrantLock.Sync
-^^^^^
- Bad hierarchy for class ReentrantLock.Sync
-
-@startuml
-
-!include ../../charts/global/stylesheet.iuml
-
-interface Lock {
-  + void lock();
-  + void lockInterruptibly() throws InterruptedException;
-  + boolean tryLock();
-  + boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
-  + void unlock();
-  + Condition newCondition();
-}
-class ReentrantLock
-Lock &lt;.. ReentrantLock
-
-class AbstractOwnableSynchronizer
-class AbstractQueuedSynchronizer
-class ReentrantLock.Sync
-class ReentrantLock.NonfairSync
-class ReentrantLock.FairSync
-AbstractOwnableSynchronizer &lt;|-- AbstractQueuedSynchronizer
-AbstractQueuedSynchronizer &lt;|-- ReentrantLock.Sync
-ReentrantLock.Sync &lt;|-- ReentrantLock.NonfairSync
-ReentrantLock.Sync &lt;|-- ReentrantLock.FairSync
-
-ReentrantLock -&gt; ReentrantLock.Sync
-
-@enduml</pre>
+<img src="https://kroki.io/plantuml/svg/eNqNkn1LwzAQxv_vpzjBPza07QdwyEQUhKH49gHS9LYGs4skF2t9-e4mnY62dmMQDu55fnd5Apk7Fpb9WifJkSKpfYmQZXk4sgqGy1faFELnjhuNrkLkTLW0Ika7FBJhYeQLfCYAJ_BmVAk69JPpWV-4ibj1r6wK3UymwJU1tYOtjOXVu8RgG9pMFsZoFARsm0Vn4VDWhlbAao2n8BTqMykGH8oBN7TZPHXjXhoqVSSAsN420f1OpBbOwQMisRXE8fakffosywbyL3tRuKBJvqtJFBofG5IhE6kPtAPi3qPHcgTo7T2OwKhxa2gplN3pX_-ZeyLB7CtN9yXabW1GR7L-l8bQbvrDJrbv6fOQno-lSOZIZfy0P8bwC9I=" alt="ReentrantLock类图">
 </div>
+<div class="title">Figure 3. ReentrantLock类图</div>
 </div>
 <div class="ulist">
 <div class="title">ReentrantLock与synchronized对比</div>
@@ -1606,78 +1441,11 @@ ReentrantLock -&gt; ReentrantLock.Sync
 <div class="paragraph">
 <p><code>ReentrantReadWriteLock</code> 实现了读写/写写互斥, 但是读读不互斥.</p>
 </div>
-<div class="listingblock">
-<div class="title">ReentrantReadWriteLock类图</div>
+<div class="imageblock kroki">
 <div class="content">
-<pre>Failed to generate image: PlantUML preprocessing failed: [From &lt;input&gt; (line 19) ]
-
-@startuml
-
-
-
-
-...
-... ( skipping 112 lines )
-...
-    NoteFontName Roboto Condensed
-    NoteFontStyle Italic
-
-}
-
-class AbstractQueuedSynchronizer
-
-class ReentrantReadWriteLock {
-  + ReentrantReadWriteLock.ReadLock  readLock();
-  + ReentrantReadWriteLock.WriteLock writeLock();
-}
-
-class ReentrantReadWriteLock.Sync {
-  # int tryAcquireShared(int);
-  # boolean tryReleaseShared(int);
-  # boolean tryAcquire(int);
-  # boolean tryRelease(int);
-  boolean readerShouldBlock();
-  boolean writerShouldBlock();
-}
-^^^^^
- Bad hierarchy for class ReentrantReadWriteLock.Sync
-
-@startuml
-
-!include ../../charts/global/stylesheet.iuml
-
-class AbstractQueuedSynchronizer
-
-class ReentrantReadWriteLock {
-  + ReentrantReadWriteLock.ReadLock  readLock();
-  + ReentrantReadWriteLock.WriteLock writeLock();
-}
-
-class ReentrantReadWriteLock.Sync {
-  # int tryAcquireShared(int);
-  # boolean tryReleaseShared(int);
-  # boolean tryAcquire(int);
-  # boolean tryRelease(int);
-  boolean readerShouldBlock();
-  boolean writerShouldBlock();
-}
-class ReentrantReadWriteLock.NonfairSync {
-  boolean readerShouldBlock();
-  boolean writerShouldBlock();
-}
-class ReentrantReadWriteLock.FairSync {
-  boolean readerShouldBlock();
-  boolean writerShouldBlock();
-}
-
-AbstractQueuedSynchronizer &lt;|-- ReentrantReadWriteLock.Sync
-ReentrantReadWriteLock.Sync &lt;|-- ReentrantReadWriteLock.NonfairSync
-ReentrantReadWriteLock.Sync &lt;|-- ReentrantReadWriteLock.FairSync
-
-ReentrantReadWriteLock -&gt; ReentrantReadWriteLock.Sync
-
-@enduml</pre>
+<img src="https://kroki.io/plantuml/svg/eNq1U8FOxCAQvfMVY9bDmk3bD9CYXQ-ejIntwTOF0RJZiDDEVN1_F8i2GpNyMG7CYeC9eTNvgK0n7ijsNWNnyggdJEJdN3GJIQK-eda257rxNGr0AyLVKrOF5t7DrvfkuKCHgAFlNxoxOGvUO7qJ0SKaSDHUIpePThHeWfECHwxgswDWaZdZ4I7R-uKylPCt-zZFKeNQbuI89Zs7WYEyBOTGnXgNymEXvaNcx8NcdwW9tRq5SZQWY-SLlKNKMX8GJyhZRdcNNmh5o2fPE5yN_YYPZX_31jxx5WabJyx1-3912PKjgqvPqirdJivddCn5x6j-rDHNgC0oQHVd7J1t0cj0ub4AIWNE4w==" alt="ReentrantReadWriteLock类图">
 </div>
+<div class="title">Figure 4. ReentrantReadWriteLock类图</div>
 </div>
 <div class="paragraph">
 <p><code>ReentrantReadWriteLock</code> 内部将state高16位维护持有共享锁线程的重入次数, 低16位维护持有排他锁线程的重入次数, 这是为了CAS无法同时对两个变量操作.<br>
@@ -1860,7 +1628,7 @@ static final class FairSync extends Sync {
 <div class="listingblock">
 <div class="title">filename.java</div>
 <div class="content">
-<pre>package me.jy.lang.thread.juc;
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.juc;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.stream.IntStream;
@@ -1911,7 +1679,7 @@ public class StampedLockDemo {
         return Math.sqrt(currentX * currentX + currentY * currentY);
     }
 
-}</pre>
+}</code></pre>
 </div>
 </div>
 </div>
@@ -4201,9 +3969,9 @@ public class DelayQueue&lt;E extends Delayed&gt; extends AbstractQueue&lt;E&gt; 
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_线程池类继承关系"><a class="link" href="#_线程池类继承关系">10.1. 线程池类继承关系</a></h3>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="ThreadPoolExecutor.svg" alt="Diagram" width="1647" height="1612">
+<img src="https://kroki.io/plantuml/svg/eNqlVMlOwzAQvfsrzC2I0n4AUaACekIItQHOTjwQi4ktxeMuAv4dJzQhzSKKkHLxvMXP43GuLImCXI6MnSidopPAp9OZ_9LMA3b2iiYROLO0Q7AZAE1VxVaaoHgRKfDbLaSOTMHfGednfG2U5FDVIFg6rUWCcHrBPoc0KyjWyq9bUps5kmajA68pi3fKUlj7RA18bzY1IzEGQWiu7Kqj_UFiKHKlBYHsYmIjFNWwMjpAo18nscrhUSvakxeOXAFh7Pd3Sa4ouBaIZaCyRMK-jfHq4BMeH1Iue5T2eRufiCu9Nm8wRwyuDSKkZcbw0neYQEvLW0Gi_ztMeHV63jl-XHvo3dEp_qQZ2PdgXlZpBtIhyOHBaeBWc_el1g0MHq0rfWpJm4RP0ZHq1sZzWqgtyKWgfoa_ej0ryiq3G0Cx-93O904klgqREk9RWMvn-2Wnf-wbjbMChHzwL6LG90CTaYDBmocffpyfd580695U6DljKXrc0nDsztmIS7XDQM5-qeM_oBmdt_AXIbvys13-IL8Ayvva3w==" alt="Diagram">
 </div>
 </div>
 </div>
@@ -4259,9 +4027,9 @@ public class DelayQueue&lt;E extends Delayed&gt; extends AbstractQueue&lt;E&gt; 
 </div>
 <div class="sect2">
 <h3 id="_线程池状态"><a class="link" href="#_线程池状态">10.3. 线程池状态</a></h3>
-<div class="imageblock">
+<div class="imageblock kroki">
 <div class="content">
-<img src="ThreadPoolState.svg" alt="Diagram" width="827" height="766">
+<img src="https://kroki.io/plantuml/svg/eNpzKC5JLCopzc3h4lLMzEvOKU1JVdDT00_PyU9KzNEvLqnMSS3OSE0t0csEqcnIBEqn5haUVCqkpBYnF2UWlGTm53FxRWvFKujaKQSF-vl5-rlzQWmQULBHaIiLf7ifgpVCcUZpSUp-eR5CGiQf4h-AkPLLL-eC6wBJh3i6RIKUWim8nDH_acf0p5N6nu_a_3xF97ONC57s2PV85S4ukAkKxCmFKQGb7Brk6-nnGOLqAtRRklqUm5mXWJLKhSQMUgX0GBeXQ2peCsj3AD_Qbo8=" alt="Diagram">
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">

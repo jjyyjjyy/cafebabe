@@ -9,7 +9,7 @@ class ReentrantReadWriteLock {
   + ReentrantReadWriteLock.WriteLock writeLock();
 }
 
-class ReentrantReadWriteLock.Sync {
+class ReentrantReadWriteLock$Sync {
   # int tryAcquireShared(int);
   # boolean tryReleaseShared(int);
   # boolean tryAcquire(int);
@@ -17,19 +17,19 @@ class ReentrantReadWriteLock.Sync {
   boolean readerShouldBlock();
   boolean writerShouldBlock();
 }
-class ReentrantReadWriteLock.NonfairSync {
+class ReentrantReadWriteLock$NonfairSync {
   boolean readerShouldBlock();
   boolean writerShouldBlock();
 }
-class ReentrantReadWriteLock.FairSync {
+class ReentrantReadWriteLock$FairSync {
   boolean readerShouldBlock();
   boolean writerShouldBlock();
 }
 
-AbstractQueuedSynchronizer <|-- ReentrantReadWriteLock.Sync
-ReentrantReadWriteLock.Sync <|-- ReentrantReadWriteLock.NonfairSync
-ReentrantReadWriteLock.Sync <|-- ReentrantReadWriteLock.FairSync
+AbstractQueuedSynchronizer <|-- ReentrantReadWriteLock$Sync
+ReentrantReadWriteLock$Sync <|-- ReentrantReadWriteLock$NonfairSync
+ReentrantReadWriteLock$Sync <|-- ReentrantReadWriteLock$FairSync
 
-ReentrantReadWriteLock -> ReentrantReadWriteLock.Sync
+ReentrantReadWriteLock -> ReentrantReadWriteLock$Sync
 
 @enduml
