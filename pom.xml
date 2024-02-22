@@ -45,7 +45,7 @@
         <asciidoctor-kroki.version>0.9.1</asciidoctor-kroki.version>
         <asciidoctorj-diagram.version>2.3.0</asciidoctorj-diagram.version>
         <asciidoctorj-diagram-plantuml.version>1.2024.0</asciidoctorj-diagram-plantuml.version>
-        <testcontainer.version>1.19.5</testcontainer.version>
+        <testcontainer.version>1.19.6</testcontainer.version>
         <arthas.version>3.7.2</arthas.version>
         <javassist.version>3.30.2-GA</javassist.version>
         <logstash-logback.version>7.4</logstash-logback.version>
