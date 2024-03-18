@@ -4,30 +4,30 @@
 hide empty description
 
 [*] --> NEW
-NEW --> RUNNING : start
-RUNNING -up-> BLOCKED : synchronized争取锁
-BLOCKED --> RUNNING : synchronized获取到锁
-RUNNING -right-> WAITING
+NEW --> RUNNABLE : start
+RUNNABLE -up-> BLOCKED : synchronized争取锁
+BLOCKED --> RUNNABLE : synchronized获取到锁
+RUNNABLE -right-> WAITING
 note on link
   * Object.wait()
   * Thread.join()
-  * LockSupport.lock()
+  * LockSupport.park()
 end note
-WAITING --> RUNNING
+WAITING --> RUNNABLE
 note on link
   * Object.notify()
   * Object.notifyAll()
   * LockSupport.unpark(Thread)
 end note
-RUNNING --> TERMINATED : run方法运行结束
-RUNNING --> TIMED_WAITING
+RUNNABLE --> TERMINATED : run方法运行结束
+RUNNABLE --> TIMED_WAITING
 note on link
   * Object.wait(long)
   * Thread.join(long)
   * Thread.sleep(long)
-  * LockSupport.lock(long)
+  * LockSupport.park(long)
 end note
-TIMED_WAITING --> RUNNING
+TIMED_WAITING --> RUNNABLE
 note on link
   * Object.notify()
   * Object.notifyAll()

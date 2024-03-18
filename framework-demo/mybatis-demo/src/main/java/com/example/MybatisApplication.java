@@ -25,7 +25,7 @@ public class MybatisApplication {
 
         PooledDataSource dataSource = new PooledDataSource();
         dataSource.setDriver("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql:mybatis-demo");
+        dataSource.setUrl("jdbc:postgresql://workstation.local:5432/mybatis-demo");
         dataSource.setUsername("jy");
         dataSource.setPassword("123456");
 
@@ -40,7 +40,7 @@ public class MybatisApplication {
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
-        userMapper.findAll(new RowBounds(0, 100)).forEach(System.out::println);
+        userMapper.findAll(new RowBounds(0, 10)).forEach(System.out::println);
 
         userMapper.deleteUser(2);
 

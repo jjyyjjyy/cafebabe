@@ -17,7 +17,7 @@ image::./images/CompletableFuture/Synchronous.jpg[,470]
 
 ==== 异步
 
-image::./images/CompletableFuture/Asynchronous.jpg[,500]
+// image::./images/CompletableFuture/Asynchronous.jpg[,500]
 
 > 异步任务创建后立即返回, 任务完成后通知或者回调调用方.
 

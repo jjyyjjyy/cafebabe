@@ -155,7 +155,7 @@ start方法不能重复调用.
 
 当前线程从 `RUNNABLE` 变为 `TIME_WAITING` 状态.
 
-如果调用方调用了这个线程的 `interrupt()` 方法, 则 `sleep` 方法会抛出 `InterruptedException` .
+如果sleep过程中调用方调用了这个线程的 `interrupt()` 方法, 则 `sleep` 方法会抛出 `InterruptedException` .
 
 === _yield_
 
@@ -175,18 +175,11 @@ start方法不能重复调用.
 
 返回当前线程的打断标志, 然后重置为false.
 
-=== Object::wait
-
-当前线程从 `RUNNABLE` 变为 `WAITING` 状态.
-
-=== Object::notify
-
-唤醒另外一个等待线程锁的代码块.
-
 [WARNING]
 ====
 * 每一条线程都有自己的栈空间,拥有一份方法参数、局部变量和返回值的拷贝.每一个线程都有自己的一份标识信息,包括线程名、线程优先级、线程是否存活、线程执行状态、守护线程标识等.
-* 线程内异常无法在外层try-catch, 只能设置Thread的UncaughtExceptionHandler wait()释放对象锁,sleep()不释放.
+* 线程内异常无法在外层try-catch, 只能设置Thread的UncaughtExceptionHandler.
+* wait()释放对象锁, sleep()不释放.
 ====
 
 == volatile
@@ -451,7 +444,7 @@ plantuml::charts/java/ReentrantLock.puml[format=svg]
 * ReentrantLock可中断, synchronized需要手动判断 `interrupted` 标志位.
 * ReentrantLock尝试加锁时可以设置超时时间.
 * ReentrantLock可以设置为公平锁(默认非公平锁).
-* ReentrantLock支持多个条件变量.
+* ReentrantLock支持多个条件变量(Condition).
 
 `ReentrantLock` 加锁释放锁都是通过内部继承了 `AbstractQueuedSynchronizer` 的 `Sync` 类来实现的, Sync又有公平锁和非公平锁区分, 默认为非公平锁.
 
@@ -825,7 +818,7 @@ abstract static class Sync extends AbstractQueuedSynchronizer {
         int c = getState();
         int w = exclusiveCount(c);
         if (c != 0) { // c不等于0, 代表当前有线程正在持有锁.
-            // w为0代表有读线程持有锁, 如果持有锁的线程不是自己, 直接返回false.
+            // w为0代表有写线程持有锁, 如果持有锁的线程不是自己, 直接返回false.
             if (w == 0 || current != getExclusiveOwnerThread())
                 return false;
             if (w + exclusiveCount(acquires) > MAX_COUNT)
@@ -861,9 +854,9 @@ abstract static class Sync extends AbstractQueuedSynchronizer {
     protected final int tryAcquireShared(int unused) {
         Thread current = Thread.currentThread();
         int c = getState();
-        // 排他锁去竞争共享锁的情况, 如果不是当前线程持有的排他锁则竞争失败.
         if (exclusiveCount(c) != 0 &&
             getExclusiveOwnerThread() != current)
+            // 如果当前存在排他锁且不是当前线程持有的排他锁则竞争失败.
             return -1;
         int r = sharedCount(c);
         if (!readerShouldBlock() &&
@@ -1963,6 +1956,11 @@ static class ThreadLocalMap {
             e = tab[i];
         }
         return null;
+    }
+
+    // 开放地址法
+    private static int nextIndex(int i, int len) {
+        return ((i + 1 < len) ? i + 1 : 0);
     }
 
     private void remove(ThreadLocal<?> key) {
@@ -3313,6 +3311,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 * `DiscardPolicy` : 忽略掉新的任务.
 * `DiscardOldestPolicy` : 将队列最老的任务删除掉, 然后去执行新的任务.
 
+////
+
 == 多处理器
 
 === 定义
@@ -3450,3 +3450,5 @@ include::../basic-knowledge/src/main/java/me/jy/lang/thread/lock/spin/CLHLock.ja
 ----
 include::../basic-knowledge/src/main/java/me/jy/lang/thread/lock/spin/MCSLock.java[]
 ----
+
+////

@@ -3,7 +3,7 @@
 <mapper namespace="com.example.UserMapper">
 
     <sql id="sqlSource">
-        from public.ucenter_user
+        from public.t_user
     </sql>
 
     <resultMap id="user" type="com.example.domain.User">
@@ -23,6 +23,7 @@
     <select id="findAll" resultMap="user">
         select *
         <include refid="sqlSource"/>
+        order by id
     </select>
     <select id="findById" resultMap="user">
         select *

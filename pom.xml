@@ -49,6 +49,7 @@
         <arthas.version>3.7.2</arthas.version>
         <javassist.version>3.30.2-GA</javassist.version>
         <logstash-logback.version>7.4</logstash-logback.version>
+        <postgresql.version>42.7.2</postgresql.version>
 
         <maven-complier-plugin.version>3.12.1</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
@@ -102,7 +103,7 @@
             </dependency>
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
@@ -169,6 +170,11 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash-logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

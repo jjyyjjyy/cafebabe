@@ -243,7 +243,7 @@ public class Producer {
 === 刷盘策略
 
 * 同步刷盘: Broker收到消息后, 写入内存再提交刷盘任务, 将待提交的数据(write到flush指针范围)批量写到硬盘再返回.
-* 异步刷盘: Broker收到消息后, 写入内存后直接返回, 另起一个500ms的定时线程将pagecache写入硬盘.
+* 异步刷盘: Broker收到消息后, 写入内存后直接返回, 另起一个500ms的定时线程将 `pagecache` 写入硬盘.
 
 === transientStorePoolEnable机制
 

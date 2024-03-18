@@ -125,7 +125,7 @@ public class MybatisApplication {
 <3> 全局注册Mapper并解析.
 <4> 创建一个 `SqlSessionFactory` 来获取 `SqlSession` , 以实现对数据库的操作.
 
-plantuml::charts/mybatis/MapperAnnotationBuilder.puml[format=svg]
+// plantuml::charts/mybatis/MapperAnnotationBuilder.puml[format=svg]
 
 === 初始化Configuration
 
