@@ -149,8 +149,6 @@ $(globalSwitch);
 <li><a href="#_join">2.5. join</a></li>
 <li><a href="#_interrupt">2.6. interrupt</a></li>
 <li><a href="#_interrupted">2.7. <em>interrupted</em></a></li>
-<li><a href="#_objectwait">2.8. Object::wait</a></li>
-<li><a href="#_objectnotify">2.9. Object::notify</a></li>
 </ul>
 </li>
 <li><a href="#_volatile">3. volatile</a>
@@ -294,28 +292,6 @@ $(globalSwitch);
 </ul>
 </li>
 <li><a href="#_线程池的4种拒绝策略">10.7. 线程池的4种拒绝策略</a></li>
-</ul>
-</li>
-<li><a href="#_多处理器">11. 多处理器</a>
-<ul class="sectlevel2">
-<li><a href="#_定义">11.1. 定义</a></li>
-<li><a href="#_互斥">11.2. 互斥</a>
-<ul class="sectlevel3">
-<li><a href="#_双线程实现互斥">11.2.1. 双线程实现互斥</a></li>
-<li><a href="#_多线程实现互斥">11.2.2. 多线程实现互斥</a></li>
-</ul>
-</li>
-<li><a href="#_内存访问">11.3. 内存访问</a></li>
-<li><a href="#_自旋锁_2">11.4. 自旋锁</a>
-<ul class="sectlevel3">
-<li><a href="#_testandset">11.4.1. TestAndSet</a></li>
-<li><a href="#_testandtestandset">11.4.2. TestAndTestAndSet</a></li>
-<li><a href="#_backoff_testandtestandset">11.4.3. Backoff TestAndTestAndSet</a></li>
-<li><a href="#_队列锁数组">11.4.4. 队列锁(数组)</a></li>
-<li><a href="#_队列锁clh">11.4.5. 队列锁(CLH)</a></li>
-<li><a href="#_队列锁mcs">11.4.6. 队列锁(MCS)</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -514,7 +490,7 @@ public class ThreadC implements Callable&lt;String&gt; {
 </div>
 <div class="imageblock kroki">
 <div class="content">
-<img src="https://kroki.io/plantuml/svg/eNq9Uk9LwzAcvedTxNscrLt7kE1XpLh1MCs7iEjX_lyzZUlIU6TevCmICs7dRPwGggdRD34ZN-e3MO3-0DkFTx4CyXsv7_3ySClUrlRRjyK0QphHIx-wYRTblLdcWgxVTCEMAJRBEk1ANA09oWLsQ-hJIhThDKG9_D4uFNaxbTaRXum-sWvblr2F13AagWbnQiQ0u1Gtb26blYSNmRdIzsgx-O8vZ8PLwWf_BM34b04Z7fjiSWuHpw-JfG4uSTtQ-k6zbDkaQIwrwJxhSlgXYZzH9VYHPGUcuUTlVlPECSS4vtHhhE2RKve6O5EQXCqD6r2Ggfk48UJT4-xgv4ZonBzGU9MFrEzpD1kRE67s5iYDZTLnr9OZjtmoWXbZSbuTERsNnkePN-O3q_H9-cfr9ej2blFu1czKwZ_aoJy1lxtZQkMKIDLwUlkTaj78wgT_WlumqiRWf1KESppNfvIXSo36VQ==" alt="线程状态流转图">
+<img src="https://kroki.io/plantuml/svg/eNq9UkFLwzAYvedXxJsO1t09yDpXpNh1MCs7iEjXxjVrloQ0RerNm4Ko4NxNxH8geBD14J9xc_4L025u3abgyUMgvPfy3pfHV46kK2TcJQCsYOqR2EdQ00ptwlouKUUyISgKEJIaTjUBVjTqcplAH0WewFxiRgHYK-zDYnED2kYTqJPdG7u2rVcsA67DLANMgWLMFV-x6pvbRjWlE-oFglF8jPz3l7PBZf-zdwK--UWvnHh08aTEg9OHVD-zF7gdSPWqqZuOaW8ByiSCjEKCaQggLMB6q4M8qR25WK6uZYgTCOT6WodhOkEs5oU7MedMSI27IlQwoj5MvcDEeG60X1MUjg-TiescphPyQ1hMs7jxRLnQ2f9UqmM0aqatO1l_IqbD_vPw8Wb0djW6P_94vR7e3i3ozZpRPfhTIYTR9nIpS2hEEOI5eKmvMTUdf26C_20uV1aaq5YVgLJi043-ApGc_A8=" alt="线程状态流转图">
 </div>
 <div class="title">Figure 2. 线程状态流转图</div>
 </div>
@@ -544,7 +520,7 @@ start方法不能重复调用.</p>
 <p>当前线程从 <code>RUNNABLE</code> 变为 <code>TIME_WAITING</code> 状态.</p>
 </div>
 <div class="paragraph">
-<p>如果调用方调用了这个线程的 <code>interrupt()</code> 方法, 则 <code>sleep</code> 方法会抛出 <code>InterruptedException</code> .</p>
+<p>如果sleep过程中调用方调用了这个线程的 <code>interrupt()</code> 方法, 则 <code>sleep</code> 方法会抛出 <code>InterruptedException</code> .</p>
 </div>
 </div>
 <div class="sect2">
@@ -573,18 +549,6 @@ start方法不能重复调用.</p>
 <div class="paragraph">
 <p>返回当前线程的打断标志, 然后重置为false.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_objectwait"><a class="link" href="#_objectwait">2.8. Object::wait</a></h3>
-<div class="paragraph">
-<p>当前线程从 <code>RUNNABLE</code> 变为 <code>WAITING</code> 状态.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_objectnotify"><a class="link" href="#_objectnotify">2.9. Object::notify</a></h3>
-<div class="paragraph">
-<p>唤醒另外一个等待线程锁的代码块.</p>
-</div>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -598,7 +562,10 @@ start方法不能重复调用.</p>
 <p>每一条线程都有自己的栈空间,拥有一份方法参数、局部变量和返回值的拷贝.每一个线程都有自己的一份标识信息,包括线程名、线程优先级、线程是否存活、线程执行状态、守护线程标识等.</p>
 </li>
 <li>
-<p>线程内异常无法在外层try-catch, 只能设置Thread的UncaughtExceptionHandler wait()释放对象锁,sleep()不释放.</p>
+<p>线程内异常无法在外层try-catch, 只能设置Thread的UncaughtExceptionHandler.</p>
+</li>
+<li>
+<p>wait()释放对象锁, sleep()不释放.</p>
 </li>
 </ul>
 </div>
@@ -1095,7 +1062,7 @@ LongAddr求和的时候没有对单元加锁, 所以取值操作只满足最终�
 <p>ReentrantLock可以设置为公平锁(默认非公平锁).</p>
 </li>
 <li>
-<p>ReentrantLock支持多个条件变量.</p>
+<p>ReentrantLock支持多个条件变量(Condition).</p>
 </li>
 </ul>
 </div>
@@ -1499,7 +1466,7 @@ LongAddr求和的时候没有对单元加锁, 所以取值操作只满足最终�
         int c = getState();
         int w = exclusiveCount(c);
         if (c != 0) { // c不等于0, 代表当前有线程正在持有锁.
-            // w为0代表有读线程持有锁, 如果持有锁的线程不是自己, 直接返回false.
+            // w为0代表有写线程持有锁, 如果持有锁的线程不是自己, 直接返回false.
             if (w == 0 || current != getExclusiveOwnerThread())
                 return false;
             if (w + exclusiveCount(acquires) &gt; MAX_COUNT)
@@ -1535,9 +1502,9 @@ LongAddr求和的时候没有对单元加锁, 所以取值操作只满足最终�
     protected final int tryAcquireShared(int unused) {
         Thread current = Thread.currentThread();
         int c = getState();
-        // 排他锁去竞争共享锁的情况, 如果不是当前线程持有的排他锁则竞争失败.
         if (exclusiveCount(c) != 0 &amp;&amp;
             getExclusiveOwnerThread() != current)
+            // 如果当前存在排他锁且不是当前线程持有的排他锁则竞争失败.
             return -1;
         int r = sharedCount(c);
         if (!readerShouldBlock() &amp;&amp;
@@ -2969,6 +2936,11 @@ public class PhaserDemo {
             e = tab[i];
         }
         return null;
+    }
+
+    // 开放地址法
+    private static int nextIndex(int i, int len) {
+        return ((i + 1 &lt; len) ? i + 1 : 0);
     }
 
     private void remove(ThreadLocal&lt;?&gt; key) {
@@ -4552,632 +4524,6 @@ public class DelayQueue&lt;E extends Delayed&gt; extends AbstractQueue&lt;E&gt; 
 <p><code>DiscardOldestPolicy</code> : 将队列最老的任务删除掉, 然后去执行新的任务.</p>
 </li>
 </ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_多处理器"><a class="link" href="#_多处理器">11. 多处理器</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_定义"><a class="link" href="#_定义">11.1. 定义</a></h3>
-<div class="paragraph">
-<p>线程A产生一个事件序列 \$a_0,a_1,...\$.<br>
-由于线程中往往包含循环, 因此一条程序语句可以产生多次事件.<br>
-用 \$a_i^j\$ 表示事件 \$a_i\$ 的第 \$j\$ 次发生. 如果事件a在事件b之前发生, 则称a先于b, 记作 \$a-&gt;b\$ .</p>
-</div>
-<div class="paragraph">
-<p>令 \$a_0,a_1\$表示事件, 且 \$a_0-&gt;a_1\$, \$I_A\$ =interval( \$a_0-&gt;a_1\$ )表示 \$a_0和a_1\$ 事件之间的间隔.<br>
-如果 \$a_1-&gt;b_0\$,则 \$I_A-&gt;I_B\$.多个不存在 \$-&gt;\$的关系称为 <strong>并发的</strong>.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>互斥</strong>: 对于线程A,B, 以及整数j,k, 都有 \$CS_A^j-&gt;CS_B^i\$或者\$CS_B^j-&gt;CS_A^i\$.</p>
-</li>
-<li>
-<p><strong>无死锁</strong>: 如果一个线程正在尝试获得一个锁, 那么总会成功地获取到锁, 如果暂时无法获得, 那么一定存在其他线程已经进入临界区.</p>
-</li>
-<li>
-<p><strong>无饥饿</strong>: 每个尝试获得锁的线程最终都能成功.(无饥饿意味着无死锁)</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_互斥"><a class="link" href="#_互斥">11.2. 互斥</a></h3>
-<div class="listingblock">
-<div class="title">Lock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-/**
- * @author jy
- */
-public interface Lock {
-
-    ThreadLocal&lt;Integer&gt; THREAD_ID_HOLDER = new InheritableThreadLocal&lt;&gt;();
-
-    AtomicInteger THREAD_ID_INCREMENTER = new AtomicInteger();
-
-    void lock();
-
-    void unlock();
-
-    // 假设ThreadId从0开始递增
-    default int getThreadId() {
-        if (THREAD_ID_HOLDER.get() == null) {
-            THREAD_ID_HOLDER.set(THREAD_ID_INCREMENTER.getAndIncrement());
-        }
-        return THREAD_ID_HOLDER.get();
-    }
-
-    static void resetThreadId() {
-        THREAD_ID_INCREMENTER.set(0);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_双线程实现互斥"><a class="link" href="#_双线程实现互斥">11.2.1. 双线程实现互斥</a></h4>
-<div class="listingblock">
-<div class="title">LockOne.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock;
-
-/**
- * @author jy
- */
-public class LockOne implements Lock {
-
-    private static final int LIMIT = 1;
-
-    private final boolean[] flags = new boolean[LIMIT + 1];
-
-    @Override
-    public void lock() {
-        int id = getThreadId();
-
-        flags[id] = true;
-        // 等待另一个线程释放锁. 两个线程同时执行到这会发生死锁
-        while (flags[LIMIT - id]) ;
-    }
-
-    @Override
-    public void unlock() {
-        flags[getThreadId()] = false;
-    }
-
-
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">LockTwo.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock;
-
-/**
- * @author jy
- */
-public class LockTwo implements Lock {
-
-    private int victim;
-
-    @Override
-    public void lock() {
-        int i = getThreadId();
-        victim = i;
-        // 第一个线程会一直阻塞在这里, 直到第二个线程执行
-        while (victim == i) ;
-    }
-
-    @Override
-    public void unlock() {
-        victim = getThreadId();
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">PetersonLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-/**
- * Peterson锁, 实现双线程互斥
- *
- * @author jy
- */
-public class PetersonLock implements Lock {
-
-    private static final int LIMIT = 1;
-
-    private final boolean[] flags = new boolean[LIMIT + 1];
-
-    private final AtomicInteger victim = new AtomicInteger();
-
-    @Override
-    public void lock() {
-        int id = getThreadId();
-        flags[id] = true; // 表示当前线程正在竞争临界区
-        victim.set(id); // 让其他正在竞争临界区的线程通过
-        while (flags[LIMIT - id] &amp;&amp; victim.get() == id) ;
-    }
-
-    @Override
-    public void unlock() {
-        flags[getThreadId()] = false;
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_多线程实现互斥"><a class="link" href="#_多线程实现互斥">11.2.2. 多线程实现互斥</a></h4>
-<div class="listingblock">
-<div class="title">FilterLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.stream.IntStream;
-
-/**
- * 过滤锁
- *
- * @author jy
- */
-public class FilterLock implements Lock {
-
-    // 线程数
-    private final int n;
-
-    private final int[] level;
-
-    private final int[] victim;
-
-    public FilterLock(int n) {
-        this.n = n;
-        this.level = new int[n];
-        this.victim = new int[n];
-    }
-
-    @Override
-    public void lock() {
-        int me = getThreadId();
-        for (int i = 1; i &lt; n; i++) {
-            level[me] = i; // 表示当前线程正在竞争临界区, 阻塞其他线程
-            victim[i] = me; // 让其他线程通过临界区
-            int aliasI = i;
-            while (victim[i] == me &amp;&amp; IntStream.range(0, n).filter(idx -&gt; idx != me).map(k -&gt; level[k]).anyMatch(l -&gt; l &gt;= aliasI))
-                ;
-        }
-    }
-
-    @Override
-    public void unlock() {
-        level[getThreadId()] = 0;
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">BakeryLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
-
-/**
- * Bakery锁, 先来先服务
- *
- * @author jy
- */
-public class BakeryLock implements Lock {
-
-    private final AtomicBoolean[] flag;
-    private final int[] label;
-
-    public BakeryLock(int n) {
-        this.flag = IntStream.range(0, n).mapToObj(i -&gt; new AtomicBoolean()).toArray(AtomicBoolean[]::new);
-        this.label = new int[n];
-    }
-
-    @Override
-    public void lock() {
-        int i = getThreadId();
-
-        flag[i].set(true); // 表示该线程正在竞争临界区
-        label[i] = Arrays.stream(label).max().getAsInt() + 1;
-        flag[i].set(false);
-
-        while (IntStream.range(0, flag.length)
-            .filter(j -&gt; i != j)
-            .anyMatch(j -&gt; flag[j].get() // 其他线程还在设置label值
-                || label[j] &gt; 0 // 其他线程正在竞争临界区
-                &amp;&amp; (label[j] &lt; label[i] || Objects.equals(label[i], label[j]) &amp;&amp; j &lt; i))) // 比较优先级
-            ;
-    }
-
-    @Override
-    public void unlock() {
-        label[getThreadId()] = 0;
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_内存访问"><a class="link" href="#_内存访问">11.3. 内存访问</a></h3>
-<div class="paragraph">
-<p>处理器和存储控制器之间通过总线通信, 同一时间只能有一个处理器在总线上广播, 但处理器可以和存储控制器同时广播.<br>
-所有的处理器都可以监听.<br>
-每一个处理器都有一个cache. 当处理器想从存储器读数据时, 首先检查该内存地址以及值是否已经在cache中. 如果在cache中, 那么处理器可以产生一个cache命中, 立即加载这个值.<br>
-如果不在, 则产生一个 <code>cache miss</code> , 紧接着在总线上广播这个地址, 其他的处理器监听总线, 如果某个处理器在自己的cache中发现这个地址, 则广播该地址及其值做出响应.<br>
-如果所有的处理器都没有发现该地址, 则从内存中加载.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_自旋锁_2"><a class="link" href="#_自旋锁_2">11.4. 自旋锁</a></h3>
-<div class="paragraph">
-<p>多线程竞争临界区, 如果不能获得锁, 有两种选择:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>让其继续尝试, 称为 <strong>自旋锁</strong> .</p>
-</li>
-<li>
-<p>挂起自己, 请求操作系统调度另外一个线程, 称为 <strong>阻塞</strong> .</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>许多操作系统将这两种结合起来使用, 先旋转一个小的时间段再阻塞.</p>
-</div>
-<div class="sect3">
-<h4 id="_testandset"><a class="link" href="#_testandset">11.4.1. TestAndSet</a></h4>
-<div class="listingblock">
-<div class="title">TASLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-/**
- * @author jy
- */
-public class TASLock implements Lock {
-
-    private static final AtomicBoolean mutex = new AtomicBoolean();
-
-    @Override
-    public void lock() {
-        while (mutex.getAndSet(true)) ;
-    }
-
-    @Override
-    public void unlock() {
-        mutex.set(false);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="ulist">
-<div class="title">TAS缺点:</div>
-<ul>
-<li>
-<p>每个 <code>getAndSet</code> 对应总线上一次广播, 该广播会延迟所有的线程, 包括那些没有阻塞锁和准备释放锁的线程.</p>
-</li>
-<li>
-<p><code>getAndSet</code> 设置值后会导致所有处理器丢弃 <code>cache</code> .</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_testandtestandset"><a class="link" href="#_testandtestandset">11.4.2. TestAndTestAndSet</a></h4>
-<div class="listingblock">
-<div class="title">TTASLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-/**
- * @author jy
- */
-public class TTASLock implements Lock {
-
-    private static final AtomicBoolean mutex = new AtomicBoolean();
-
-    @Override
-    public void lock() {
-        while (true) {
-            while (mutex.get()) ; // get为true说明有其他线程已经进入临界区
-            if (!mutex.getAndSet(true)) { // get为false说明可以进入临界区
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void unlock() {
-        mutex.set(false);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="ulist">
-<div class="title">TTAS改进:</div>
-<ul>
-<li>
-<p>自旋时只会读取本地的cache值, 不产生总线流量.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_backoff_testandtestandset"><a class="link" href="#_backoff_testandtestandset">11.4.3. Backoff TestAndTestAndSet</a></h4>
-<div class="listingblock">
-<div class="title">Backoff.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock;
-
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-
-/**
- * backoff随机毫秒数
- *
- * @author jy
- */
-public class Backoff {
-
-    private final int minDelay;
-    private final int maxDelay;
-    private int limit;
-
-    public Backoff(int minDelay, int maxDelay) {
-        this.limit = this.minDelay = minDelay;
-        this.maxDelay = maxDelay;
-    }
-
-    public void backoff() {
-        int i = ThreadLocalRandom.current().nextInt(limit) + 1;
-        this.limit = Math.min(maxDelay, 2 * i);
-        try {
-            TimeUnit.MILLISECONDS.sleep(limit);
-            if (this.limit == maxDelay) { // miracle :)
-                this.limit = minDelay;
-            }
-        } catch (InterruptedException ignore) {
-        }
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">TTASBackoffLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Backoff;
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-/**
- * @author jy
- */
-public class TTASBackoffLock implements Lock {
-
-    private static final AtomicBoolean mutex = new AtomicBoolean();
-
-    private final Backoff backoff;
-
-    public TTASBackoffLock(int minDelay, int maxDelay) {
-        this.backoff = new Backoff(minDelay, maxDelay);
-    }
-
-    @Override
-    public void lock() {
-        while (true) {
-            while (mutex.get()) ;
-            if (!mutex.getAndSet(true)) {
-                return;
-            } else {
-                backoff.backoff(); // 退让一段时间再去争用锁
-            }
-        }
-    }
-
-    @Override
-    public void unlock() {
-        mutex.set(false);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="ulist">
-<div class="title">TTASBackoffLock改进:</div>
-<ul>
-<li>
-<p>当有其他线程释放锁, 但当前线程没有竞争到锁后会后退一个随机的时间间隔再去争用锁, 减少CPU消耗.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_队列锁数组"><a class="link" href="#_队列锁数组">11.4.4. 队列锁(数组)</a></h4>
-<div class="listingblock">
-<div class="title">ArrayLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReferenceArray;
-
-/**
- * @author jy
- */
-public class ArrayLock implements Lock {
-
-    private final ThreadLocal&lt;Integer&gt; slot = ThreadLocal.withInitial(() -&gt; 0);
-    private final int size;
-    private final AtomicInteger tail = new AtomicInteger();
-    private final AtomicReferenceArray&lt;Boolean&gt; flags;
-
-    public ArrayLock(int size) {
-        this.size = size;
-        Boolean[] booleans = new Boolean[size];
-        for (int i = 1; i &lt; size; i++) {
-            booleans[i] = false; // false用来阻塞该线程
-        }
-        booleans[0] = true; // 默认第一个线程可以直接获得锁
-        this.flags = new AtomicReferenceArray&lt;&gt;(booleans);
-    }
-
-    @Override
-    public void lock() {
-        int idx = tail.getAndIncrement() % size;
-        slot.set(idx);
-        while (!flags.get(idx)) ; // 等待上一个线程释放锁
-    }
-
-    @Override
-    public void unlock() {
-        Integer idx = this.slot.get();
-        flags.set(idx % size, false); // 重置标志位
-        flags.set((idx + 1) % size, true); // 释放下一个slot线程
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_队列锁clh"><a class="link" href="#_队列锁clh">11.4.5. 队列锁(CLH)</a></h4>
-<div class="listingblock">
-<div class="title">CLHLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.concurrent.atomic.AtomicReference;
-
-/**
- * @author jy
- */
-public class CLHLock implements Lock {
-
-    private final ThreadLocal&lt;Node&gt; node = ThreadLocal.withInitial(Node::new);
-
-    // 如果只有一个线程, 将自己的node一直设置为tail, 会造成tail和current相同都为true, 则会一直循环下去.
-    // 所以在释放锁的时候需要将当前node重新赋值. pre的作用仅仅是复用Node对象.
-    private final ThreadLocal&lt;Node&gt; pre = new ThreadLocal&lt;&gt;();
-
-    private final AtomicReference&lt;Node&gt; tail = new AtomicReference&lt;&gt;(new Node());
-
-    @Override
-    public void lock() {
-        Node current = this.node.get();
-        current.locked = true; // 设置当前线程正在竞争锁
-        Node preNode = this.tail.getAndSet(current);
-        this.pre.set(preNode);
-        while (preNode.locked) ; // 等待上一个线程释放锁
-    }
-
-    @Override
-    public void unlock() {
-        Node current = this.node.get();
-        current.locked = false;
-        // 重置当前node. 此处复用上一个node对象, 相当于 `this.node.set(new Node());` .
-        this.node.set(this.pre.get());
-    }
-
-    private static class Node {
-        // false代表已经释放锁, true代表正在竞争锁或者已经成功进入临界区.
-        private volatile boolean locked;
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_队列锁mcs"><a class="link" href="#_队列锁mcs">11.4.6. 队列锁(MCS)</a></h4>
-<div class="listingblock">
-<div class="title">MCSLock.java</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">package me.jy.lang.thread.lock.spin;
-
-import me.jy.lang.thread.lock.Lock;
-
-import java.util.concurrent.atomic.AtomicReference;
-
-/**
- * @author jy
- */
-public class MCSLock implements Lock {
-
-    private final ThreadLocal&lt;Node&gt; node = ThreadLocal.withInitial(Node::new);
-
-    private final AtomicReference&lt;Node&gt; tail = new AtomicReference&lt;&gt;();
-
-    @Override
-    public void lock() {
-        Node current = this.node.get();
-        Node preNode = tail.getAndSet(current);
-        if (preNode != null) {
-            current.locked = true;
-            preNode.next = current; // 将上一个线程的next设置为该线程
-            while (current.locked) ; // 本地自旋, 等待上一个线程释放这个线程的锁
-        }
-    }
-
-    @Override
-    public void unlock() {
-        Node current = this.node.get();
-        if (current.next == null) {
-            // 如果tail是自己, 则说明只有自己竞争锁, 那么直接清空tail返回.
-            if (tail.compareAndSet(current, null)) {
-                return;
-            }
-            // 需要等待其他线程释放锁
-            while (current.next == null) ;
-        }
-        // 如果next不为空, 则直接释放下一个线程的锁
-        current.next.locked = false;
-        current.next = null;
-    }
-
-
-    private static class Node {
-        // important: invalid local cache
-        private volatile boolean locked;
-        private volatile Node next;
-    }
-}</code></pre>
-</div>
-</div>
 </div>
 </div>
 </div>

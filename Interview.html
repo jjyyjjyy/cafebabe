@@ -128,20 +128,37 @@ $(globalSwitch);
 <li><a href="#_jvm">4. JVM</a></li>
 <li><a href="#_maven">5. Maven</a></li>
 <li><a href="#_mybatis">6. MyBatis</a></li>
-<li><a href="#_spring">7. Spring</a></li>
+<li><a href="#_框架">7. 框架</a>
+<ul class="sectlevel2">
+<li><a href="#_spring">7.1. Spring</a></li>
+<li><a href="#_spring_boot">7.2. Spring Boot</a></li>
+<li><a href="#_nacos">7.3. Nacos</a></li>
+</ul>
+</li>
 <li><a href="#_redis">8. Redis</a></li>
-<li><a href="#_database">9. Database</a></li>
+<li><a href="#_database">9. Database</a>
+<ul class="sectlevel2">
+<li><a href="#_mysql">9.1. MySQL</a></li>
+<li><a href="#_postgresql">9.2. PostgreSQL</a></li>
+</ul>
+</li>
 <li><a href="#_消息队列">10. 消息队列</a>
 <ul class="sectlevel2">
-<li><a href="#_rocketmq">10.1. RocketMQ</a></li>
-<li><a href="#_rabbitmq">10.2. RabbitMQ</a></li>
-<li><a href="#_kafka">10.3. Kafka</a></li>
+<li><a href="#_mq">10.1. MQ</a></li>
+<li><a href="#_rocketmq">10.2. RocketMQ</a></li>
+<li><a href="#_rabbitmq">10.3. RabbitMQ</a></li>
+<li><a href="#_kafka">10.4. Kafka</a></li>
 </ul>
 </li>
 <li><a href="#_docker">11. Docker</a></li>
 <li><a href="#_网络">12. 网络</a></li>
-<li><a href="#_linux">13. Linux</a></li>
-<li><a href="#_分布式">14. 分布式</a></li>
+<li><a href="#_网关">13. 网关</a>
+<ul class="sectlevel2">
+<li><a href="#_nginx">13.1. Nginx</a></li>
+</ul>
+</li>
+<li><a href="#_linux">14. Linux</a></li>
+<li><a href="#_分布式">15. 分布式</a></li>
 </ul>
 </div>
 </div>
@@ -217,7 +234,7 @@ $(globalSwitch);
 <p><code>private</code> : 只能在类的内部访问.</p>
 </li>
 <li>
-<p><code>default</code> : 只能被同一个包中其他类访问, 但子包不能访问.</p>
+<p><code>default</code> : 只能被同一个包中其他类访问, 且子包不能访问.</p>
 </li>
 <li>
 <p><code>protected</code> : 可以被子类或同一个包中其他类访问.</p>
@@ -233,7 +250,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>重载:</p>
+<p>重载发生在同一个类中:</p>
 <div class="ulist">
 <ul>
 <li>
@@ -291,13 +308,14 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>new String("abc")创建了几个对象?</em></p>
+<p>两种情况:</p>
 <div class="ulist">
 <ul>
 <li>
 <p>如果常量池已经存在abc这个常量, 则只在堆中创建一个String对象.</p>
 </li>
 <li>
-<p>如果常量池不存在abc这个常量, 则会先把abc放入常量池, 然后在堆中创建一个String对象.</p>
+<p>如果常量池不存在abc这个常量, 则会先把abc放入常量池, 然后在堆中创建一个String对象, 一共两个对象.</p>
 </li>
 </ul>
 </div>
@@ -323,7 +341,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>Checked异常为继承了 <code>Exception</code> 类但不是 <code>RuntimeException</code> 的子类的异常, 需要程序手动处理.</p>
+<p>Checked异常为继承了 <code>Exception</code> 类但不是 <code>RuntimeException</code> 的子类的异常, 需要调用方手动处理.</p>
 </li>
 <li>
 <p>UnChecked异常为继承了 <code>RuntimeException</code> 或 <code>Error</code> 的异常, 对于UnChecked异常程序可以手动捕获, 也可以不处理.</p>
@@ -363,10 +381,10 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>成员内部类的变量和方法不能声明为静态的.</p>
+<p>成员内部类的变量和方法不能声明为静态的, 因为静态成员的访问不需要外部类的对象实例, 这不符合内部类的设计初衷.</p>
 </li>
 <li>
-<p>内部类可以引用外部类的非静态属性及方法.</p>
+<p>成员内部类可以引用外部类的非静态属性及方法.</p>
 </li>
 </ul>
 </div>
@@ -383,6 +401,34 @@ $(globalSwitch);
 </li>
 </ul>
 </div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>Object类有哪些方法?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>hashcode</p>
+</li>
+<li>
+<p>equals</p>
+</li>
+<li>
+<p>clone</p>
+</li>
+<li>
+<p>toString</p>
+</li>
+<li>
+<p>wait</p>
+</li>
+<li>
+<p>notify</p>
+</li>
+<li>
+<p>notifyAll</p>
 </li>
 </ul>
 </div>
@@ -424,7 +470,7 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>获取泛型类型的方法?</em></p>
-<p><code>ParameterizedType) getClass().getGenericSuperclass(.getActualTypeArguments()[0];</code></p>
+<p><code>ParameterizedType) getClass().getGenericSuperclass(.getActualTypeArguments()[0]</code></p>
 </li>
 <li>
 <p><em>创建对象有哪些方式?</em></p>
@@ -434,13 +480,13 @@ $(globalSwitch);
 <p>new</p>
 </li>
 <li>
-<p>Object.clone()</p>
+<p>Object#clone()</p>
 </li>
 <li>
-<p>Class::newInstance()</p>
+<p>Class#newInstance()</p>
 </li>
 <li>
-<p>Constructor::newInstance()</p>
+<p>Constructor#newInstance()</p>
 </li>
 <li>
 <p>反序列化</p>
@@ -465,7 +511,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>Class.forName()和ClassLoader.loadClass()的区别?</em></p>
+<p><em>Class.forName()和ClassLoader#loadClass()的区别?</em></p>
 <p><code>Class.forName()</code> 会执行类的静态代码块, <code>ClassLoader#loadClass()</code> 不会.</p>
 </li>
 <li>
@@ -473,7 +519,17 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p><code>Class#getResourceAsStream</code> 为使用加载该类的类加载器加载文件: 不以 <code>/</code> 开头时为在该类所在路径下加载文件, 以 <code>/</code> 开头时为在 <code>classpath</code> 下加载文件.</p>
+<p><code>Class#getResourceAsStream</code> 为使用加载该类的类加载器加载文件:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>不以 <code>/</code> 开头时为在该类所在路径下加载文件.</p>
+</li>
+<li>
+<p>以 <code>/</code> 开头时为在 <code>classpath</code> 下加载文件.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p><code>ClassLoader#getResourceAsStream</code> : 为用指定类加载器加载文件.</p>
@@ -489,7 +545,7 @@ $(globalSwitch);
 <p><code>ClassNotFoundException</code> 是Exception类型, <code>NoClassDefFoundError</code> 是Error类型.</p>
 </li>
 <li>
-<p>使用 <code>Class.forName()</code> / <code>ClassLoader#loadClass()</code> / <code>ClassLoader#findSystemClass()</code> 动态加载类时找不到类就会抛出 <code>ClassNotFoundException</code> ,当编译成功但运行时(调用该类的一个方法或者new一个实例时)找不到类或者初始化static成员时有异常则会抛出 <code>NoClassDefFoundError</code> 异常.</p>
+<p>使用 <code>Class.forName()</code> / <code>ClassLoader#loadClass()</code> / <code>ClassLoader#findSystemClass()</code> 等 <strong>加载</strong> 类时找不到类就会抛出 <code>ClassNotFoundException</code> ,当编译成功但 <strong>运行</strong> 时(调用该类的一个方法或者new一个实例时)找不到类或者初始化static成员时有异常则会抛出 <code>NoClassDefFoundError</code> 异常.</p>
 </li>
 </ul>
 </div>
@@ -502,7 +558,7 @@ $(globalSwitch);
 <p>父类静态变量</p>
 </li>
 <li>
-<p>父类静态代码块块</p>
+<p>父类静态代码块</p>
 </li>
 <li>
 <p>子类静态变量</p>
@@ -539,44 +595,113 @@ $(globalSwitch);
 <p>及时释放数据库链接, 减少资源消耗. (如果没有显式close, 也会被gc)</p>
 </li>
 <li>
-<p><em>BIO/NIO/AIO区别?</em></p>
-<div class="ulist">
-<ul>
-<li>
-<p>BIO</p>
-<div class="ulist">
-<ul>
-<li>
-<p>一个线程单独处理一个读写请求.</p>
+<p><em>var和val的区别?</em></p>
+<p>var表示可变变量, val为非标准关键字, 表示不可变变量.</p>
 </li>
 <li>
-<p>BIO用流处理数据.</p>
+<p><em>BIO和NIO的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>BIO属于同步阻塞模型, 业务线程读写请求过程中会一直等待数据到达(阻塞), 业务操作完成后才会继续执行后续任务(同步).</p>
+</li>
+<li>
+<p>NIO属于IO多路复用模型, 通过epoll/kqueue系统调用批量查询可用的socket(非阻塞), 然后通过单读的线程进行读写操作(同步), 节省了read阻塞阶段的耗时.</p>
+</li>
+<li>
+<p>BIO基于字节流读写请求, NIO使用缓冲区读写请求.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>NIO</p>
+<p><em>Java NIO有哪些Buffer类型?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>所有的读写请求交给一个线程轮询状态, 然后根据不同的I/O事件交给线程池中的线程处理.</p>
+<p>ByteBuffer(字节缓冲区): 用于读写字节数据.</p>
 </li>
 <li>
-<p>NIO用块处理数据.</p>
+<p>ShortBuffer(短整型缓冲区): 用于读写短整型数据.</p>
+</li>
+<li>
+<p>IntBuffer(整型缓冲区): 用于读写整型数据.</p>
+</li>
+<li>
+<p>LongBuffer(长整型缓冲区): 用于读写长整型数据.</p>
+</li>
+<li>
+<p>CharBuffer(字符缓冲区): 用于读写字符数据.</p>
+</li>
+<li>
+<p>FloatBuffer(浮点型缓冲区): 用于读写浮点型数据.</p>
+</li>
+<li>
+<p>DoubleBuffer(双精度浮点型缓冲区): 用于读写双精度浮点型数据.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>AIO</p>
+<p><em>Buffer的四个核心属性?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>通过内核回调机制通知请求读写完毕, 然后执行回调.</p>
+<p>capacity: 缓冲区的容量, 不可修改.</p>
+</li>
+<li>
+<p>limit: 当前可操作的缓冲区的长度.</p>
+</li>
+<li>
+<p>position: 当前操作的索引.</p>
+</li>
+<li>
+<p>mark: 标记位置, 可通过 <code>reset()</code> 恢复position为mark的位置.</p>
 </li>
 </ul>
 </div>
+</li>
+<li>
+<p><em><code>flip()</code> 和 <code>rewind()</code> 方法的使用场景?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>flip()</code> 方法用于写完后读取整个缓冲区内容的场景, 如写header+body后读取整个header+body内容.</p>
+</li>
+<li>
+<p><code>rewind()</code> 方法用于重复读取缓冲区内容的场景.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>SelectionKey的事件类型?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>OP_CONNECT(仅客户端SocketChannel): 请求连接成功.</p>
+</li>
+<li>
+<p>OP_ACCEPT(仅服务端ServerSocketChannel): 请求连接就绪.</p>
+</li>
+<li>
+<p>OP_READ: 读缓冲区中存在数据可以读取.</p>
+</li>
+<li>
+<p>OP_WRITE: 写缓冲区中存在空间可以写入.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>HeapByteBuffer和DirectByteBuffer的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>HeapByteBuffer在JVM堆内存中分配缓冲区.</p>
+</li>
+<li>
+<p>DirectByteBuffer在JVM堆外内存中分配缓冲区.</p>
 </li>
 </ul>
 </div>
@@ -595,7 +720,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>列表/链表</p>
+<p><code>List</code> 列表/链表</p>
 <div class="ulist">
 <ul>
 <li>
@@ -614,12 +739,9 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p>队列</p>
+<p><code>Queue</code> 队列</p>
 <div class="ulist">
 <ul>
-<li>
-<p>ArrayQueue</p>
-</li>
 <li>
 <p>ArrayDeque</p>
 </li>
@@ -634,9 +756,6 @@ $(globalSwitch);
 </li>
 <li>
 <p>SynchronousQueue</p>
-</li>
-<li>
-<p>PriorityBlockingQueue</p>
 </li>
 <li>
 <p>LinkedTransferQueue</p>
@@ -664,7 +783,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p>集合</p>
+<p><code>Set</code> 集合</p>
 <div class="ulist">
 <ul>
 <li>
@@ -673,11 +792,17 @@ $(globalSwitch);
 <li>
 <p>LinkedHashSet</p>
 </li>
+<li>
+<p>CopyOnWriteArraySet</p>
+</li>
+<li>
+<p>ConcurrentSkipListSet</p>
+</li>
 </ul>
 </div>
 </li>
 <li>
-<p>散列表</p>
+<p><code>Map</code> 散列表</p>
 <div class="ulist">
 <ul>
 <li>
@@ -695,6 +820,9 @@ $(globalSwitch);
 <li>
 <p>ConcurrentHashMap</p>
 </li>
+<li>
+<p>WeakHashMap</p>
+</li>
 </ul>
 </div>
 </li>
@@ -704,6 +832,16 @@ $(globalSwitch);
 <ul>
 <li>
 <p>TreeMap</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>NavigableMap</code> 跳表</p>
+<div class="ulist">
+<ul>
+<li>
+<p>ConcurrentSkipListMap</p>
 </li>
 </ul>
 </div>
@@ -747,13 +885,13 @@ $(globalSwitch);
 <p>TreeMap <code>红黑树, 按照自定义顺序遍历key</code></p>
 </li>
 <li>
-<p>IdentityHashMap <code>使用System.identityHashCode()计算hashCode, 使用==判断key是否相同</code></p>
-</li>
-<li>
 <p>ConcurrentHashMap <code>线程安全</code></p>
 </li>
 <li>
 <p>WeakHashMap <code>存取弱引用对象的哈希表</code></p>
+</li>
+<li>
+<p>IdentityHashMap <code>使用System.identityHashCode()计算hashCode, 使用==判断key是否相同</code></p>
 </li>
 </ul>
 </div>
@@ -934,6 +1072,22 @@ $(globalSwitch);
 <div class="qlist qanda">
 <ol>
 <li>
+<p><em>创建线程的方法?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>实现Runnable接口.</p>
+</li>
+<li>
+<p>继承Thread类.</p>
+</li>
+<li>
+<p>实现Callable接口.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>synchronized关键字的使用?</em></p>
 <div class="ulist">
 <ul>
@@ -954,10 +1108,13 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>作用对象不同: sleep作用于当前线程, wait作用于指定的对象.</p>
+<p>定义不同: sleep为Thread类的方法, wait为Object类的方法.</p>
 </li>
 <li>
-<p>sleep不会释放锁, wait会释放锁进入 <code>WAITING</code> 状态.</p>
+<p>作用对象不同: sleep作用于当前线程, wait作用于持有指定的对象锁的线程.</p>
+</li>
+<li>
+<p>sleep不会释放锁, 当前线程进入 <code>TIMED_WAITING</code> 状态, wait会释放锁且进入 <code>WAITING/TIMED_WAITING</code> 状态.</p>
 </li>
 <li>
 <p>sleep可以在任意代码块里, wait必须在同步代码块里.</p>
@@ -967,7 +1124,16 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>为什么wait方法必须在同步代码块里?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>释放锁的前提是要先持有锁.</p>
+</li>
+<li>
 <p>避免CPU切换到另外一个线程先执行了notify方法.</p>
+</li>
+</ol>
+</div>
 </li>
 <li>
 <p><em>为什么wait方法定义在Object里而不是Thread?</em></p>
@@ -975,13 +1141,63 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>synchronized和volatile的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>功能不同: <code>synchronized</code> 用于锁定临界区, 只有持有锁的线程才能访问临界区. <code>volatile</code> 用于变量, 标识该变量的值一直需要从主存读取.</p>
+</li>
+<li>
+<p>使用不同: <code>volatile</code> 只能用于变量上, <code>synchronized</code> 可以用作实例方法/静态方法和代码块上.</p>
+</li>
+<li>
+<p>语义不同: <code>volatile</code> 只保证可见性和禁止指令重排序, <code>synchronized</code> 保证可见性和原子性.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>线程的状态流转?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>NEW &#8594; RUNNING: Thread#start()方法.</p>
+</li>
+<li>
+<p>RUNNING &#8594; BLOCKED: 未争取到锁被阻塞.</p>
+</li>
+<li>
+<p>BLOCKED &#8594; RUNNING: 争取到锁.</p>
+</li>
+<li>
+<p>RUNNING &#8594; WAITING/TIMED_WAITING: Object#wait, Thread#join, Thread.sleep, LockSupport.park.</p>
+</li>
+<li>
+<p>WAITING/TIMED_WAITING &#8594; RUNNING: Object#notify, Object#notifyAll, LockSupport.unpark.</p>
+</li>
+<li>
+<p>RUNNING &#8594; TERMINATED: run方法执行结束.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>Thread类run()和start()区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>run()</code> : 执行具体的工作.</p>
+</li>
+<li>
+<p><code>start()</code> : 启动一个新的线程, 该线程去执行具体的工作.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>Thread.join()有什么作用?</em></p>
 <p>等待线程执行完</p>
 </li>
 <li>
-<p><em>同步和非同步、阻塞和非阻塞的概念?</em></p>
 <p><em>终止一个线程的方法有哪些?</em></p>
 <div class="ulist">
 <ul>
@@ -1002,7 +1218,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p>调用Thread#stop()方法, 此方法会释放所有子线程的锁, 可能会导致线程安全问题.</p>
+<p>调用Thread#stop()方法, 此方法会释放所有子线程的锁, 但可能会导致线程安全问题.</p>
 </li>
 </ul>
 </div>
@@ -1012,10 +1228,38 @@ $(globalSwitch);
 <p>当JVM内部只剩守护线程时, JVM就会自动退出.</p>
 </li>
 <li>
-<p><em>请描述 <code>synchronized</code> 和 <code>ReentrantLock</code> 的底层实现及重入的底层原理?</em></p>
 <p><em>请描述锁的四种状态和升级过程?</em></p>
-<p><em>CAS是什么?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>无锁</p>
+</li>
+<li>
+<p>偏向锁</p>
+</li>
+<li>
+<p>轻量级锁</p>
+</li>
+<li>
+<p>重量级锁</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>CAS的ABA问题如何解决?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>AtomicStampedReference</p>
+</li>
+<li>
+<p>AtomicMarkableReference</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>基于AQS实现的锁有哪些?</em></p>
 <div class="ulist">
 <ul>
@@ -1035,95 +1279,72 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>请谈一下你对 volatile的理解?</em></p>
-<p><em>volatile的可见性和禁止指令重排序是如何实现的?</em></p>
-<p><em>请描述一下对象的创建过程?</em></p>
-<p><em>对象在内存中的内存布局?</em></p>
-<p><em>DCL单例为什么要加volatile?</em></p>
-<p><em>Object o = new Object()在内存中占了多少字节?</em></p>
-<p><em>请描述 synchronized和 Reentrant Lock的异同?</em></p>
-<p><em>聊聊你对as-if-serial和 happens-before语义的理解?</em></p>
-<p><em>你了解 ThreadLocal吗?你知道 ThreadLoca中如何解决内存泄漏问题吗?</em></p>
-<p><em>请描述一下锁的分类以及JDK中的应用?</em></p>
-<p><em>线程池中阻塞队列的作用?</em></p>
-<p><em>线程池的工作原理?</em></p>
 <p><em>线程池初始化参数的解释?</em></p>
-<p><em>多线程断点续传的实现原理?</em></p>
-<p><em>守护线程和本地线程区别?</em></p>
-<p><em>线程与进程的区别?</em></p>
-<p><em>什么是多线程中的上下文切换?</em></p>
-<p><em>死锁与活锁的区别?</em></p>
-<p><em>死锁与饥饿的区别?</em></p>
-<p><em>Java中用到的线程调度算法是什么?</em></p>
-<p><em>什么是线程组, 为什么在Java中不推荐使用?</em></p>
-<p><em>Lock接口是什么? 对比synchronized它有什么优势?</em></p>
-<p><em>什么是阻塞队列? 阻塞队列的实现原理是什么? 如何使用阻塞队列来实现生产者-消费者模型?</em></p>
-<p><em>什么是Callable和Future?</em></p>
-<p><em>什么是FutureTask?</em></p>
-<p><em>什么是并发容器的实现?</em></p>
-<p><em>多线程同步和互斥有几种实现方法?</em></p>
-<p><em>什么是竞争条件? 你怎样发现和解决竞争?</em></p>
-<p><em>Java中你怎样唤醒一个阻塞的线程?</em></p>
-<p><em>CyclicBarrier和CountdownLatch有什么区别?</em></p>
-<p><em>什么是不可变对象, 它对写并发应用有什么帮助?</em></p>
-<p><em>什么是多线程中的上下文切换?</em></p>
-<p><em>Java中用到的线程调度算法是什么?</em></p>
-<p><em>什么是线程组，为什么在Java中不推荐使用?</em></p>
-<p><em>为什么使用Executor框架比使用应用创建和管理线程好?</em></p>
-<p><em>java中有几种方法可以实现一个线程?</em></p>
-<p><em>如何停止一个正在运行的线程?</em></p>
-<p><em>什么是Daemon线程? 它有什么意义?</em></p>
-<p><em>java如何实现多线程之间的通讯和协作?</em></p>
-<p><em>什么是可重入锁?</em></p>
-<p><em>当一个线程进入某个对象的一个synchronized的实例方法后，其它线程是否可进入此对象的其它方法?</em></p>
-<p><em>乐观锁和悲观锁的理解及如何实现?</em></p>
-<p><em>SynchronizedMap和ConcurrentHashMap有什么区别?</em></p>
-<p><em>CopyOnWriteArrayList可以用于什么应用场景?</em></p>
-<p><em>什么叫线程安全? servlet是线程安全吗?</em></p>
-<p><em>volatile有什么用? 能否用一句话说明下volatile的应用场景?</em></p>
-<p><em>为什么代码会重排序?</em></p>
-<p><em>在java中wait和sleep方法的不同?</em></p>
-<p><em>一个线程运行时发生异常会怎样?</em></p>
-<p><em>如何在两个线程间共享数据?</em></p>
-<p><em>Java中notify和notifyAll有什么区别?</em></p>
-<p><em>为什么wait, notify 和 notifyAll这些方法不在thread类里面?</em></p>
-<p><em>什么是ThreadLocal变量?</em></p>
-<p><em>Java中interrupted和isInterrupted方法的区别?</em></p>
-<p><em>为什么wait和notify方法要在同步块中调用?</em></p>
-<p><em>为什么你应该在循环中检查等待条件?</em></p>
-<p><em>Java中的同步集合与并发集合有什么区别?</em></p>
-<p><em>什么是线程池? 为什么要使用它?</em></p>
-<p><em>怎么检测一个线程是否拥有锁?</em></p>
-<p><em>JVM中哪个参数是用来控制线程的栈堆栈小的?</em></p>
-<p><em>Thread类中的yield方法有什么作用?</em></p>
-<p><em>Java中ConcurrentHashMap的并发度是什么?</em></p>
-<p><em>Java中Semaphore是什么?</em></p>
-<p><em>Java线程池中submit()和execute()方法有什么区别?</em></p>
-<p><em>什么是阻塞式方法?</em></p>
-<p><em>Java中的ReadWriteLock是什么?</em></p>
-<p><em>volatile 变量和 atomic 变量有什么不同?</em></p>
-<p><em>可以直接调用Thread类的run()方法么?</em></p>
-<p><em>如何让正在运行的线程暂停一段时间?</em></p>
-<p><em>你对线程优先级的理解是什么?</em></p>
-<p><em>什么是线程调度器和时间分片?</em></p>
-<p><em>你如何确保main()方法所在的线程是Java程序最后结束的线程?</em></p>
-<p><em>线程之间是如何通信的?</em></p>
-<p><em>为什么线程通信的方法wait()、notify()和notifyAll()被定义在Object类里?</em></p>
-<p><em>为什么wait()、notify()和notifyAll()必须在同步方法或者同步块中被调用?</em></p>
-<p><em>为什么Thread类的sleep()和yield()方法是静态的?</em></p>
-<p><em>如何确保线程安全?</em></p>
-<p><em>同步方法和同步块, 哪个是更好的选择?</em></p>
-<p><em>如何创建守护线程?</em></p>
-<p><em>Timer类的缺点?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>一个任务执行时间长将会影响后面的任务.</p>
+<p><code>int corePoolSize</code> : 核心线程数个数</p>
 </li>
 <li>
-<p>前面的任务抛出异常, 后面的任务会执行不了.</p>
+<p><code>int maximumPoolSize</code> : 最大线程数个数</p>
+</li>
+<li>
+<p><code>long keepAliveTime</code> : 核心线程之外的线程存活时间</p>
+</li>
+<li>
+<p><code>TimeUnit unit</code> : KeepAliveTime时间单位</p>
+</li>
+<li>
+<p><code>BlockingQueue&lt;Runnable&gt; workQueue</code> : 线程池所用的阻塞队列类型</p>
+</li>
+<li>
+<p><code>ThreadFactory threadFactory</code> : 线程创建的工厂类</p>
+</li>
+<li>
+<p><code>RejectedExecutionHandler handler</code> : 最大线程满载后的线程提交后拒绝策略</p>
 </li>
 </ul>
+</div>
+</li>
+<li>
+<p><em>线程池中阻塞队列有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>ArrayBlockingQueue</p>
+</li>
+<li>
+<p>LinkedBlockingQueue</p>
+</li>
+<li>
+<p>SynchronousQueue</p>
+</li>
+<li>
+<p>TransferQueue</p>
+</li>
+<li>
+<p>DelayQueue</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>线程池的工作原理?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>如果当前线程池中的线程数目小于corePoolSize，则每来一个任务，就会创建一个线程去执行这个任务；</p>
+</li>
+<li>
+<p>如果当前线程池中的线程数目大于等于corePoolSize，则每来一个任务，会尝试将其添加到任务缓存队列当中，若添加成功，则该任务会等待空闲线程将其取出去执行；若添加失败（一般来说是任务缓存队列已满），则会尝试创建新的线程去执行这个任务；</p>
+</li>
+<li>
+<p>如果当前线程池中的线程数目达到maximumPoolSize，则会采取任务拒绝策略进行处理；</p>
+</li>
+<li>
+<p>如果线程池中的线程数量大于corePoolSize时，如果某线程空闲时间超过keepAliveTime，线程将被终止，直至线程池中的线程数目不大于corePoolSize；如果允许为核心池中的线程设置存活时间，那么核心池中的线程空闲时间超过keepAliveTime，线程也会被终止。</p>
+</li>
+</ol>
 </div>
 </li>
 <li>
@@ -1146,6 +1367,19 @@ $(globalSwitch);
 </div>
 </li>
 <li>
+<p><em>Timer类的缺点?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>一个任务执行时间长将会影响后面的任务.</p>
+</li>
+<li>
+<p>前面的任务抛出异常, 后面的任务会执行不了.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>Tomcat线程调度流程?</em></p>
 <p>Tomcat自定义了阻塞队列和Executor的实现, 处理的流程与JDK线程池稍有不同.</p>
 <div class="olist arabic">
@@ -1163,8 +1397,7 @@ $(globalSwitch);
 <p>如果当前线程数大于最大线程数, 则加入到队列中, 等待有空闲的工作线程执行该任务.</p>
 </li>
 <li>
-<p>如果加入到队列失败, 则抛出异常.<br>
-&#8230;&#8203;</p>
+<p>如果加入到队列失败, 则抛出异常.</p>
 </li>
 </ol>
 </div>
@@ -1219,7 +1452,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p><strong>强引用</strong> : 强引用的对象不会被垃圾回收.</p>
+<p><strong>强引用</strong> : 强引用的对象不会被立即回收.</p>
 </li>
 <li>
 <p><strong>软引用(SoftReference)</strong> : 满足以下 <code>ReferencePolicy</code> 的回收条件时, 会将软引用关联的对象列入垃圾回收范围回收 (详见 <code>ReferenceProcessor::process_soft_ref_reconsider_work</code> 方法).</p>
@@ -1269,19 +1502,6 @@ $(globalSwitch);
 <p>执行构造函数.</p>
 </li>
 </ol>
-</div>
-</li>
-<li>
-<p><em>为对象分配内存的方式?</em></p>
-<div class="ulist">
-<ul>
-<li>
-<p>指针碰撞(标记-整理): 堆中内存是规整的, 所有空闲的内存放在一边, 被使用的内存放在另一边, 中间有一个指针作为分界点, 分配内存仅需将指针向空闲方向挪动一段与对象大小相等的距离.</p>
-</li>
-<li>
-<p>空闲列表(标记-清除): 堆中已使用和空闲的内存交错在一起, 虚拟机维护一个列表, 记录哪些块是可用的, 分配对象的时候从空闲列表划分一块足够大的空间给对象实例, 并更新列表上的记录.</p>
-</li>
-</ul>
 </div>
 </li>
 <li>
@@ -1351,16 +1571,16 @@ $(globalSwitch);
 <p>堆内存溢出. <code>Java heap space</code></p>
 </li>
 <li>
-<p>内存不足导致线程无法创建. <code>unable to create new native thread</code></p>
-</li>
-<li>
 <p>无限创建动态代理对象导致方法区内存溢出. <code>Metaspace</code></p>
 </li>
 <li>
-<p>花费超过98%的时间GC而只得到不到2%的内存.<code>GC overhead limit exceed</code></p>
+<p>分配直接内存失败. <code>Direct buffer memory</code></p>
 </li>
 <li>
-<p>分配直接内存失败. <code>Direct buffer memory</code></p>
+<p>内存不足导致线程无法创建. <code>unable to create new native thread</code></p>
+</li>
+<li>
+<p>花费超过98%的时间GC而只得到不到2%的内存.<code>GC overhead limit exceed</code></p>
 </li>
 </ul>
 </div>
@@ -1527,7 +1747,7 @@ $(globalSwitch);
 <p>ParNew</p>
 </li>
 <li>
-<p>Parallel Scavenge</p>
+<p>Parallel Scavenge Young</p>
 </li>
 </ul>
 </div>
@@ -1556,7 +1776,7 @@ $(globalSwitch);
 <p>G1</p>
 </li>
 <li>
-<p>ZGC(不支持分代回收)</p>
+<p>ZGC</p>
 </li>
 </ul>
 </div>
@@ -1669,7 +1889,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>Minor GC频繁原因?</em></p>
+<p><em>Young GC频繁原因?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -1685,7 +1905,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>Minor GC慢的原因?</em></p>
+<p><em>Young GC慢的原因?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -2124,7 +2344,7 @@ $(globalSwitch);
 <p>拦截Executor query方法.</p>
 </li>
 <li>
-<p>根据参数中的分页参数对象, 在boundSql的sql后拼接分页查询语句.</p>
+<p>根据参数中的 <code>RowBounds</code> 分页参数对象, 在boundSql的sql后拼接分页查询语句.</p>
 </li>
 </ol>
 </div>
@@ -2388,12 +2608,14 @@ $(globalSwitch);
 </div>
 </div>
 <div class="sect1">
-<h2 id="_spring"><a class="link" href="#_spring">7. Spring</a></h2>
+<h2 id="_框架"><a class="link" href="#_框架">7. 框架</a></h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_spring"><a class="link" href="#_spring">7.1. Spring</a></h3>
 <div class="qlist qanda">
 <ol>
 <li>
-<p><em>IoC?</em></p>
+<p><em>IoC含义?</em></p>
 <p>对象自身生命周期的控制以及与其他对象的依赖关系交由Spring容器管理.</p>
 </li>
 <li>
@@ -2437,9 +2659,6 @@ $(globalSwitch);
 </li>
 <li>
 <p>新增一些应用层context, 如 <code>WebApplicationContext</code> .</p>
-</li>
-<li>
-<p>&#8230;&#8203;</p>
 </li>
 </ul>
 </div>
@@ -2605,7 +2824,7 @@ $(globalSwitch);
 解析构造函数注入或者 <code>@Autowired</code> 注解注入时会看需要注入的Bean在不在这个set中, 如果在, 则抛出循环引用异常.</p>
 </li>
 <li>
-<p><em>Spring如何解决Bean循环引用?</em></p>
+<p><em>Spring的三级缓存?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -2716,11 +2935,38 @@ $(globalSwitch);
 <p><em>@Transaction默认情况下抛出什么异常类型后会回滚事务?</em></p>
 <p><strong>UnChecked Exception</strong> , 即 <code>RuntimeException</code> 及其子类或者 <code>Error</code> 异常.</p>
 </li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spring_boot"><a class="link" href="#_spring_boot">7.2. Spring Boot</a></h3>
+<div class="qlist qanda">
+<ol>
 <li>
 <p><em>Spring Boot应用中为什么带有 <code>@SpringBootApplication</code> 注解的启动类要放到所有包的最外层?</em></p>
 <p><code>@SpringBootApplication</code> 注解是 <code>@SpringBootConfiguration</code> , <code>@EnableAutoConfiguration</code> 和 <code>@ComponentScan</code> 三个注解的组合.<br>
 其中 <code>@ComponentScan</code> 注解默认扫描本包以及子包下的所有Bean, 所以默认配置下需要放到最外层的包里, 防止扫描不到其他包里的Bean.</p>
 </li>
+<li>
+<p><em>Spring Boot的自动装配原理?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>v2.7.0之前: <code>META-INF/spring.factories</code> 文件中添加EnableAutoConfiguration配置类名.</p>
+</li>
+<li>
+<p>v2.7.0之后: <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code> 文件中添加AutoConfiguration配置类名.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_nacos"><a class="link" href="#_nacos">7.3. Nacos</a></h3>
+<div class="qlist qanda">
+<ol>
 <li>
 <p><em>Nacos服务注册流程?</em></p>
 <div class="olist arabic">
@@ -2814,6 +3060,7 @@ $(globalSwitch);
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
 <h2 id="_redis"><a class="link" href="#_redis">8. Redis</a></h2>
 <div class="sectionbody">
@@ -2846,6 +3093,9 @@ $(globalSwitch);
 </li>
 <li>
 <p>stream</p>
+</li>
+<li>
+<p>hyperLogLog</p>
 </li>
 </ul>
 </div>
@@ -3033,7 +3283,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>一个字符串类型的值能存储最大容量是多少?</em></p>
+<p><em>一个string类型的值能存储最大容量是多少?</em></p>
 <p>512MB.</p>
 </li>
 <li>
@@ -3071,22 +3321,28 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p><code>no-eviction</code> (默认) : 禁止淘汰数据。</p>
+<p><code>noeviction</code> (默认) 禁止淘汰数据.</p>
 </li>
 <li>
-<p><code>volatile-lru</code> (设置了 <code>maxmemory</code> 下的默认配置) : 从已经设置过期时间的数据集中，挑选最近最少使用的数据淘汰。</p>
+<p><code>volatile-lru</code> (设置了 <code>maxmemory</code> 下的默认配置): 从已经设置过期时间的数据集中, 挑选最久未使用的数据淘汰.</p>
 </li>
 <li>
-<p><code>volatile-ttl</code> : 从已经设置过期时间的数据集中，挑选即将要过期的数据淘汰。</p>
+<p><code>volatile-lfu</code> (设置了 <code>maxmemory</code> 下的默认配置): 从已经设置过期时间的数据集中, 挑选最少使用的数据淘汰.</p>
 </li>
 <li>
-<p><code>volatile-random</code> : 从已经设置过期时间的数据集中，随机挑选数据淘汰。</p>
+<p><code>volatile-ttl</code>  从已经设置过期时间的数据集中，挑选即将要过期的数据淘汰.</p>
 </li>
 <li>
-<p><code>allkeys-lru</code> : 从所有的数据集中，挑选最近最少使用的数据淘汰。</p>
+<p><code>volatile-random</code> 从已经设置过期时间的数据集中，随机挑选数据淘汰.</p>
 </li>
 <li>
-<p><code>allkeys-random</code> : 从所有的数据集中，随机挑选数据淘汰。</p>
+<p><code>allkeys-lru</code> 从所有的数据集中, 挑选最久未使用的数据淘汰.</p>
+</li>
+<li>
+<p><code>allkeys-lfu</code> 从所有的数据集中, 挑选最少使用的数据淘汰.</p>
+</li>
+<li>
+<p><code>allkeys-random</code> 从所有的数据集中, 随机挑选数据淘汰.</p>
 </li>
 </ul>
 </div>
@@ -3227,7 +3483,7 @@ $(globalSwitch);
 <p><code>always</code> : 每个写命令都会同步将AOF缓冲区内容写入到文件里.</p>
 </li>
 <li>
-<p><code>everysec</code> : 每秒fork出一个子进程</p>
+<p><code>everysec</code> : 每秒执行一次磁盘同步.</p>
 </li>
 </ul>
 </div>
@@ -3289,7 +3545,7 @@ $(globalSwitch);
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>使用 <code>eval</code> 命令: <code>eval "&lt;SCRIPT&gt;" &lt;NUMBER_OF_KEYS&gt; KEY1 KEY2 ARG1 ARG2 &#8230;&#8203;</code> , 如 <code>eval "return {KEYS[1], KEYS[2], ARGV[1]} 2 k1 k2 a1"</code></p>
+<p>使用 <code>eval</code> 命令: <code>eval "&lt;SCRIPT&gt;" &lt;NUMBER_OF_KEYS&gt; KEY1 KEY2 ARG1 ARG2 &#8230;&#8203;</code> , 如 <code>eval "return {KEYS[1], KEYS[2], ARGV[1]}" 2 k1 k2 a1</code></p>
 <div class="ulist">
 <ul>
 <li>
@@ -3405,7 +3661,7 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>什么是缓存雪崩? 怎么解决?</em></p>
-<p>缓存雪崩指大量key同一时间时效, 导致都请求到DB上.</p>
+<p>缓存雪崩指大量key同一时间失效, 导致都请求到DB上.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -3773,10 +4029,10 @@ $(globalSwitch);
 <p>B+树的非叶子节点不存储数据, 只存储索引, 这样每一层可以存放更多的索引, 减少磁盘随机IO次数.</p>
 </li>
 <li>
-<p>B+树的叶子节点包含所有的索引及索引所在行的数据.</p>
+<p>B+树的叶子节点包含索引值或索引所在行的数据.</p>
 </li>
 <li>
-<p>B+树的叶子节点有指针指向左右两边的叶子节点.</p>
+<p>B+树的叶子节点有指针指向左右两边的叶子节点.(MySQL中页为双向指针, 页里的数据记录为单向指针)</p>
 </li>
 </ul>
 </div>
@@ -3798,24 +4054,26 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>MySQL <code>Innodb</code> 和 <code>MyIsam</code> 引擎的区别?</em></p>
+<p><em>如何更好地创建索引?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>MyIsam使用堆表保存索引和数据, InnoDB使用索引组织表保存索引和数据.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>堆表: 聚集索引和数据分开存储, 索引存放数据文件的pageID和tupleID.</p>
+<p>为出现在where/order by/group by的列创建索引.</p>
 </li>
 <li>
-<p>索引组织表: 非聚集索引的叶子节点存储主键, 聚集索引直接存储数据.</p>
-</li>
-</ul>
-</div>
+<p>如果列重复数据比例较高, 则可能没有创建索引的必要.</p>
 </li>
 <li>
-<p>MyIsam不支持事务和行级锁, InnoDB支持.</p>
+<p>索引列的数据类型尽量短小.</p>
+</li>
+<li>
+<p>查询时尽量覆盖索引, 避免回表.</p>
+</li>
+<li>
+<p>聚集索引中主键应尽量按插入顺序排序(如主键自增), 避免插入时移动页数据, 增大插入开销.</p>
+</li>
+<li>
+<p>如果存在联合索引, 则没有必要再去为第一列创建一个普通索引, 避免重复.</p>
 </li>
 </ul>
 </div>
@@ -3840,6 +4098,199 @@ $(globalSwitch);
 </div>
 </li>
 <li>
+<p><em>事务并发执行的问题?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>脏写: 一个事务修改了另外一个事务未提交的数据.</p>
+</li>
+<li>
+<p>脏读: 一个事务读取了另外一个事务未提交的数据.</p>
+</li>
+<li>
+<p>不可重复读: 一个事务先后读取了另外一个update事务提交的数据, 两次读取数据不一致.</p>
+</li>
+<li>
+<p>幻读: 一个事务先后读取了另外一个insert/delete事务提交的数据, 两次读取数据量不一致.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>事务的隔离级别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>read uncommitted: 解决脏写.</p>
+</li>
+<li>
+<p>read committed: 解决脏读.</p>
+</li>
+<li>
+<p>repeatable read: 解决不可重复读.</p>
+</li>
+<li>
+<p>serializable: 解决幻读.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>分区和分表的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>分表分为水平分表和垂直分表: 水平分表指将表中的多行数据按照规则分到不同的表中存储, 垂直分表指将表中的多列数据按照规则分到不同的表中存储.</p>
+</li>
+<li>
+<p>分区是水平分表的实现方式, 可以通过range/hash/list等规则划分分区, 或者通过父子表+check约束实现.</p>
+</li>
+<li>
+<p>分区无法保证</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_mysql"><a class="link" href="#_mysql">9.1. MySQL</a></h3>
+<div class="qlist qanda">
+<ol>
+<li>
+<p><em>MySQL <code>Innodb</code> 和 <code>MyIsam</code> 引擎的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>MyIsam使用堆表保存索引和数据, InnoDB使用索引组织表保存索引和数据.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>堆表: 聚集索引和数据分开存储, 索引存放数据文件的pageID和tupleID.</p>
+</li>
+<li>
+<p>索引组织表: 非聚集索引的叶子节点存储主键和pageID, 聚集索引的叶子节点直接存储数据.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>MyIsam不支持事务和行级锁, InnoDB支持.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL的page大小是多少?</em></p>
+<p>16kb</p>
+</li>
+<li>
+<p><em>MySQL有哪些索引?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>主键索引</p>
+</li>
+<li>
+<p>b+树索引: create index on table(column)</p>
+</li>
+<li>
+<p>唯一索引: create unique index on table(column)</p>
+</li>
+<li>
+<p>哈希索引: create index on table(column) using hash</p>
+</li>
+<li>
+<p>全文索引: create fulltext index on table(column)</p>
+</li>
+<li>
+<p>地理位置索引: create spatial index on table(column)</p>
+</li>
+<li>
+<p>前缀索引: create index on table(text/blob_column(length))</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL执行计划中type类型有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>const: 主键或唯一索引查询, IS NULL查询除外.</p>
+</li>
+<li>
+<p>ref: 普通二级索引等值查询.</p>
+</li>
+<li>
+<p>ref_or_null: 普通二级索引等值 <code>OR IS NULL</code> 查询.</p>
+</li>
+<li>
+<p>eq_ref: 两个表的唯一索引列JOIN关联查询.</p>
+</li>
+<li>
+<p>range: 索引范围查询.</p>
+</li>
+<li>
+<p>index: 二级索引查询(不回表)或者排序.</p>
+</li>
+<li>
+<p>index_merge: 使用了多个不同索引列查询.</p>
+</li>
+<li>
+<p>all: 全表扫描.</p>
+</li>
+<li>
+<p>fulltext: 全文索引查询.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL执行计划中extra类型有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>No table used: 查询语句没有from表.</p>
+</li>
+<li>
+<p>Impossible WHERE: where语句永远为false.</p>
+</li>
+<li>
+<p>No matching min/max row: 查询列有min/max函数但是没有查询结果.</p>
+</li>
+<li>
+<p>Using index: 使用到覆盖索引.</p>
+</li>
+<li>
+<p>Using index condition: 使用到二级索引下推判断where条件是否符合.</p>
+</li>
+<li>
+<p>Using where: 在内存中判断where条件是否符合.</p>
+</li>
+<li>
+<p>Using join buffer (Block Nested Loop): 使用join buffer来筛选被驱动表数据, 减少对被驱动表的访问次数.</p>
+</li>
+<li>
+<p>Using intersect: 使用多个索引合并的方式查询.</p>
+</li>
+<li>
+<p>Zero limit: 查询语句存在limit 0.</p>
+</li>
+<li>
+<p>Using filesort: 在内存或者磁盘中对数据进行排序.</p>
+</li>
+<li>
+<p>Using temporary: 使用到临时表.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL默认的事务隔离级别?</em></p>
+<p>Repeatable Read</p>
+</li>
+<li>
 <p><em>MySQL如何保证事务ACID特性?</em></p>
 <div class="ulist">
 <ul>
@@ -3859,28 +4310,132 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>MySQL执行计划中type类型有哪些?</em></p>
+<p><em>MySQL redo日志的作用?</em></p>
+<p>为了保证持久性, 在SQL执行过程中会把对数据库表空间下所有页的修改记录下来, 以便在数据库崩溃重启后恢复.</p>
+</li>
+<li>
+<p><em>MySQL redo日志的lsn?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>all: 全表扫描</p>
+<p>lsn: 表示系统写入redo日志的总量(字节数).</p>
 </li>
 <li>
-<p>index: 全索引扫描</p>
+<p>flush_to_disk_lsn: redo日志buffer中完成刷盘的lsn.</p>
 </li>
 <li>
-<p>range: 索引范围扫描</p>
-</li>
-<li>
-<p>ref: 非唯一索引扫描</p>
-</li>
-<li>
-<p>eq_ref: 唯一索引扫描</p>
-</li>
-<li>
-<p>const: 结果只有一条的主键或唯一索引扫描</p>
+<p>checkpoint_lsn: 表示当前系统中已经刷完盘可以被覆盖的redo日志总量.</p>
 </li>
 </ul>
+</div>
+</li>
+<li>
+<p><em>MySQL redo日志恢复的过程?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>找到最后一次刷盘的checkpoint_lsn, 此lsn为redo日志恢复的起点, 日志中lsn小于checkpoint_lsn的说明已经刷完盘, 不需要恢复.</p>
+</li>
+<li>
+<p>日志block header中 <code>LOG_BLOCK_HDR_DATA_LEN</code> 小于512的说明该block为最后一个没写完的block, 此block为日志恢复的终点.</p>
+</li>
+<li>
+<p>过滤掉待恢复的页header中 <code>FILE_PAGE_LSN</code> 大于checkpoint_point的页, 该页说明在checkpoint后已经刷完盘过, 不需要恢复.</p>
+</li>
+<li>
+<p>将待恢复的日志按表空间id+pagenumber为key组成哈希表(拉链法), 按页恢复数据.</p>
+</li>
+<li>
+<p>通过undo日志找到系统崩溃前活跃的事务id, 回滚事务.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><em>MySQL undo日志的作用?</em></p>
+<p>为了保证原子性, 记录事务过程中增删改操作对应的回滚操作, 以便事务回滚.</p>
+</li>
+<li>
+<p><em>MySQL undo日志的类型?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>TRX_UNDO_INSERT_REC: 对应insert操作的undo日志, 记录主键值.</p>
+</li>
+<li>
+<p>TRX_UNDO_DEL_MARK_REC: 对应delete操作的undo日志, 记录主键值和索引列值.</p>
+</li>
+<li>
+<p>TRX_UNDO_UPD_EXIST_REC: 对应update原地更新操作的undo日志, 记录主键值和被更新的列值和被更新的索引列值.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL开启事务的方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>BEGIN</code></p>
+</li>
+<li>
+<p><code>START TRANSACTION</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL MVCC实现原理?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>MySQL针对每行数据存在两个隐藏列: trx_id(当前操作该行记录的事务id)和roll_pointer(该行对应的undo日志指针). undo日志也存在之前行对应的上一个roll_pointer, 所以每行数据可以根据roll_pointer从undo日志中组成一个版本链.</p>
+</li>
+<li>
+<p>事务中每次(Read Committed)或者第一次(Repeatable Read)select查询时, 会生成一个ReadView, 包含四个属性:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>m_ids: 当前未提交的事务id列表.</p>
+</li>
+<li>
+<p>min_trx_id: 当前最小的未提交事务id.</p>
+</li>
+<li>
+<p>max_trx_id: 下一个事务id.</p>
+</li>
+<li>
+<p>creator_trx_id: 当前创建ReadView的事务id.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>select读取数据时, 会遍历版本链中事务id:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>如果该版本的事务id等于creator_trx_id, 则该版本可见.</p>
+</li>
+<li>
+<p>如果该版本的事务id小于min_trx_id, 则说明该事务已提交, 该版本可见.</p>
+</li>
+<li>
+<p>如果该版本的事务id大于等于max_trx_id, 则说明该事务属于当前事务之后开启的事务, 该版本不可见.</p>
+</li>
+<li>
+<p>如果该版本的事务id在m_ids中, 说明该事务未提交, 该版本不可见; 如果不在, 说明该事务在生成ReadView时已提交, 该版本可见.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>如果select不是全表扫描, 而是查询的二级索引数据, 则判断当前ReadView的min_trx_id是否大于二级索引页的最大事务id, 如果大于则说明事务已提交, 该二级索引页数据可见, 否则回表根据聚簇索引行数据隐藏列再去判断.</p>
+</li>
+<li>
+<p>MySQL的Repeatable Read级别由于只是在第一次生成ReadView, 可以一定程度上解决幻读. 但是如果当前事务中更新了其他事务插入的数据, 那么该数据的事务id会变成当前事务id, 那么该数据会对当前事务可见.</p>
+</li>
+</ol>
 </div>
 </li>
 <li>
@@ -3906,6 +4461,16 @@ $(globalSwitch);
 <ul>
 <li>
 <p>表锁: 锁住整个表记录.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>意向锁: 当对某行加S/X锁时, 会对表加IS/IX锁.</p>
+</li>
+<li>
+<p>AUTO-INC锁: 插入数据时需加锁计算自增列数值, 插入完成后释放锁, 无需等待事务结束.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>行锁: 锁住一到多行记录, 包含记录锁/间隙锁/临键锁.</p>
@@ -3940,6 +4505,12 @@ $(globalSwitch);
 </ul>
 </div>
 </li>
+<li>
+<p>插入意向锁: 如果插入记录的位置被别的事务加了间隙锁, 则会生成一个插入意向锁等待.</p>
+</li>
+<li>
+<p>隐式锁</p>
+</li>
 </ul>
 </div>
 </li>
@@ -3959,6 +4530,70 @@ $(globalSwitch);
 </ul>
 </div>
 </li>
+<li>
+<p><em>MySQL表中的隐藏列有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>DB_ROW_ID: 每行的唯一标识id, 如果表中没有主键和唯一键, 则会生成row_id.</p>
+</li>
+<li>
+<p>DB_TRX_ID: 事务id.</p>
+</li>
+<li>
+<p>DB_ROLL_PTR: 回滚指针.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL统计表中数据量的方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>count(*)</p>
+</li>
+<li>
+<p><code>select * from mysql.innodb_table_stats where database_name = '数据库名' and table_name = '表名';</code> n_rows列(估算值)</p>
+</li>
+<li>
+<p><code>show table status like '表名';</code> Rows列(估算值)</p>
+</li>
+<li>
+<p><code>select * from information_schema.tables where TABLE_SCHEMA = '数据库名' and TABLE_NAME = '表名';</code> TABLE_ROWS列(估算值)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>MySQL分区的方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>range</p>
+</li>
+<li>
+<p>list</p>
+</li>
+<li>
+<p>hash: 支持表达式</p>
+</li>
+<li>
+<p>key: 不支持表达式, 使用MD5计算hash.</p>
+</li>
+<li>
+<p>复合分区: 对一列多次分区, 如range+hash.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_postgresql"><a class="link" href="#_postgresql">9.2. PostgreSQL</a></h3>
+<div class="qlist qanda">
+<ol>
 <li>
 <p><em>PostgreSQL中scan类型有哪些?</em></p>
 <div class="ulist">
@@ -4019,7 +4654,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>PostgreSQL索引类型有哪些?</em></p>
+<p><em>PostgreSQL的索引类型有哪些?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -4029,13 +4664,87 @@ $(globalSwitch);
 <p>hash</p>
 </li>
 <li>
-<p>gin</p>
+<p>gin: 倒排索引, 用于数组查询或者全文搜索</p>
 </li>
 <li>
-<p>brin</p>
+<p>brin: 稀疏索引</p>
 </li>
 <li>
-<p>gist &#8230;&#8203;</p>
+<p>gist: 多叉树索引, 用于范围查询</p>
+</li>
+<li>
+<p>sp-gist: 空间索引, 用于geo/ip查询.</p>
+</li>
+<li>
+<p>pg_tgrm: 全文索引</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>PostgreSQL的gin和gist索引有什么区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>gist索引是有误差的, gin索引是准确的.</p>
+</li>
+<li>
+<p>gin的查询性能比gist高, 但是插入/更新/存储成本比gist高, 所以静态数据+准确性要求高选gin.</p>
+</li>
+<li>
+<p>gist可以自定义扩展操作符, gin固定内置操作符.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>PostgreSQL的窗口函数有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>row_number(): 为每个分组内的行分配一个唯一的顺序号, 序号从1开始.</p>
+</li>
+<li>
+<p>rank(): 为每个分组内的行分配一个顺序号,如果有相同值则分配相同的序号,序号不连续.</p>
+</li>
+<li>
+<p>dense_rank(): 为每个分组内的行分配一个顺序号,如果有相同值则分配相同的序号,序号连续.</p>
+</li>
+<li>
+<p>percent_rank(): 计算当前行处于所有行顺序的百分比, 计算结果为(相对位置-1)/(总行数-1), 返回值为[0,1], 如果有重复行按第一行的位置.</p>
+</li>
+<li>
+<p>cume_dist(): 计算当前行+之前所有行的累计分布, 计算结果为相对位置/总行数, 返回值为(0,1], 如果有重复行按最后一行的位置.</p>
+</li>
+<li>
+<p>ntile(n): 将分组内的行平均分为n个组, 为每行按顺序分配1到n之间的组号.</p>
+</li>
+<li>
+<p>sum()</p>
+</li>
+<li>
+<p>avg()</p>
+</li>
+<li>
+<p>max()</p>
+</li>
+<li>
+<p>min()</p>
+</li>
+<li>
+<p>lag(column[, offset[, default_value]]): 返回当前行前第offset行的值,如果不存在则返回default_value.</p>
+</li>
+<li>
+<p>lead(column[, offset[, default_value]]): 返回当前行后第offset行的值,如果不存在则返回default_value.</p>
+</li>
+<li>
+<p>first_value(column): 返回分组内第一个值.</p>
+</li>
+<li>
+<p>last_value(column): 返回分组内最后一个值.</p>
+</li>
+<li>
+<p>nth_value(column, n): 返回分组内第n个值.</p>
 </li>
 </ul>
 </div>
@@ -4044,11 +4753,109 @@ $(globalSwitch);
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
 <h2 id="_消息队列"><a class="link" href="#_消息队列">10. 消息队列</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_rocketmq"><a class="link" href="#_rocketmq">10.1. RocketMQ</a></h3>
+<h3 id="_mq"><a class="link" href="#_mq">10.1. MQ</a></h3>
+<div class="qlist qanda">
+<ol>
+<li>
+<p><em>消息队列的作用?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>解耦</p>
+</li>
+<li>
+<p>异步</p>
+</li>
+<li>
+<p>削峰</p>
+</li>
+<li>
+<p>性能: 并发批量处理提高吞吐量.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>消息队列的缺点?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>系统可用性降低: 一旦消息队列宕机, 生产者消费者都会受到影响.</p>
+</li>
+<li>
+<p>系统复杂度提高: 需要关注消息是否会丢失/消息是否会重复消费/消息顺序性能否保证等问题.</p>
+</li>
+<li>
+<p>数据一致性问题: 消费者消费失败如何解决.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>消息队列如何选型?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Kafka:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>优点: 吞吐量大性能高.</p>
+</li>
+<li>
+<p>缺点: 消息会丢失, 功能单一, 不支持条件过滤/死信/延迟消息等功能.</p>
+</li>
+<li>
+<p>适用场景: 日志记录, 大数据传输.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>RabbitMQ:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>优点: 消息可靠性高, 功能全面.</p>
+</li>
+<li>
+<p>缺点: 吞吐量低, erlang语言开发难以定制.</p>
+</li>
+<li>
+<p>适用场景: 小规模场景.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>RocketMQ:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>优点: 高吞吐量, 高可用, 功能全面.</p>
+</li>
+<li>
+<p>缺点: 客户端只支持Java.</p>
+</li>
+<li>
+<p>适用场景: 兼顾性能和功能的通用场景.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rocketmq"><a class="link" href="#_rocketmq">10.2. RocketMQ</a></h3>
 <div class="qlist qanda">
 <ol>
 <li>
@@ -4081,9 +4888,80 @@ $(globalSwitch);
 <p>消费者提交offset前宕机.</p>
 </li>
 <li>
-<p>消费过程中rebalance, 消费中的queue被分配给其他消费者, 则此刻未提交的消息会被其他消费者消费一次.</p>
+<p>消费过程中 <code>rebalance</code> , 消费中的queue被分配给其他消费者, 则此刻未提交的消息会被其他消费者消费一次.</p>
 </li>
 </ul>
+</div>
+</li>
+<li>
+<p><em>RocketMQ如何保证消息不丢失?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>消息发送: 消息可以选择同步发送, 发送异常后重试(默认最多重试3次).</p>
+</li>
+<li>
+<p>主从同步: 消息发送到master broker后会等待消息同步给所有slave节点(默认最多等待10s).</p>
+</li>
+<li>
+<p>消息存储: 同步刷盘: 消息提交到内存后立即刷新到硬盘.</p>
+</li>
+<li>
+<p>消息消费: 消费完成后手动提交offset.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>RocketMQ的刷盘策略?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>同步刷盘: Broker收到消息后, 写入内存再提交刷盘任务, 将待提交的数据(write到flush指针范围)批量写到硬盘再返回.</p>
+</li>
+<li>
+<p>异步刷盘: Broker收到消息后, 写入内存后直接返回, 另起一个500ms的定时线程将 <code>pagecache</code> 写入硬盘.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>RocketMQ如何提高消息写入性能?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>commitlog</code> 文件会mmap映射到JVM内存, 写入消息时先写内存再由Broker配置决定同步刷盘还是异步刷盘.</p>
+</li>
+<li>
+<p>master节点同步消息到slave节点时, 使用CompletableFuture异步批量发送然后等待完成.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>如果开启transientStorePoolEnable, 则先写到堆外内存, 避免受到GC影响, 然后异步刷到mmap出来的JVM内存, 最后异步刷盘.</p>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>RocketMQ事务消息实现原理?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Producer发送一个half消息, 暂存到Broker中.</p>
+</li>
+<li>
+<p>Producer执行本地事务回调: <code>TransactionListener#executeLocalTransaction</code> .</p>
+</li>
+<li>
+<p>Producer发送commit或者rollback状态或者到Broker, Broker将消息恢复到用户原先发送的Topic中供消费者消费.</p>
+</li>
+<li>
+<p>如果Producer发送的是UNKOWN状态或者未发送, 则Broker会回调 <code>TransactionListener#checkLocalTransaction</code> 方法检查状态, 根据结果重复步骤3/4, 默认最多重复15次, 超过则丢弃消息.</p>
+</li>
+</ol>
 </div>
 </li>
 <li>
@@ -4099,11 +4977,52 @@ $(globalSwitch);
 </ul>
 </div>
 </li>
+<li>
+<p><em>RocketMQ如何实现消息顺序消费?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>对于同一主体的消息可以根据业务id发送到相同的MessageQueue, RocketMQ保证同一个MessageQueue内消息有序.</p>
+</li>
+<li>
+<p>Broker针对顺序消息存储和消费时会对MessageQueue加同步锁.</p>
+</li>
+<li>
+<p>消费者单线程消费且加同步锁, 并处理消息消费时的异常, 如果不处理异常则RocketMQ会一直重试这条消息并不会消费下一条.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>RocketMQ消费者队列分配策略?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>AllocateMessageQueueAveragely(默认): 平均分配, m个队列,n个消费者, 按队列顺序为每个消费者平均划分m/n个队列.</p>
+</li>
+<li>
+<p>AllocateMessageQueueAveragelyByCircle: 环形分配, m个队列, n个消费者, 每个消费者分配m%n=i的队列.</p>
+</li>
+<li>
+<p>AllocateMessageQueueByConfig: 用户自定义设置队列.</p>
+</li>
+<li>
+<p>AllocateMessageQueueByMachineRoom: 选择相同机房然后平均分配队列.</p>
+</li>
+<li>
+<p>AllocateMachineRoomNearby: 先选择相同机房然后平均分配队列, 然后将剩余的队列通过自定义策略继续分配给所有的消费者.</p>
+</li>
+<li>
+<p>AllocateMessageQueueConsistentHash: 一致性哈希分配: 消费者节点构建虚拟节点, 默认计算队列的key的MD5值找到第一个比它大的消费者节点消费该队列.</p>
+</li>
+</ul>
+</div>
+</li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_rabbitmq"><a class="link" href="#_rabbitmq">10.2. RabbitMQ</a></h3>
+<h3 id="_rabbitmq"><a class="link" href="#_rabbitmq">10.3. RabbitMQ</a></h3>
 <div class="qlist qanda">
 <ol>
 <li>
@@ -4130,7 +5049,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>定时检查消息投递状态:</p>
+<p>本地事务表:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -4168,23 +5087,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>rabbitmq的使用场景有哪些?</em></p>
-<div class="ulist">
-<ul>
-<li>
-<p>削峰: 让服务能够平滑的处理突发的超负荷请求.</p>
-</li>
-<li>
-<p>解耦: 消息生产者和消费者不需要知道对方的存在.</p>
-</li>
-<li>
-<p>存储: 消息系统可以保证该消息真正被消费完才会被丢弃.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><em>rabbitmq有哪些角色?</em></p>
+<p><em>RabbitMQ有哪些角色?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -4203,14 +5106,14 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>rabbitmq的消息是怎么发送的?</em></p>
+<p><em>RabbitMQ的消息是怎么发送的?</em></p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
 <p>生产者将消息发送给Exchange, 并指定一个Routing Key.</p>
 </li>
 <li>
-<p>RabbitMQ根据Exchange的类型和Binding Key去和Routing Key匹配找到相应的队列.</p>
+<p>RabbitMQ根据Exchange的类型和与队列绑定的Binding Key去和Routing Key匹配找到相应的队列.</p>
 </li>
 <li>
 <p>RabbitMQ将消息路由到队列里.</p>
@@ -4219,7 +5122,7 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>rabbitmq的Exchange类型?</em></p>
+<p><em>RabbitMQ的Exchange类型?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -4248,17 +5151,11 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>rabbitmq 中 vhost 的作用是什么?</em></p>
-<div class="ulist">
-<ul>
-<li>
+<p><em>RabbitMQ中vhost的作用是什么?</em></p>
 <p>实现租户隔离.</p>
 </li>
-</ul>
-</div>
-</li>
 <li>
-<p><em>rabbitmq怎么实现延迟消息队列?</em></p>
+<p><em>RabbitMQ怎么实现延迟消息队列?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -4271,7 +5168,32 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>rabbitmq消息的状态?</em></p>
+<p><em>RabbitMQ消息的状态?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ready: 消息进入队列等待消费.</p>
+</li>
+<li>
+<p>Unacked: 消息被消费且未受到Ack确认.</p>
+</li>
+<li>
+<p>Acked: 消息被消费且受到Ack确认, 即将删除.</p>
+</li>
+<li>
+<p>Rejected: 消费者拒绝消息并不希望重新放回队列, 即将进入死信队列.</p>
+</li>
+<li>
+<p>Delayed: TTL消息.</p>
+</li>
+<li>
+<p>Expired: TTL消息过期, 即将进入死信队列.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>RabbitMQ消息存储的方式?</em></p>
 <div class="ulist">
 <ul>
 <li>
@@ -4294,7 +5216,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_kafka"><a class="link" href="#_kafka">10.3. Kafka</a></h3>
+<h3 id="_kafka"><a class="link" href="#_kafka">10.4. Kafka</a></h3>
 <div class="qlist qanda">
 <ol>
 <li>
@@ -4546,6 +5468,17 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </ul>
 </div>
 </li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_网关"><a class="link" href="#_网关">13. 网关</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_nginx"><a class="link" href="#_nginx">13.1. Nginx</a></h3>
+<div class="qlist qanda">
+<ol>
 <li>
 <p><em>Nginx反向代理路径配置方式?</em></p>
 <div class="ulist">
@@ -4619,8 +5552,9 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_linux"><a class="link" href="#_linux">13. Linux</a></h2>
+<h2 id="_linux"><a class="link" href="#_linux">14. Linux</a></h2>
 <div class="sectionbody">
 <div class="qlist qanda">
 <ol>
@@ -4670,11 +5604,89 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 <p>LT模式: 如果文件句柄上的字节流没读完, 下次还会通知.</p>
 </li>
 <li>
-<p>ET模式: 每个文件句柄最多只通知一次, 无论应用程序有没有读完.<br>
-&#8230;&#8203;</p>
+<p>ET模式: 每个文件句柄最多只通知一次, 无论应用程序有没有读完.</p>
 </li>
 </ul>
 </div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>普通io, mmap和sendfile读写的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>普通io:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>用户态切换到内核态, 内核将磁盘文件DMA读取(避免消耗CPU资源)到内核缓冲区.</p>
+</li>
+<li>
+<p>内核缓冲区数据复制到用户缓冲区.</p>
+</li>
+<li>
+<p>read返回, 内核态切换到用户态.</p>
+</li>
+<li>
+<p>用户态写数据, 调用write, 切换到内核态, 将用户缓冲区拷贝到Socket缓冲区.</p>
+</li>
+<li>
+<p>Socket缓冲区数据DMA复制到网卡.</p>
+</li>
+<li>
+<p>write返回, 内核态切换到用户态.</p>
+</li>
+<li>
+<p>一共4次上下文切换, 4次拷贝.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>mmap:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>用户态切换到内核态, 内核将磁盘文件DMA读取到内核缓冲区, 同时将该内核缓冲区映射到用户缓冲区.</p>
+</li>
+<li>
+<p>内核态切换到用户态.</p>
+</li>
+<li>
+<p>用户态写数据, 切换到内核态, 内核将缓冲区数据CPU拷贝到Socket缓冲区.</p>
+</li>
+<li>
+<p>Socket缓冲区DMA复制数据到网卡.</p>
+</li>
+<li>
+<p>内核态切换到用户态.</p>
+</li>
+<li>
+<p>一共4次上下文切换, 3次拷贝.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>sendfile:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>用户态切换到内核态, 内核将磁盘文件DMA读取到内核缓冲区.</p>
+</li>
+<li>
+<p>内核态切换回用户态, 从内核缓冲区直接将数据DMA拷贝到网卡.</p>
+</li>
+<li>
+<p>一共2次上下文切换, 2次拷贝.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>mmap存在一次CPU拷贝, 适用于小文件频繁修改, sendfile适用于大文件网络传输.</p>
 </li>
 </ul>
 </div>
@@ -4684,7 +5696,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_分布式"><a class="link" href="#_分布式">14. 分布式</a></h2>
+<h2 id="_分布式"><a class="link" href="#_分布式">15. 分布式</a></h2>
 <div class="sectionbody">
 <div class="qlist qanda">
 <ol>

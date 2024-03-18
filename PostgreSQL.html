@@ -1316,11 +1316,10 @@ select ival from tbl_mvcc where id =1;</code></pre>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 8. 事务隔离级别</caption>
 <colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
 </colgroup>
 <thead>
 <tr>
@@ -1328,37 +1327,32 @@ select ival from tbl_mvcc where id =1;</code></pre>
 <th class="tableblock halign-left valign-top">脏读</th>
 <th class="tableblock halign-left valign-top">不可重复读</th>
 <th class="tableblock halign-left valign-top">幻读</th>
-<th class="tableblock halign-left valign-top">序列化异常</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Read Uncommitted</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Read Committed (PostgreSQL默认)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Repeatable Read (MySQL默认)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Serializable</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 </tr>
 </tbody>
 </table>
