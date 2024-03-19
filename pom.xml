@@ -30,7 +30,7 @@
         <project-reactor.version>2023.0.3</project-reactor.version>
         <mybatis.version>3.5.15</mybatis.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <guava.version>33.0.0-jre</guava.version>
+        <guava.version>33.1.0-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.37</jmh.version>
         <disruptor.version>4.0.0</disruptor.version>
