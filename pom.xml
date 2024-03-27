@@ -27,10 +27,10 @@
         <spring-boot.version>3.2.3</spring-boot.version>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
-        <project-reactor.version>2023.0.3</project-reactor.version>
+        <project-reactor.version>2023.0.4</project-reactor.version>
         <mybatis.version>3.5.15</mybatis.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <guava.version>33.0.0-jre</guava.version>
+        <guava.version>33.1.0-jre</guava.version>
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.37</jmh.version>
         <disruptor.version>4.0.0</disruptor.version>
@@ -44,14 +44,15 @@
         <spring-asciidoctor-backends.version>0.0.7</spring-asciidoctor-backends.version>
         <asciidoctor-kroki.version>0.9.1</asciidoctor-kroki.version>
         <asciidoctorj-diagram.version>2.3.0</asciidoctorj-diagram.version>
-        <asciidoctorj-diagram-plantuml.version>1.2024.0</asciidoctorj-diagram-plantuml.version>
+        <asciidoctorj-diagram-plantuml.version>1.2024.3</asciidoctorj-diagram-plantuml.version>
         <testcontainer.version>1.19.7</testcontainer.version>
         <arthas.version>3.7.2</arthas.version>
         <javassist.version>3.30.2-GA</javassist.version>
         <logstash-logback.version>7.4</logstash-logback.version>
-        <postgresql.version>42.7.2</postgresql.version>
+        <postgresql.version>42.7.3</postgresql.version>
+        <redisson.version>3.27.2</redisson.version>
 
-        <maven-complier-plugin.version>3.12.1</maven-complier-plugin.version>
+        <maven-complier-plugin.version>3.13.0</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
@@ -95,6 +96,11 @@
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainer.version}</version>
                 <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mybatis</groupId>

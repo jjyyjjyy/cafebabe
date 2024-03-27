@@ -27,6 +27,12 @@ public class CyclicBarrierDemo {
             PLAYERS.stream()
                 .sorted(Comparator.comparingLong(a -> a.finishedAt))
                 .forEach(System.out::println);
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            log.info("====== End ======");
             THREAD_POOL.shutdownNow();
         });
 
@@ -37,7 +43,7 @@ public class CyclicBarrierDemo {
                     TimeUnit.SECONDS.sleep(i);
                     PLAYERS.add(new Player().setName(Thread.currentThread().getName()).setFinishedAt(Instant.now().getEpochSecond()));
                     cyclicBarrier.await();
-                    log.info(" over!");
+                    log.info(" over!"); // 执行完barrierAction后才释放锁.
                 } catch (Exception ignored) {
                 }
             }));

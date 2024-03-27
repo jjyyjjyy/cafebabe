@@ -76,6 +76,8 @@ Checked和UnChecked异常的区别?::
 * 静态内部类
 ** 静态内部类的属性和方法可以声明为静态和非静态的.
 ** 静态内部类只能引用外部类的静态变量或方法.
+为什么匿名内部类引用的外部局部变量的值为final修饰?::
+生成的匿名内部类会拷贝一份局部变量的值, 如果外部修改了局部变量的值会导致匿名内部类对象中的值不同, 所以用final修饰禁止修改.
 Object类有哪些方法?::
 * hashcode
 * equals
@@ -127,10 +129,12 @@ Java类初始化顺序?::
 . 子类成员变量
 . 子类构造代码块
 . 子类构造函数
-Java中Connection为什么要close?::
-及时释放数据库链接, 减少资源消耗. (如果没有显式close, 也会被gc)
 var和val的区别?::
 var表示可变变量, val为非标准关键字, 表示不可变变量.
+Java静态代理和动态代理的区别?::
+静态代理的代理实现类在编译期就已经确定, 无法在程序运行时期修改; 动态代理是在程序运行期通过反射生成代理类的代码, 具体实现方式为JDK动态代理(实现接口)和CGLIB动态代理(继承父类).
+Java中Connection为什么要close?::
+及时释放数据库链接, 减少资源消耗. (如果没有显式close, 也会被gc)
 BIO和NIO的区别?::
 * BIO属于同步阻塞模型, 业务线程读写请求过程中会一直等待数据到达(阻塞), 业务操作完成后才会继续执行后续任务(同步).
 * NIO属于IO多路复用模型, 通过epoll/kqueue系统调用批量查询可用的socket(非阻塞), 然后通过单读的线程进行读写操作(同步), 节省了read阻塞阶段的耗时.
@@ -149,7 +153,7 @@ Buffer的四个核心属性?::
 * position: 当前操作的索引.
 * mark: 标记位置, 可通过 `reset()` 恢复position为mark的位置.
 `flip()` 和 `rewind()` 方法的使用场景?::
-* `flip()` 方法用于写完后读取整个缓冲区内容的场景, 如写header+body后读取整个header+body内容.
+* `flip()` 方法用于写完后读取刚刚写入缓冲区内容的场景, 如写header+body后读取整个header+body内容.
 * `rewind()` 方法用于重复读取缓冲区内容的场景.
 SelectionKey的事件类型?::
 * OP_CONNECT(仅客户端SocketChannel): 请求连接成功.
@@ -193,9 +197,8 @@ Java容器有哪些?::
 ** IdentityHashMap
 ** ConcurrentHashMap
 ** WeakHashMap
-* 树
+* 有序树
 ** TreeMap
-* `NavigableMap` 跳表
 ** ConcurrentSkipListMap
 ArrayList和LinkedList的区别?::
 * `ArrayList` 底层使用数组存储元素, `LinkedList` 使用双向链表.
@@ -205,20 +208,22 @@ ArrayList和LinkedList的区别?::
 * 都不是线程安全的.
 有哪些Map实现类?::
 * HashMap `查找键值对`
-* LinkedHashMap `保证key按照插入的顺序输出`
+* LinkedHashMap `保证key按照插入/查找的顺序输出`
 * TreeMap `红黑树, 按照自定义顺序遍历key`
+* ConcurrentSkipListMap `线程安全的有序树, 基于跳表实现`
 * ConcurrentHashMap `线程安全`
 * WeakHashMap `存取弱引用对象的哈希表`
 * IdentityHashMap `使用System.identityHashCode()计算hashCode, 使用==判断key是否相同`
 HashMap和HashTable的区别?::
-* HashTable线程安全, HashMap线程不安全.
-* HashTable默认初始长度为11, HashMap默认初始长度为16, 且总为2的幂.
-* HashTable扩容后为stem:[2n+1],HashMap扩容后为stem:[2n].
-* HashMap的kv可以为null, 放在数据索引为0的位置.HashTable的kv均不能为null.
-* HashMap因hash冲突产生的链表长度大于8后会转成红黑树, HashTable不会.
+* HashTable线程安全; HashMap线程不安全.
+* HashTable默认初始长度为11; HashMap默认初始长度为16, 且总为2的幂.
+* HashTable扩容后为stem:[2n+1]; HashMap扩容后为stem:[2n].
+* HashMap的kv可以为null, 放在数据索引为0的位置; HashTable的kv均不能为null.
+* HashMap因hash冲突产生的链表长度大于8后会转成红黑树; HashTable不会.
 JDK中有哪些保持key有序的Map?::
 * LinkedHashMap: 按照插入顺序或者读取顺序排列key.
 * TreeMap: 按照key的大小排好序.
+* ConcurrentSkipListMap: 线程安全.
 有哪些散列函数?::
 * 求和: 将每一位的ascii值相加得到哈希值.
 * 多项式求和: 以一个素数(31)为底, 多项式求和: stem:[sum_(i=0)^(n-1)"key"[n-i-1\]xx31^i] , 如 stem:[h=k_0+k_1xx31+k_2xx31^2+...+k_(n-1)xx31^(n-1)]
@@ -281,12 +286,12 @@ synchronized和volatile的区别?::
 * 使用不同: `volatile` 只能用于变量上, `synchronized` 可以用作实例方法/静态方法和代码块上.
 * 语义不同: `volatile` 只保证可见性和禁止指令重排序, `synchronized` 保证可见性和原子性.
 线程的状态流转?::
-* NEW -> RUNNING: Thread#start()方法.
-* RUNNING -> BLOCKED: 未争取到锁被阻塞.
-* BLOCKED -> RUNNING: 争取到锁.
-* RUNNING -> WAITING/TIMED_WAITING: Object#wait, Thread#join, Thread.sleep, LockSupport.park.
-* WAITING/TIMED_WAITING -> RUNNING: Object#notify, Object#notifyAll, LockSupport.unpark.
-* RUNNING -> TERMINATED: run方法执行结束.
+* NEW -> RUNNABLE: Thread#start()方法.
+* RUNNABLE -> BLOCKED: 未争取到锁被阻塞.
+* BLOCKED -> RUNNABLE: 争取到锁.
+* RUNNABLE -> WAITING/TIMED_WAITING: Object#wait, Thread#join, Thread.sleep, LockSupport.park.
+* WAITING/TIMED_WAITING -> RUNNABLE: Object#notify, Object#notifyAll, LockSupport.unpark.
+* RUNNABLE -> TERMINATED: run方法执行结束.
 Thread类run()和start()区别?::
 * `run()` : 执行具体的工作.
 * `start()` : 启动一个新的线程, 该线程去执行具体的工作.
@@ -295,16 +300,16 @@ Thread.join()有什么作用?::
 终止一个线程的方法有哪些?::
 * 使用一个volatile修饰的标志位while循环判断是否终止.
 * 调用Thread#interrupt()方法
-** 如果线程处于运行状态, Thread#isInterrupted()方法返回true, 线程内部判断这个标志位跳出方法.
+** 如果线程处于运行状态, `Thread.currentThread().isInterrupted()` 方法返回true, 线程内部判断这个标志位跳出方法.
 ** 如果线程处于阻塞状态, 则会抛出InterruptedException.线程内部可以捕获该异常终止方法.
 * 调用Thread#stop()方法, 此方法会释放所有子线程的锁, 但可能会导致线程安全问题.
 守护线程和本地线程的区别?::
 当JVM内部只剩守护线程时, JVM就会自动退出.
-请描述锁的四种状态和升级过程?::
-* 无锁
-* 偏向锁
-* 轻量级锁
-* 重量级锁
+请描述synchronized锁的升级过程?::
+* 无锁: 当线程首次进入同步代码块时, 不需要获得锁, 处于无锁状态.
+* 偏向锁: 当线程反复进入该同步代码块时, 会在锁对象header中记录该线程id, 下次进入时无需获得锁.
+* 轻量级锁: 当有其他线程竞争锁时, 会升级成轻量级锁, 通过CAS操作获得锁, 失败后重试(自旋).
+* 重量级锁: 自旋超过一定次数后仍未获得锁, 则会升级成重量级锁, 通过操作系统的Mutex来实现线程同步.
 CAS的ABA问题如何解决?::
 * AtomicStampedReference
 * AtomicMarkableReference
@@ -325,7 +330,7 @@ CAS的ABA问题如何解决?::
 * ArrayBlockingQueue
 * LinkedBlockingQueue
 * SynchronousQueue
-* TransferQueue
+* LinkedTransferQueue
 * DelayQueue
 线程池的工作原理?::
 . 如果当前线程池中的线程数目小于corePoolSize，则每来一个任务，就会创建一个线程去执行这个任务；
@@ -347,6 +352,12 @@ Tomcat自定义了阻塞队列和Executor的实现, 处理的流程与JDK线程�
 . 如果当前工作线程数小于总线程数, 说明有空闲线程, 加入到队列中.
 . 如果当前线程数大于最大线程数, 则加入到队列中, 等待有空闲的工作线程执行该任务.
 . 如果加入到队列失败, 则抛出异常.
+ThreadLocal内存泄漏问题?::
+* 何时会发生泄漏: 持有ThreadLocal对象已经被回收, 但是线程还处于运行状态且Value没有被remove掉, threadLocalMap中还存在ThreadLocal设置的Entry和Value(Entry包含Key和Value, key为弱引用会在GC后被回收, 但是Entry和Value不会).
+* ThreadLocal协助解决内存泄漏的方式:
+. ThreadLocal的Entry将key(也就是ThreadLocal对象本身)设置为弱引用, 防止但Thread持有该对象的引用导致该ThreadLocal对象始终无法回收.
+. 每次set/remove时会遍厉槽位, 清除get()为null的槽位(获取key为null代表该ThreadLocal已被回收), 一直遍历到不为null的槽位.
+* 正确的使用ThreadLocal: ThreadLocal设置为类常量强引用, 线程设置完value后在使用结束后remove掉, 防止thread不停止的情况下value不会回收从而导致内存泄漏.
 
 == JVM
 
@@ -459,8 +470,14 @@ Full GC发生的场景有哪些?::
 * Young GC时Eden区的对象放不进survivor区, 会直接进入老年代.
 CMS采用哪种回收算法?::
 CMS使用标记-清除算法回收老年代.
+CMS何时触发FullGC?::
+* `promotion failed` : YoungGC回收后将一部分对象晋升到老年代, 但是老年代空间不足, 触发FullGC.
+** 优化思路1: 调大Xmn
+** 优化思路2: 调大老年代晋升年龄.
+* `concurrent mode failure` : CMS并发Old GC时应用线程有新的对象放到老年代但是剩余的老年代空间不足, 升级为FullFC.
+** 优化思路1: 调低CMS Old GC阈值: `-XX:+UseCMSInitiatingOccupancyOnly -XX:CMSFullGCsBeforeCompaction=60`
 CMS怎么解决内存碎片问题?::
-* CMS提供 `-XX:+UseCMSCompactAtFullCollection` 开关参数, 用于CMS在Full GC时开启内存碎片的合并整理过程.
+* (JDK8及以后版本后此参数已过时无用) CMS提供 `-XX:+UseCMSCompactAtFullCollection` 开关参数, 用于在CMS Old GC时开启内存碎片的合并整理过程.
 * CMS提供 `-XX:CMSFullGCsBeforeCompaction` 参数, 用于设置在执行指定次数不整理空间的Full FC后, 在下一次Full GC前整理内存碎片.
 CMS回收的步骤?::
 . 初始标记
@@ -529,10 +546,12 @@ Young GC慢的原因?::
 * 哈希表使用可变对象作为key. 修改变量属性后hash值发生改变, 此时如果从hash表中删除该key会找不到而删除失败.
 * 一个生命周期短的对象被生命周期长的对象所持有, 则会导致该对象无法被回收.
 如何找到JVM CPU占用高的原因?::
+* top+jstack
 . `jps` 查看JVM进程 `PID`.
 . `top -Hp PID` 查看该JVM进程内线程资源占用情况.找到CPU占用资源高的线程 `TID`.
 . `printf '%x\n' TID` 将线程id转成16进制数.
 . `jstack PID | grep TID -A 10` 查看该线程所在堆栈, 检查堆栈所在代码上的错误.
+* async-profiler
 JVM的类加载器?::
 * Bootstrap ClassLoader: 加载jre/classes下的类以及rt.jar.
 * Ext ClassLoader: 加载jre/lib/ext下的类以及 `java.ext.dirs` 系统变量指定的路径下的类.
@@ -727,9 +746,9 @@ Spring如何检测Bean循环引用?::
 每个Bean在创建前 `beanName` 会放到 `singletonsCurrentlyInCreation` 这个set中, Bean创建完会从这个set中移出.
 解析构造函数注入或者 `@Autowired` 注解注入时会看需要注入的Bean在不在这个set中, 如果在, 则抛出循环引用异常.
 Spring的三级缓存?::
-* `singletonObjects` : 存放已经实例化并初始化好的单例对象.
-* `earlySingletonObjects` : 暂存实例化好但属性没有初始化好的单例对象.
-* `singletonFactories` : 暂存用于创建单例对象的工厂.
+* 一级缓存: `singletonObjects` : 存放已经实例化并初始化好的单例对象.
+* 二级缓存: `earlySingletonObjects` : 暂存实例化好但属性没有初始化好的单例对象.(存放循环依赖下创建好但未完全初始化好的AOP对象)
+* 三级缓存: `singletonFactories` : 暂存用于创建单例对象的工厂.(存放用于创建对象的工厂方法)
 为什么不直接使用一级缓存?::
 有循环依赖的情况下, Bean还没创建好就要暴露出去, 不方便维护, 也解决不了代理对象重复创建的问题.
 为什么不使用二级缓存而是三级缓存?::
@@ -1180,16 +1199,31 @@ MySQL的锁有哪些?::
 *** AUTO-INC锁: 插入数据时需加锁计算自增列数值, 插入完成后释放锁, 无需等待事务结束.
 ** 行锁: 锁住一到多行记录, 包含记录锁/间隙锁/临键锁.
 ** 记录锁: 锁住单行记录, 防止脏读.
-*** 触发条件: 查询条件精准匹配(等于), 且命中主键索引或者唯一索引.
-** 间隙锁: 锁住多行记录, 防止幻读.
-*** 触发条件: 查询条件为范围查询, 且命中非唯一索引, 只会出现在RR隔离级别下.
+** 间隙锁: 锁住索引区间.
 ** 临键锁: 记录锁+间隙锁的组合, 锁住查询条件范围和下一个相邻的区间.加了临键锁后, 范围内不能更新和插入.
-*** 触发条件: 查询条件为范围查询, 且命中非唯一索引.
 ** 插入意向锁: 如果插入记录的位置被别的事务加了间隙锁, 则会生成一个插入意向锁等待.
 ** 隐式锁
 * 根据锁的状态分类:
 ** 意向共享锁
 ** 意向排他锁
++
+.RR隔离级别下加锁判定
+|===
+| 查询类型 | 唯一索引 | 非唯一索引
+
+| 等值查询
+a|
+记录存在 -> 记录锁;
+记录不存在 -> 间隙锁
+a| 记录存在 -> 临键锁+间隙锁;
+记录不存在 -> 间隙锁
+
+| 范围查询
+| 左区间的临键锁/记录锁 + 右区间的临键锁/间隙锁
+| 左区间的临键锁 + 右区间的临键锁
+
+|===
++
 MySQL表中的隐藏列有哪些?::
 * DB_ROW_ID: 每行的唯一标识id, 如果表中没有主键和唯一键, 则会生成row_id.
 * DB_TRX_ID: 事务id.
@@ -1311,6 +1345,7 @@ RocketMQ事务消息实现原理?::
 . Producer执行本地事务回调: `TransactionListener#executeLocalTransaction` .
 . Producer发送commit或者rollback状态或者到Broker, Broker将消息恢复到用户原先发送的Topic中供消费者消费.
 . 如果Producer发送的是UNKOWN状态或者未发送, 则Broker会回调 `TransactionListener#checkLocalTransaction` 方法检查状态, 根据结果重复步骤3/4, 默认最多重复15次, 超过则丢弃消息.
+. 如果消费者消费失败则消息会重新进入队列消息, 默认重试超过16次后还是失败则会进入死信队列让人工干预.
 push和pull消费模式区别?::
 * pull: 消费客户端手动调用pull拉取消息, 消费完手动提交offset.
 * push: 消费客户端注册消息消费的回调. 消费完会自动提交offset并拉取下一批消息继续消费.
@@ -1398,10 +1433,30 @@ Kafka为消费者分配分区的方式?::
 == Docker
 
 [qanda]
+Linux namespace类型有哪些?::
+* UTS: 主机名和域名
+* IPC: 进程通信资源.
+* Mount: 文件挂载.
+* PID: 进程pid.
+* Network: 网卡.
+* User: 用户和用户组.
 Docker的实现原理?::
-* `namespace` : 隔离环境
-* `cgroup` : 控制资源配额
-* `rootfs(overlay2/aufs)` : 将不同位置的目录联合挂载到同一个目录下, 文件分层.
+* 资源隔离 `namespace` : 隔离环境.
+* 资源配额 `cgroup` : 控制资源配额 (cgroupV1限制不了Buffer IO, V2可以)
+* 文件系统 `UnionFS` : 将不同位置的目录联合挂载到同一个目录下, 文件分层, 具体实现有overlay2/zfs/vfs.
+* 网络驱动: 设置虚拟网卡, 实现网络隔离和端口映射.
+* 执行引擎: 管理容器的生命周期, 如创建, 启动, 停止.
+* 镜像管理: 镜像系统支持分层构建和增量更新, 提供Registry用于存储和分发镜像.
+Docker支持哪些网络类型?::
+* bridge
+* host
+* ipvlan
+* macvlan
+* overlay
+* null
+Docker文件持久化存储方式?::
+* 创建volume
+* 宿主机目录挂载到容器里.
 如何限制容器内存和CPU最大用量?::
 * 限制内存使用量: `-m=100m` 表示容器最多可使用100MB的内存.
 * 限制cpu使用率: `--cpus="1.5"` 表示容器可以达到 stem:[150%] 的CPU使用率(8核的话最大使用率为 stem:[800%]).
@@ -1409,8 +1464,8 @@ Docker的实现原理?::
 * `ADD` 会自动解压压缩包, 然后复制到指定目录, `COPY` 不支持自动解压.
 * `ADD` 支持下载URL文件到指定目录, `COPY` 只支持本地文件或目录.
 `CMD` 和 `ENTRYPOINT` 指令的区别?::
-* `CMD` 只能在容器启动时被覆盖, `ENTRYPOINT` 可以在容器启动时传递参数.
-* `CMD` 可以声明多个, 但是只有最后一个会生效, `ENTRYPOINT` 在 _EXEC_ 模式下可以和 `CMD` 混用, `CMD` 作为 `ENTRYPOINT` 的参数传递过去.
+* `CMD` 只能在容器启动时被命令行参数覆盖, `ENTRYPOINT` 可以在容器启动时追加传递参数.
+* `CMD` 可以声明多个, 但是只有最后一个会生效, `ENTRYPOINT` 在 _EXEC_ 模式(数组)下可以和 `CMD` 混用, `CMD` 作为 `ENTRYPOINT` 的参数传递过去.
 
 == 网络
 
@@ -1525,13 +1580,67 @@ CAP定理?::
 什么是一致性?::
 * 强一致性: 所有节点的数据状态始终保持一致.
 * 弱(最终)一致性: 数据一致性会有延迟, 但保证未来会有一个时刻保证数据一致性.
+分布式事务的实现方式?::
+* 强一致性
+** 2PC
+** 3PC
+** TCC
+* 最终一致性
+** Saga
+** 本地消息表
+** RocketMQ事务消息
 2PC流程?::
-. prepare commit
-. do commit/rollback
+. prepare commit: 事务协调者向每个事务参与者发送prepare commit请求, 每个事务参与者开启事务并执行业务逻辑.
+. do commit/rollback: 事务协调者向每个事务参与者发送do commit请求, 每个事务参与者提交事务.
+. 如果在prepare commit阶段事务参与者存在报错, 事务协调者向每个事务参与者发送取消/rollback请求.
 3PC流程?::
-. can commit
-. prepare commit
-. do commit/rollback
+. can commit: 事务协调者向每个事务参与者发送can commit请求, 如果存在事务参与者响应正常则进行下一个阶段.
+. prepare commit: 事务协调者向每个事务参与者发送prepare commit请求, 每个事务参与者开启事务并执行业务逻辑.
+. do commit/rollback: 事务协调者向每个事务参与者发送do commit请求, 每个事务参与者提交事务.
+. 如果在can commit/prepare commit阶段事务参与者存在报错, 事务协调者向每个事务参与者发送rollback请求.
+TCC流程?::
+. 事务参与者定义好Try/Confirm/Cancel方法.
+. Try: 事务协调者通知所有事务参与者执行Try方法, 检查业务可行性或者尝试执行业务逻辑(例: 插入enabled=0数据/删除数据前取出来冻结数据/检查数据是否存在), 如果检查未通过则执行Cancel方法.
+. Confirm: 执行业务逻辑(例: enabled设置成1/执行删除逻辑), 提交事务.
+* Cancel: 如果存在事务参与者存在报错, 则事务协调者通知所有事务参与者执行Cancel方法回滚事务.
+Saga流程?::
+. 事务参与者定义好执行初始事务和补偿事务的方法.
+. 事务协调者通知所有事务参与者执行初始事务并提交.
+. 如果有事务参与者执行报错, 则通知所有事务参与者执行补偿事务.
+TCC和Saga的区别?::
+* TCC的事务粒度比较小, 仅需针对Try或者Try+Confirm的操作进行回滚; Saga需要回滚整个操作的事务.
+* TCC同步阻塞, Saga异步非阻塞.
+* TCC保证强一致性, Saga只保证最终一致性.
+分布式锁的使用场景?::
+* 避免不同的节点执行相同的任务, 如定时任务, 批处理任务.
+* 避免不同的节点读取到同一条数据, 避免数据竞争导致数据不一致的问题.
+* 分布式事务管理.
+* 分布式限流.
+分布式锁的实现方式?::
+* 基于关系型数据库: 在拥有唯一索引或主键索引的基础上插入数据, 插入成功则获取锁成功; 释放锁时删除数据.
+* 基于kv数据库: 获取锁时在kv库中插入一个带时效时间的键值对, 不存在则插入成功, 表示获取锁成功; 释放锁时删除该键值对.
+** Redis:
+. 加锁: `SET key value NX PX expire_ms` .
+. 新建一个定时任务续约锁的超时时间.
+. 释放锁: 判断是否是当前线程持有锁, 如果是则删除key.
++
+[source, lua]
+----
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+    return redis.call("DEL",KEYS[1])
+    else
+return 0
+end
+----
++
+** etcd:
+. 为同一把锁定义一个目录/locks/, 每个线程在这里目录下put数据, key为/locks[/业务id]/随机UUID, TTL为业务预估时间, 如果业务超时且需要续约的场景可以创建一个定时任务续约该key的TTL.
+. 查询该目录下所有kv, 比较版本号:
+.. 如果当前key的版本号最小, 则获取锁成功, 执行业务逻辑.
+.. 如果当前key的版本号不是最小, 则watch前一个版本号的key进入阻塞状态.
+.. watch返回则说明上一个锁释放且当前线程获取锁成功, 执行业务逻辑.
+. 执行完业务逻辑需释放锁, 删除当前key.
+. etcdv3自带lock/unlock命令, 可直接使用, 如果业务超时且需要续约的场景可以创建一个定时任务续约lock生成的key的TTL.
 Basic Paxos的各个角色?::
 * Client(民众): 系统外部角色, 请求发起者.
 * Proposer(议员): 接收Client请求, 向集群提出提议.
@@ -1556,3 +1665,44 @@ Raft日志复制流程?::
 . Leader收到客户端请求, 本地写日志.
 . Leader同步日志给其他节点.
 . Leader本地提交, 通知其他节点提交.
+
+
+== 场景问题
+
+[qanda]
+订单超时如何关闭?::
+* 定时任务扫描
+* MQ延迟消息
+* Redisson RDelayedQueue
+如何防止用户重复提交表单?::
+* 前端按钮点击后置灰.
+* 前端页面加载时从后端服务取到token, 提交表单时带上token, 后端校验该token是否已经被使用过.
+* 对于插入操作, 数据库表加唯一索引; 对于更新操作, 数据库表加乐观锁列.
+* by用户id限流, 限制1秒只能提交一次该接口的请求.
+如何设计一个秒杀系统?::
+* 性能:
+** 前端静态资源和待秒杀的商品数据提前渲染生成页面放到CDN上, 保证页面加载速度.
+** 查询接口使用长TTL分布式缓存+短TTL本地缓存, 并提前预热缓存数据.
+** 为秒杀相关服务单独部署, 提前做好性能测试预估机器配额, 防止影响其他普通交易.
+** 库存表拆分为多个子表来降低update行锁的并发性能, 或者插入订单流水数据来校验库存, 然后发异步消息扣减库存.
+* 安全:
+** 接入层添加IP或者设备限流/waf防御等功能, 前后端可以使用csrf token机制, 阻止恶意请求, .
+** 业务上可以设计成用户预约后才能参与秒杀, 降低风险.
+** 页面上集成验证码.
+* 一致性:
+** 下单后生成订单流水日志数据以核对校验数据, 如禁止重复下单/库存校验等.
+** 扣减库存使用分布式锁或者Redis lua脚本来实现.
+如何实现排行榜功能?::
+使用Redis ZSet来实现, value为用户id, score为用户积分.
+如果积分相同的情况下需按照时间排序, 则score可以将时间戳作为小数位存储, 这样可以按时间倒序获取排行, 如果要按时间顺序则小数位可以用(10e11-时间戳)来实现.
+* `zadd <key> <score> <user_id>` : 向排行榜添加/更新用户数据.
+* `zrevrange <key> <from> <to> withscores` : 获取排行榜第from~to的用户和积分数据.
+* `zrank <key> <user_id>` : 获取指定用户的排名.
+* `zrem <key> <user_id>` : 删除指定用户的数据.
+* `zscore <key> <user_id>` : 获取指定用户的积分数据.
+如何实现附近的人功能?::
+* 使用Redis的geo数据类型实现.
+** `geoadd <key> <longitude> <latitude> <user_id>` : 添加用户经纬度数据.
+** `geopos <key> <user_id>` : 获取指定用户的经纬度数据.
+** `georadius <key> <longitude> <latitude> <radius> m|km|ft|mi withcoord withdist` : 获取指定经纬度radius半径内的用户数据, 包含经纬度和距离.
+

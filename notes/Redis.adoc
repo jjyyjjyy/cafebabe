@@ -605,3 +605,5 @@ sentinel monitor master redis-master 6379 2
 sentinel down-after-milliseconds master 15000
 sentinel parallel-syncs master 1
 ----
+
+== 集群模式

@@ -17,8 +17,13 @@ image::http://resources-1252259164.file.myqcloud.com/images/kongfu.jpeg[]
 * link:SpringSession.html[Spring Session]
 * link:SpringInitializr.html[Spring Initializr]
 * link:JUnit.html[JUnit]
-* link:Nacos.html[Nacos]
-* link:Arthas.html[Arthas]
+
+.Database
+* link:PostgreSQL.html[PostgreSQL]
+* link:Elasticsearch.html[Elasticsearch]
+* link:Redis.html[Redis]
+* link:ClickHouse.html[ClickHouse]
+* link:Prometheus.html[Prometheus]
 
 .Ops
 * link:Ubuntu.html[Ubuntu]
@@ -26,14 +31,8 @@ image::http://resources-1252259164.file.myqcloud.com/images/kongfu.jpeg[]
 * link:Vagrant.html[Vagrant]
 * link:RocketMQ.html[RocketMQ]
 * link:RabbitMQ.html[RabbitMQ]
-
-.Database
-* link:PostgreSQL.html[PostgreSQL]
-* link:Redis.html[Redis]
-* link:Elasticsearch.html[Elasticsearch]
-* link:MySQL.html[MySQL]
-* link:ClickHouse.html[ClickHouse]
-* link:Prometheus.html[Prometheus]
+* link:Arthas.html[Arthas]
+* link:Nacos.html[Nacos]
 
 .Mathematics
 * link:Calculus.html[Calculus]
