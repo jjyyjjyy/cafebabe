@@ -24,8 +24,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- dependencies -->
-        <spring-boot.version>3.2.3</spring-boot.version>
-        <spring-cloud.version>2023.0.0</spring-cloud.version>
+        <spring-boot.version>3.2.4</spring-boot.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
         <spring-cloud-alibaba.version>2022.0.0.0</spring-cloud-alibaba.version>
         <project-reactor.version>2023.0.4</project-reactor.version>
         <mybatis.version>3.5.15</mybatis.version>
@@ -35,7 +35,7 @@
         <jmh.version>1.37</jmh.version>
         <disruptor.version>4.0.0</disruptor.version>
         <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
-        <netty.version>4.1.107.Final</netty.version>
+        <netty.version>4.1.108.Final</netty.version>
         <jol.version>0.17</jol.version>
         <jcstress.version>0.16</jcstress.version>
         <fastjson.version>1.2.83</fastjson.version>
@@ -189,7 +189,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>1.18.32</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
