@@ -159,6 +159,7 @@ $(globalSwitch);
 </li>
 <li><a href="#_linux">14. Linux</a></li>
 <li><a href="#_分布式">15. 分布式</a></li>
+<li><a href="#_场景问题">16. 场景问题</a></li>
 </ul>
 </div>
 </div>
@@ -406,6 +407,10 @@ $(globalSwitch);
 </div>
 </li>
 <li>
+<p><em>为什么匿名内部类引用的外部局部变量的值为final修饰?</em></p>
+<p>生成的匿名内部类会拷贝一份局部变量的值, 如果外部修改了局部变量的值会导致匿名内部类对象中的值不同, 所以用final修饰禁止修改.</p>
+</li>
+<li>
 <p><em>Object类有哪些方法?</em></p>
 <div class="ulist">
 <ul>
@@ -591,12 +596,16 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p><em>Java中Connection为什么要close?</em></p>
-<p>及时释放数据库链接, 减少资源消耗. (如果没有显式close, 也会被gc)</p>
-</li>
-<li>
 <p><em>var和val的区别?</em></p>
 <p>var表示可变变量, val为非标准关键字, 表示不可变变量.</p>
+</li>
+<li>
+<p><em>Java静态代理和动态代理的区别?</em></p>
+<p>静态代理的代理实现类在编译期就已经确定, 无法在程序运行时期修改; 动态代理是在程序运行期通过反射生成代理类的代码, 具体实现方式为JDK动态代理(实现接口)和CGLIB动态代理(继承父类).</p>
+</li>
+<li>
+<p><em>Java中Connection为什么要close?</em></p>
+<p>及时释放数据库链接, 减少资源消耗. (如果没有显式close, 也会被gc)</p>
 </li>
 <li>
 <p><em>BIO和NIO的区别?</em></p>
@@ -666,7 +675,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p><code>flip()</code> 方法用于写完后读取整个缓冲区内容的场景, 如写header+body后读取整个header+body内容.</p>
+<p><code>flip()</code> 方法用于写完后读取刚刚写入缓冲区内容的场景, 如写header+body后读取整个header+body内容.</p>
 </li>
 <li>
 <p><code>rewind()</code> 方法用于重复读取缓冲区内容的场景.</p>
@@ -827,19 +836,12 @@ $(globalSwitch);
 </div>
 </li>
 <li>
-<p>树</p>
+<p>有序树</p>
 <div class="ulist">
 <ul>
 <li>
 <p>TreeMap</p>
 </li>
-</ul>
-</div>
-</li>
-<li>
-<p><code>NavigableMap</code> 跳表</p>
-<div class="ulist">
-<ul>
 <li>
 <p>ConcurrentSkipListMap</p>
 </li>
@@ -879,10 +881,13 @@ $(globalSwitch);
 <p>HashMap <code>查找键值对</code></p>
 </li>
 <li>
-<p>LinkedHashMap <code>保证key按照插入的顺序输出</code></p>
+<p>LinkedHashMap <code>保证key按照插入/查找的顺序输出</code></p>
 </li>
 <li>
 <p>TreeMap <code>红黑树, 按照自定义顺序遍历key</code></p>
+</li>
+<li>
+<p>ConcurrentSkipListMap <code>线程安全的有序树, 基于跳表实现</code></p>
 </li>
 <li>
 <p>ConcurrentHashMap <code>线程安全</code></p>
@@ -901,19 +906,19 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>HashTable线程安全, HashMap线程不安全.</p>
+<p>HashTable线程安全; HashMap线程不安全.</p>
 </li>
 <li>
-<p>HashTable默认初始长度为11, HashMap默认初始长度为16, 且总为2的幂.</p>
+<p>HashTable默认初始长度为11; HashMap默认初始长度为16, 且总为2的幂.</p>
 </li>
 <li>
-<p>HashTable扩容后为\$2n+1\$,HashMap扩容后为\$2n\$.</p>
+<p>HashTable扩容后为\$2n+1\$; HashMap扩容后为\$2n\$.</p>
 </li>
 <li>
-<p>HashMap的kv可以为null, 放在数据索引为0的位置.HashTable的kv均不能为null.</p>
+<p>HashMap的kv可以为null, 放在数据索引为0的位置; HashTable的kv均不能为null.</p>
 </li>
 <li>
-<p>HashMap因hash冲突产生的链表长度大于8后会转成红黑树, HashTable不会.</p>
+<p>HashMap因hash冲突产生的链表长度大于8后会转成红黑树; HashTable不会.</p>
 </li>
 </ul>
 </div>
@@ -927,6 +932,9 @@ $(globalSwitch);
 </li>
 <li>
 <p>TreeMap: 按照key的大小排好序.</p>
+</li>
+<li>
+<p>ConcurrentSkipListMap: 线程安全.</p>
 </li>
 </ul>
 </div>
@@ -1160,22 +1168,22 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>NEW &#8594; RUNNING: Thread#start()方法.</p>
+<p>NEW &#8594; RUNNABLE: Thread#start()方法.</p>
 </li>
 <li>
-<p>RUNNING &#8594; BLOCKED: 未争取到锁被阻塞.</p>
+<p>RUNNABLE &#8594; BLOCKED: 未争取到锁被阻塞.</p>
 </li>
 <li>
-<p>BLOCKED &#8594; RUNNING: 争取到锁.</p>
+<p>BLOCKED &#8594; RUNNABLE: 争取到锁.</p>
 </li>
 <li>
-<p>RUNNING &#8594; WAITING/TIMED_WAITING: Object#wait, Thread#join, Thread.sleep, LockSupport.park.</p>
+<p>RUNNABLE &#8594; WAITING/TIMED_WAITING: Object#wait, Thread#join, Thread.sleep, LockSupport.park.</p>
 </li>
 <li>
-<p>WAITING/TIMED_WAITING &#8594; RUNNING: Object#notify, Object#notifyAll, LockSupport.unpark.</p>
+<p>WAITING/TIMED_WAITING &#8594; RUNNABLE: Object#notify, Object#notifyAll, LockSupport.unpark.</p>
 </li>
 <li>
-<p>RUNNING &#8594; TERMINATED: run方法执行结束.</p>
+<p>RUNNABLE &#8594; TERMINATED: run方法执行结束.</p>
 </li>
 </ul>
 </div>
@@ -1209,7 +1217,7 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p>如果线程处于运行状态, Thread#isInterrupted()方法返回true, 线程内部判断这个标志位跳出方法.</p>
+<p>如果线程处于运行状态, <code>Thread.currentThread().isInterrupted()</code> 方法返回true, 线程内部判断这个标志位跳出方法.</p>
 </li>
 <li>
 <p>如果线程处于阻塞状态, 则会抛出InterruptedException.线程内部可以捕获该异常终止方法.</p>
@@ -1228,20 +1236,20 @@ $(globalSwitch);
 <p>当JVM内部只剩守护线程时, JVM就会自动退出.</p>
 </li>
 <li>
-<p><em>请描述锁的四种状态和升级过程?</em></p>
+<p><em>请描述synchronized锁的升级过程?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>无锁</p>
+<p>无锁: 当线程首次进入同步代码块时, 不需要获得锁, 处于无锁状态.</p>
 </li>
 <li>
-<p>偏向锁</p>
+<p>偏向锁: 当线程反复进入该同步代码块时, 会在锁对象header中记录该线程id, 下次进入时无需获得锁.</p>
 </li>
 <li>
-<p>轻量级锁</p>
+<p>轻量级锁: 当有其他线程竞争锁时, 会升级成轻量级锁, 通过CAS操作获得锁, 失败后重试(自旋).</p>
 </li>
 <li>
-<p>重量级锁</p>
+<p>重量级锁: 自旋超过一定次数后仍未获得锁, 则会升级成重量级锁, 通过操作系统的Mutex来实现线程同步.</p>
 </li>
 </ul>
 </div>
@@ -1320,7 +1328,7 @@ $(globalSwitch);
 <p>SynchronousQueue</p>
 </li>
 <li>
-<p>TransferQueue</p>
+<p>LinkedTransferQueue</p>
 </li>
 <li>
 <p>DelayQueue</p>
@@ -1400,6 +1408,32 @@ $(globalSwitch);
 <p>如果加入到队列失败, 则抛出异常.</p>
 </li>
 </ol>
+</div>
+</li>
+<li>
+<p><em>ThreadLocal内存泄漏问题?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>何时会发生泄漏: 持有ThreadLocal对象已经被回收, 但是线程还处于运行状态且Value没有被remove掉, threadLocalMap中还存在ThreadLocal设置的Entry和Value(Entry包含Key和Value, key为弱引用会在GC后被回收, 但是Entry和Value不会).</p>
+</li>
+<li>
+<p>ThreadLocal协助解决内存泄漏的方式:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ThreadLocal的Entry将key(也就是ThreadLocal对象本身)设置为弱引用, 防止但Thread持有该对象的引用导致该ThreadLocal对象始终无法回收.</p>
+</li>
+<li>
+<p>每次set/remove时会遍厉槽位, 清除get()为null的槽位(获取key为null代表该ThreadLocal已被回收), 一直遍历到不为null的槽位.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>正确的使用ThreadLocal: ThreadLocal设置为类常量强引用, 线程设置完value后在使用结束后remove掉, 防止thread不停止的情况下value不会回收从而导致内存泄漏.</p>
+</li>
+</ul>
 </div>
 </li>
 </ol>
@@ -1838,11 +1872,41 @@ $(globalSwitch);
 <p>CMS使用标记-清除算法回收老年代.</p>
 </li>
 <li>
+<p><em>CMS何时触发FullGC?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>promotion failed</code> : YoungGC回收后将一部分对象晋升到老年代, 但是老年代空间不足, 触发FullGC.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>优化思路1: 调大Xmn</p>
+</li>
+<li>
+<p>优化思路2: 调大老年代晋升年龄.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>concurrent mode failure</code> : CMS并发Old GC时应用线程有新的对象放到老年代但是剩余的老年代空间不足, 升级为FullFC.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>优化思路1: 调低CMS Old GC阈值: <code>-XX:+UseCMSInitiatingOccupancyOnly -XX:CMSFullGCsBeforeCompaction=60</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>CMS怎么解决内存碎片问题?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p>CMS提供 <code>-XX:+UseCMSCompactAtFullCollection</code> 开关参数, 用于CMS在Full GC时开启内存碎片的合并整理过程.</p>
+<p>(JDK8及以后版本后此参数已过时无用) CMS提供 <code>-XX:+UseCMSCompactAtFullCollection</code> 开关参数, 用于在CMS Old GC时开启内存碎片的合并整理过程.</p>
 </li>
 <li>
 <p>CMS提供 <code>-XX:CMSFullGCsBeforeCompaction</code> 参数, 用于设置在执行指定次数不整理空间的Full FC后, 在下一次Full GC前整理内存碎片.</p>
@@ -2094,6 +2158,10 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>如何找到JVM CPU占用高的原因?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>top+jstack</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -2109,6 +2177,12 @@ $(globalSwitch);
 <p><code>jstack PID | grep TID -A 10</code> 查看该线程所在堆栈, 检查堆栈所在代码上的错误.</p>
 </li>
 </ol>
+</div>
+</li>
+<li>
+<p>async-profiler</p>
+</li>
+</ul>
 </div>
 </li>
 <li>
@@ -2828,13 +2902,13 @@ $(globalSwitch);
 <div class="ulist">
 <ul>
 <li>
-<p><code>singletonObjects</code> : 存放已经实例化并初始化好的单例对象.</p>
+<p>一级缓存: <code>singletonObjects</code> : 存放已经实例化并初始化好的单例对象.</p>
 </li>
 <li>
-<p><code>earlySingletonObjects</code> : 暂存实例化好但属性没有初始化好的单例对象.</p>
+<p>二级缓存: <code>earlySingletonObjects</code> : 暂存实例化好但属性没有初始化好的单例对象.(存放循环依赖下创建好但未完全初始化好的AOP对象)</p>
 </li>
 <li>
-<p><code>singletonFactories</code> : 暂存用于创建单例对象的工厂.</p>
+<p>三级缓存: <code>singletonFactories</code> : 暂存用于创建单例对象的工厂.(存放用于创建对象的工厂方法)</p>
 </li>
 </ul>
 </div>
@@ -4477,33 +4551,12 @@ $(globalSwitch);
 </li>
 <li>
 <p>记录锁: 锁住单行记录, 防止脏读.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>触发条件: 查询条件精准匹配(等于), 且命中主键索引或者唯一索引.</p>
-</li>
-</ul>
-</div>
 </li>
 <li>
-<p>间隙锁: 锁住多行记录, 防止幻读.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>触发条件: 查询条件为范围查询, 且命中非唯一索引, 只会出现在RR隔离级别下.</p>
-</li>
-</ul>
-</div>
+<p>间隙锁: 锁住索引区间.</p>
 </li>
 <li>
 <p>临键锁: 记录锁+间隙锁的组合, 锁住查询条件范围和下一个相邻的区间.加了临键锁后, 范围内不能更新和插入.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>触发条件: 查询条件为范围查询, 且命中非唯一索引.</p>
-</li>
-</ul>
-</div>
 </li>
 <li>
 <p>插入意向锁: 如果插入记录的位置被别的事务加了间隙锁, 则会生成一个插入意向锁等待.</p>
@@ -4523,6 +4576,39 @@ $(globalSwitch);
 </li>
 <li>
 <p>意向排他锁</p>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. RR隔离级别下加锁判定</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">查询类型</th>
+<th class="tableblock halign-left valign-top">唯一索引</th>
+<th class="tableblock halign-left valign-top">非唯一索引</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">等值查询</p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>记录存在 &#8594; 记录锁;<br>
+记录不存在 &#8594; 间隙锁</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>记录存在 &#8594; 临键锁+间隙锁;<br>
+记录不存在 &#8594; 间隙锁</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">范围查询</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">左区间的临键锁/记录锁 + 右区间的临键锁/间隙锁</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">左区间的临键锁 + 右区间的临键锁</p></td>
+</tr>
+</tbody>
+</table>
 </li>
 </ul>
 </div>
@@ -4961,6 +5047,9 @@ $(globalSwitch);
 <li>
 <p>如果Producer发送的是UNKOWN状态或者未发送, 则Broker会回调 <code>TransactionListener#checkLocalTransaction</code> 方法检查状态, 根据结果重复步骤3/4, 默认最多重复15次, 超过则丢弃消息.</p>
 </li>
+<li>
+<p>如果消费者消费失败则消息会重新进入队列消息, 默认重试超过16次后还是失败则会进入死信队列让人工干预.</p>
+</li>
 </ol>
 </div>
 </li>
@@ -5278,17 +5367,89 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 <div class="qlist qanda">
 <ol>
 <li>
+<p><em>Linux namespace类型有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>UTS: 主机名和域名</p>
+</li>
+<li>
+<p>IPC: 进程通信资源.</p>
+</li>
+<li>
+<p>Mount: 文件挂载.</p>
+</li>
+<li>
+<p>PID: 进程pid.</p>
+</li>
+<li>
+<p>Network: 网卡.</p>
+</li>
+<li>
+<p>User: 用户和用户组.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>Docker的实现原理?</em></p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>namespace</code> : 隔离环境</p>
+<p>资源隔离 <code>namespace</code> : 隔离环境.</p>
 </li>
 <li>
-<p><code>cgroup</code> : 控制资源配额</p>
+<p>资源配额 <code>cgroup</code> : 控制资源配额 (cgroupV1限制不了Buffer IO, V2可以)</p>
 </li>
 <li>
-<p><code>rootfs(overlay2/aufs)</code> : 将不同位置的目录联合挂载到同一个目录下, 文件分层.</p>
+<p>文件系统 <code>UnionFS</code> : 将不同位置的目录联合挂载到同一个目录下, 文件分层, 具体实现有overlay2/zfs/vfs.</p>
+</li>
+<li>
+<p>网络驱动: 设置虚拟网卡, 实现网络隔离和端口映射.</p>
+</li>
+<li>
+<p>执行引擎: 管理容器的生命周期, 如创建, 启动, 停止.</p>
+</li>
+<li>
+<p>镜像管理: 镜像系统支持分层构建和增量更新, 提供Registry用于存储和分发镜像.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>Docker支持哪些网络类型?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>bridge</p>
+</li>
+<li>
+<p>host</p>
+</li>
+<li>
+<p>ipvlan</p>
+</li>
+<li>
+<p>macvlan</p>
+</li>
+<li>
+<p>overlay</p>
+</li>
+<li>
+<p>null</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>Docker文件持久化存储方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>创建volume</p>
+</li>
+<li>
+<p>宿主机目录挂载到容器里.</p>
 </li>
 </ul>
 </div>
@@ -5324,10 +5485,10 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 <div class="ulist">
 <ul>
 <li>
-<p><code>CMD</code> 只能在容器启动时被覆盖, <code>ENTRYPOINT</code> 可以在容器启动时传递参数.</p>
+<p><code>CMD</code> 只能在容器启动时被命令行参数覆盖, <code>ENTRYPOINT</code> 可以在容器启动时追加传递参数.</p>
 </li>
 <li>
-<p><code>CMD</code> 可以声明多个, 但是只有最后一个会生效, <code>ENTRYPOINT</code> 在 <em>EXEC</em> 模式下可以和 <code>CMD</code> 混用, <code>CMD</code> 作为 <code>ENTRYPOINT</code> 的参数传递过去.</p>
+<p><code>CMD</code> 可以声明多个, 但是只有最后一个会生效, <code>ENTRYPOINT</code> 在 <em>EXEC</em> 模式(数组)下可以和 <code>CMD</code> 混用, <code>CMD</code> 作为 <code>ENTRYPOINT</code> 的参数传递过去.</p>
 </li>
 </ul>
 </div>
@@ -5730,14 +5891,56 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </li>
 <li>
+<p><em>分布式事务的实现方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>强一致性</p>
+<div class="ulist">
+<ul>
+<li>
+<p>2PC</p>
+</li>
+<li>
+<p>3PC</p>
+</li>
+<li>
+<p>TCC</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>最终一致性</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Saga</p>
+</li>
+<li>
+<p>本地消息表</p>
+</li>
+<li>
+<p>RocketMQ事务消息</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>2PC流程?</em></p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>prepare commit</p>
+<p>prepare commit: 事务协调者向每个事务参与者发送prepare commit请求, 每个事务参与者开启事务并执行业务逻辑.</p>
 </li>
 <li>
-<p>do commit/rollback</p>
+<p>do commit/rollback: 事务协调者向每个事务参与者发送do commit请求, 每个事务参与者提交事务.</p>
+</li>
+<li>
+<p>如果在prepare commit阶段事务参与者存在报错, 事务协调者向每个事务参与者发送取消/rollback请求.</p>
 </li>
 </ol>
 </div>
@@ -5747,15 +5950,166 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>can commit</p>
+<p>can commit: 事务协调者向每个事务参与者发送can commit请求, 如果存在事务参与者响应正常则进行下一个阶段.</p>
 </li>
 <li>
-<p>prepare commit</p>
+<p>prepare commit: 事务协调者向每个事务参与者发送prepare commit请求, 每个事务参与者开启事务并执行业务逻辑.</p>
 </li>
 <li>
-<p>do commit/rollback</p>
+<p>do commit/rollback: 事务协调者向每个事务参与者发送do commit请求, 每个事务参与者提交事务.</p>
+</li>
+<li>
+<p>如果在can commit/prepare commit阶段事务参与者存在报错, 事务协调者向每个事务参与者发送rollback请求.</p>
 </li>
 </ol>
+</div>
+</li>
+<li>
+<p><em>TCC流程?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>事务参与者定义好Try/Confirm/Cancel方法.</p>
+</li>
+<li>
+<p>Try: 事务协调者通知所有事务参与者执行Try方法, 检查业务可行性或者尝试执行业务逻辑(例: 插入enabled=0数据/删除数据前取出来冻结数据/检查数据是否存在), 如果检查未通过则执行Cancel方法.</p>
+</li>
+<li>
+<p>Confirm: 执行业务逻辑(例: enabled设置成1/执行删除逻辑), 提交事务.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Cancel: 如果存在事务参与者存在报错, 则事务协调者通知所有事务参与者执行Cancel方法回滚事务.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><em>Saga流程?</em></p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>事务参与者定义好执行初始事务和补偿事务的方法.</p>
+</li>
+<li>
+<p>事务协调者通知所有事务参与者执行初始事务并提交.</p>
+</li>
+<li>
+<p>如果有事务参与者执行报错, 则通知所有事务参与者执行补偿事务.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><em>TCC和Saga的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>TCC的事务粒度比较小, 仅需针对Try或者Try+Confirm的操作进行回滚; Saga需要回滚整个操作的事务.</p>
+</li>
+<li>
+<p>TCC同步阻塞, Saga异步非阻塞.</p>
+</li>
+<li>
+<p>TCC保证强一致性, Saga只保证最终一致性.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>分布式锁的使用场景?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>避免不同的节点执行相同的任务, 如定时任务, 批处理任务.</p>
+</li>
+<li>
+<p>避免不同的节点读取到同一条数据, 避免数据竞争导致数据不一致的问题.</p>
+</li>
+<li>
+<p>分布式事务管理.</p>
+</li>
+<li>
+<p>分布式限流.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>分布式锁的实现方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>基于关系型数据库: 在拥有唯一索引或主键索引的基础上插入数据, 插入成功则获取锁成功; 释放锁时删除数据.</p>
+</li>
+<li>
+<p>基于kv数据库: 获取锁时在kv库中插入一个带时效时间的键值对, 不存在则插入成功, 表示获取锁成功; 释放锁时删除该键值对.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Redis:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>加锁: <code>SET key value NX PX expire_ms</code> .</p>
+</li>
+<li>
+<p>新建一个定时任务续约锁的超时时间.</p>
+</li>
+<li>
+<p>释放锁: 判断是否是当前线程持有锁, 如果是则删除key.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-lua hljs" data-lang="lua">if redis.call("GET", KEYS[1]) == ARGV[1] then
+    return redis.call("DEL",KEYS[1])
+    else
+return 0
+end</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>etcd:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>为同一把锁定义一个目录/locks/, 每个线程在这里目录下put数据, key为/locks[/业务id]/随机UUID, TTL为业务预估时间, 如果业务超时且需要续约的场景可以创建一个定时任务续约该key的TTL.</p>
+</li>
+<li>
+<p>查询该目录下所有kv, 比较版本号:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>如果当前key的版本号最小, 则获取锁成功, 执行业务逻辑.</p>
+</li>
+<li>
+<p>如果当前key的版本号不是最小, 则watch前一个版本号的key进入阻塞状态.</p>
+</li>
+<li>
+<p>watch返回则说明上一个锁释放且当前线程获取锁成功, 执行业务逻辑.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>执行完业务逻辑需释放锁, 删除当前key.</p>
+</li>
+<li>
+<p>etcdv3自带lock/unlock命令, 可直接使用, 如果业务超时且需要续约的场景可以创建一个定时任务续约lock生成的key的TTL.</p>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
 </div>
 </li>
 <li>
@@ -5844,6 +6198,152 @@ Multi Paxos 相比较Basic Paxos少了一次调用流程.</p>
 <p>Leader本地提交, 通知其他节点提交.</p>
 </li>
 </ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_场景问题"><a class="link" href="#_场景问题">16. 场景问题</a></h2>
+<div class="sectionbody">
+<div class="qlist qanda">
+<ol>
+<li>
+<p><em>订单超时如何关闭?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>定时任务扫描</p>
+</li>
+<li>
+<p>MQ延迟消息</p>
+</li>
+<li>
+<p>Redisson RDelayedQueue</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>如何防止用户重复提交表单?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>前端按钮点击后置灰.</p>
+</li>
+<li>
+<p>前端页面加载时从后端服务取到token, 提交表单时带上token, 后端校验该token是否已经被使用过.</p>
+</li>
+<li>
+<p>对于插入操作, 数据库表加唯一索引; 对于更新操作, 数据库表加乐观锁列.</p>
+</li>
+<li>
+<p>by用户id限流, 限制1秒只能提交一次该接口的请求.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>如何设计一个秒杀系统?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>性能:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>前端静态资源和待秒杀的商品数据提前渲染生成页面放到CDN上, 保证页面加载速度.</p>
+</li>
+<li>
+<p>查询接口使用长TTL分布式缓存+短TTL本地缓存, 并提前预热缓存数据.</p>
+</li>
+<li>
+<p>为秒杀相关服务单独部署, 提前做好性能测试预估机器配额, 防止影响其他普通交易.</p>
+</li>
+<li>
+<p>库存表拆分为多个子表来降低update行锁的并发性能, 或者插入订单流水数据来校验库存, 然后发异步消息扣减库存.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>安全:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>接入层添加IP或者设备限流/waf防御等功能, 前后端可以使用csrf token机制, 阻止恶意请求, .</p>
+</li>
+<li>
+<p>业务上可以设计成用户预约后才能参与秒杀, 降低风险.</p>
+</li>
+<li>
+<p>页面上集成验证码.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>一致性:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>下单后生成订单流水日志数据以核对校验数据, 如禁止重复下单/库存校验等.</p>
+</li>
+<li>
+<p>扣减库存使用分布式锁或者Redis lua脚本来实现.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>如何实现排行榜功能?</em></p>
+<p>使用Redis ZSet来实现, value为用户id, score为用户积分.<br>
+如果积分相同的情况下需按照时间排序, 则score可以将时间戳作为小数位存储, 这样可以按时间倒序获取排行, 如果要按时间顺序则小数位可以用(10e11-时间戳)来实现.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>zadd &lt;key&gt; &lt;score&gt; &lt;user_id&gt;</code> : 向排行榜添加/更新用户数据.</p>
+</li>
+<li>
+<p><code>zrevrange &lt;key&gt; &lt;from&gt; &lt;to&gt; withscores</code> : 获取排行榜第from~to的用户和积分数据.</p>
+</li>
+<li>
+<p><code>zrank &lt;key&gt; &lt;user_id&gt;</code> : 获取指定用户的排名.</p>
+</li>
+<li>
+<p><code>zrem &lt;key&gt; &lt;user_id&gt;</code> : 删除指定用户的数据.</p>
+</li>
+<li>
+<p><code>zscore &lt;key&gt; &lt;user_id&gt;</code> : 获取指定用户的积分数据.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>如何实现附近的人功能?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>使用Redis的geo数据类型实现.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>geoadd &lt;key&gt; &lt;longitude&gt; &lt;latitude&gt; &lt;user_id&gt;</code> : 添加用户经纬度数据.</p>
+</li>
+<li>
+<p><code>geopos &lt;key&gt; &lt;user_id&gt;</code> : 获取指定用户的经纬度数据.</p>
+</li>
+<li>
+<p><code>georadius &lt;key&gt; &lt;longitude&gt; &lt;latitude&gt; &lt;radius&gt; m|km|ft|mi withcoord withdist</code> : 获取指定经纬度radius半径内的用户数据, 包含经纬度和距离.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
 </div>
 </li>
 </ol>
