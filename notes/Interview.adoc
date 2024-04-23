@@ -122,7 +122,6 @@ Java类初始化顺序?::
 . 父类静态代码块
 . 子类静态变量
 . 子类静态代码块
-. 子类main方法
 . 父类成员变量
 . 父类构造代码块
 . 父类构造函数
@@ -160,9 +159,7 @@ SelectionKey的事件类型?::
 * OP_ACCEPT(仅服务端ServerSocketChannel): 请求连接就绪.
 * OP_READ: 读缓冲区中存在数据可以读取.
 * OP_WRITE: 写缓冲区中存在空间可以写入.
-HeapByteBuffer和DirectByteBuffer的区别?::
-* HeapByteBuffer在JVM堆内存中分配缓冲区.
-* DirectByteBuffer在JVM堆外内存中分配缓冲区.
+
 
 == Java集合
 
@@ -808,7 +805,7 @@ Nacos服务发现流程?::
 Nacos远程调用负载均衡策略?::
 随机+权重: 先计算每个实例的权重占比, 然后取一个0~1的随机数, 找到权重占比比该随机数大的一个实例.
 Nacos配置更新通知流程?::
-. Nacos Client端向Nacos建立一个45秒的长链接, 发送自己的配置groupKey和md5.
+. Nacos Client端向Nacos建立一个45秒的长请求, 发送自己的配置groupKey和md5.
 . Nacos收到请求后判断该md5与本地的是否相同:
 * 如果md5不同立即返回该groupKey, NacosClient收到后重新调用接口获取配置加载到本地, 然后发布 *refreshEvent* .
 * 如果md5相同, 则创建一个长链接时间-500毫秒的延时任务, 注册一个listener, 如果配置在此期间有变动, 立即返回groupKey, 否则等到最后再返回一个空响应.
@@ -927,7 +924,7 @@ Redis持久化机制有哪些? 区别是什么?::
 * `always` : 每个写命令都会同步将AOF缓冲区内容写入到文件里.
 * `everysec` : 每秒执行一次磁盘同步.
 如果同时开启rdb和aof, Redis重启后会用哪种方式恢复数据?::
-优先用aof, 如果没有开启aof则使用rdb.
+同时开启rdb和aof时, 会生成rdb和aof文件, Redis重启后会先加载rdb文件到内存, 然后重放aof文件中的命令.
 如果AOF文件的数据出现异常, 怎么处理?::
 Redis重启失败, 需要使用 `redis-check-aof --fix <AOF_FILE>` 来修复AOF文件.
 Redis通讯协议是什么? 有什么特点?::
@@ -977,9 +974,11 @@ Redis记录的慢查询日志格式是什么样的?::
 缓存雪崩指大量key同一时间失效, 导致都请求到DB上.
 * 给缓存key设置失效时间时加上随机值.
 * 增加二级缓存, 如失效时间很短的JVM本地缓存.
+* 读取时增加互斥锁.
 什么是缓存击穿? 怎么解决?::
 缓存击穿指某个热点key在失效的那一刻有大量请求同时到来, 查询DB, 导致DB负载变大.
 * 对接口增加限流.
+* 读取时增加互斥锁.
 Redis集群架构模式有哪几种?::
 * 主从复制
 * 哨兵模式
@@ -1147,6 +1146,10 @@ MySQL执行计划中extra类型有哪些?::
 * Zero limit: 查询语句存在limit 0.
 * Using filesort: 在内存或者磁盘中对数据进行排序.
 * Using temporary: 使用到临时表.
+MySQL binlog日志格式?::
+* statement: 记录执行的SQL语句.
+* row: 记录SQL执行后被修改的行数据.
+* mixed: 根据执行的SQL动态选择statement或者row格式.
 MySQL默认的事务隔离级别?::
 Repeatable Read
 MySQL如何保证事务ACID特性?::
@@ -1275,7 +1278,7 @@ PostgreSQL的窗口函数有哪些?::
 * percent_rank(): 计算当前行处于所有行顺序的百分比, 计算结果为(相对位置-1)/(总行数-1), 返回值为[0,1], 如果有重复行按第一行的位置.
 * cume_dist(): 计算当前行+之前所有行的累计分布, 计算结果为相对位置/总行数, 返回值为(0,1], 如果有重复行按最后一行的位置.
 * ntile(n): 将分组内的行平均分为n个组, 为每行按顺序分配1到n之间的组号.
-* sum()
+* sum(): 从第一行累加到当前行.
 * avg()
 * max()
 * min()
@@ -1284,6 +1287,65 @@ PostgreSQL的窗口函数有哪些?::
 * first_value(column): 返回分组内第一个值.
 * last_value(column): 返回分组内最后一个值.
 * nth_value(column, n): 返回分组内第n个值.
+
+=== Elasticsearch
+
+[qanda]
+ES的应用场景?::
+* 全文搜索
+* 日志分析
+* 聚合报表
+ES集群节点的角色有哪些?::
+* master: 负责处理集群节点管理, 索引配置, 索引分片分配, 选举等.
+* coordinating: 负责接收客户端请求和返回结果, 设置方式: `node.roles: []`
+* voting_only: 负责master选举.
+* data: 负责CRUD索引数据.
+* ingest: 负责在数据索引前执行前置操作.
+* data_content
+* data_hot
+* data_warm
+* data_cold
+* data_frozen
+* ml: 机器学习节点.
+* remote_cluster_client: 负责连接远程的ES集群处理.
+* transform
+ES查询文档的处理流程?::
+* 根据文档id查询:
+. 客户端发送请求到coordinating节点.
+. coordinating节点根据_id转发请求到文档所在分片的node, 主分片和副本分片随机选择.
+. node返回文档数据到coordinating节点, coordinating节点返回给客户端.
+* 条件查询:
+. 客户端发送请求到coordinating节点.
+. coordinating节点转发查询请求到该索引所有分片所在的node.
+. node返回文档_id到coordinating节点.
+. coordinating节点根据文档_id转发到所在分片的node.
+. node返回文档数据到coordinating节点, coordinating节点排好序返回给客户端.
+ES的字段数据类型有哪些?::
+* 普通数据类型: binary, boolean, long, double, keyword, constant_keyword, wildcard, date, date_nanos, alias
+* 对象数据类型: object, flattened, nested, join
+* 结构化数据类型: long_range, double_range, date_range, ip_range, ip, version, murmur3
+* 聚合数据类型: aggregate_metric_double, histogram
+* 全文搜索类型: text, completion, token_count, search_as_you_type
+* 文档排行类型: dense_vector, sparse_vector, rank_feature, rank_features
+* 空间数据类型: point, geo_point, shape, geo_shape
+ES字段类型text和keyword的区别?::
+* text和keyword都支持精确查询和模糊查询.
+* text支持分词查询, keyword不支持.
+* text不支持聚合查询, keyword支持.
+ES查询search_type有哪些类型?::
+* query_then_fetch: 向索引所有分片查询, 各个分片返回符合的文档_id和score, 然后再根据score排好序, 筛选size数量的文档, 最后根据筛选出来的_id取文档数据.
+* dfs_query_then_fetch: 查询索引所有分片的TF和DF值, 汇总后代入查询请求中再次进行query_then_fetch.
+ES如何保证读写一致性?::
+* 写: `wait_for_active_shards` 参数控制写完多少分片后请求才会返回, 默认写完主分片返回.
+* 读: `_preference=primary` 参数控制读主分片上的数据.
+* 更新: 更新时可以指定 `_version` 字段, 如果不是最新的版本则更新失败.
+ES分页查询的方式?::
+* from+size
+* search_after
+* scroll
+ES索引refresh和flush的区别?::
+* refresh: 将内存buffer中的数据写入到segment中, 并同步给副本分片.
+* flush: 将translog中的数据持久化到硬盘.
 
 == 消息队列
 
@@ -1475,9 +1537,9 @@ TCP三次握手的过程?::
 . 服务端向客户端发送ACK+SYN包.
 . 客户端向服务端发送ACK包.
 为什么需要三次握手而不是两次?::
-客户端也需要向服务端证明自己的收消息能力, 所以在收到服务端的SYN包后, 也要回复ACK包.
+服务端也需要向客户端证明自己的发消息能力, 所以服务端也需要发SYN包确保客户端能收到.
 为什么需要三次握手而不是四次?::
-服务端需要证明自己的消息收发能力, 所以需要答复客户端的同时发送一个SYN包, 两个包可以同时发送.
+握手流程未完成, 此时应用程序还没有开始发送数据包, 所以ACK包可以和SYN包合并发送.
 TCP四次挥手的过程?::
 . 客户端向服务端发送FIN包, 通知自己想要关闭连接.
 . 服务端收到后回复一个ACK包.
@@ -1530,6 +1592,12 @@ Nginx下游服务配置参数?::
 * max_fails: 允许请求失败的最大次数.
 * fail_timeout: max_fail次请求失败后, 暂停代理该服务的时长.
 * backup: 其他非backup服务忙或者下线的时候, 再请求该服务.
+request_time和upstream_response_time的区别?::
+* request_time: 从Nginx开始接收请求到返回响应完成的整体时间.
+* upstream_connect_time: Nginx跟上游建立连接花费的时间.
+* upstream_header_time: Nginx从建立上游连接到接收完上游返回的header花费的时间.
+* upstream_response_time: Nginx从建立上游连接到接收完上游返回的header+body花费的时间.
+* 上游处理花费的时间: upstream_header_time - upstream_connect_time.
 
 == Linux
 
@@ -1557,7 +1625,7 @@ Nginx下游服务配置参数?::
 . Socket缓冲区数据DMA复制到网卡.
 . write返回, 内核态切换到用户态.
 . 一共4次上下文切换, 4次拷贝.
-* mmap:
+* mmap+write:
 . 用户态切换到内核态, 内核将磁盘文件DMA读取到内核缓冲区, 同时将该内核缓冲区映射到用户缓冲区.
 . 内核态切换到用户态.
 . 用户态写数据, 切换到内核态, 内核将缓冲区数据CPU拷贝到Socket缓冲区.
@@ -1568,7 +1636,8 @@ Nginx下游服务配置参数?::
 . 用户态切换到内核态, 内核将磁盘文件DMA读取到内核缓冲区.
 . 内核态切换回用户态, 从内核缓冲区直接将数据DMA拷贝到网卡.
 . 一共2次上下文切换, 2次拷贝.
-* mmap存在一次CPU拷贝, 适用于小文件频繁修改, sendfile适用于大文件网络传输.
+* mmap适用于小文件频繁修改, sendfile适用于大文件网络传输.
+
 
 == 分布式
 
@@ -1705,4 +1774,30 @@ Raft日志复制流程?::
 ** `geoadd <key> <longitude> <latitude> <user_id>` : 添加用户经纬度数据.
 ** `geopos <key> <user_id>` : 获取指定用户的经纬度数据.
 ** `georadius <key> <longitude> <latitude> <radius> m|km|ft|mi withcoord withdist` : 获取指定经纬度radius半径内的用户数据, 包含经纬度和距离.
-
+限流算法有哪些?::
+* 固定窗口: 计数器.
+. 记录上次请求时间和请求数.
+. 请求到达时, 用当前时间减去上次请求时间, 如果大于窗口则重置计数器, 否则请求数加1.
+. 判断请求数是否超过限流值, 如果超过则限流.
+. 更新上次请求时间为当前时间.
+* 滑动窗口: 环形队列.
+. 将时间区间划分为N个窗口, 组成环形队列, 并记录上次请求时间.
+. 请求到达后, 用(当前时间-上次请求时间)/窗口时长=这段时间的窗口数M, 将M-N外的窗口计数置0.
+. 计算当前时间所处的窗口, 该窗口请求数加1.
+. 对队列内的请求数统计求和得到时间区间内的请求数, 判断是否超过限流值.
+* 漏斗:
+. 定义:
+** burst: 漏斗容量.
+** rate: 漏斗允许的流出速率.
+** excess: 漏斗剩余的数据量, 初始为0.
+** lastTimestamp: 上次请求的时间戳.
+. 请求到达后, 计算当前漏斗数据量: `excess = max(excess - rate * (currentTimestamp - lastTimestamp) + 1, 0)` .
+. 如果漏斗剩余的数据量excess大于burst, 则需要限流; 如果在0~burst区间内, 需要延迟 `excess/burst` 秒再放行请求; 如果excess为0则直接放行请求.
+* 令牌桶:
+. 定义
+** capacity: 令牌桶容量.
+** rate: 令牌流入速率.
+** tokens: 令牌桶剩余的令牌量, 初始为capacity.
+** lastTimestamp: 上次请求的时间戳.
+. 请求到达后, 计算当前令牌桶剩余的令牌量: `tokens = min(tokens + rate * (currentTimestamp - lastTimestamp), capacity)` .
+. 如果剩余的令牌量tokens是否为0, 则需要限流.
