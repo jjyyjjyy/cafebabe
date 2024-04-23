@@ -140,6 +140,7 @@ $(globalSwitch);
 <ul class="sectlevel2">
 <li><a href="#_mysql">9.1. MySQL</a></li>
 <li><a href="#_postgresql">9.2. PostgreSQL</a></li>
+<li><a href="#_elasticsearch">9.3. Elasticsearch</a></li>
 </ul>
 </li>
 <li><a href="#_消息队列">10. 消息队列</a>
@@ -572,9 +573,6 @@ $(globalSwitch);
 <p>子类静态代码块</p>
 </li>
 <li>
-<p>子类main方法</p>
-</li>
-<li>
 <p>父类成员变量</p>
 </li>
 <li>
@@ -698,19 +696,6 @@ $(globalSwitch);
 </li>
 <li>
 <p>OP_WRITE: 写缓冲区中存在空间可以写入.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><em>HeapByteBuffer和DirectByteBuffer的区别?</em></p>
-<div class="ulist">
-<ul>
-<li>
-<p>HeapByteBuffer在JVM堆内存中分配缓冲区.</p>
-</li>
-<li>
-<p>DirectByteBuffer在JVM堆外内存中分配缓冲区.</p>
 </li>
 </ul>
 </div>
@@ -3096,7 +3081,7 @@ $(globalSwitch);
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Nacos Client端向Nacos建立一个45秒的长链接, 发送自己的配置groupKey和md5.</p>
+<p>Nacos Client端向Nacos建立一个45秒的长请求, 发送自己的配置groupKey和md5.</p>
 </li>
 <li>
 <p>Nacos收到请求后判断该md5与本地的是否相同:</p>
@@ -3564,7 +3549,7 @@ $(globalSwitch);
 </li>
 <li>
 <p><em>如果同时开启rdb和aof, Redis重启后会用哪种方式恢复数据?</em></p>
-<p>优先用aof, 如果没有开启aof则使用rdb.</p>
+<p>同时开启rdb和aof时, 会生成rdb和aof文件, Redis重启后会先加载rdb文件到内存, 然后重放aof文件中的命令.</p>
 </li>
 <li>
 <p><em>如果AOF文件的数据出现异常, 怎么处理?</em></p>
@@ -3744,6 +3729,9 @@ $(globalSwitch);
 <li>
 <p>增加二级缓存, 如失效时间很短的JVM本地缓存.</p>
 </li>
+<li>
+<p>读取时增加互斥锁.</p>
+</li>
 </ul>
 </div>
 </li>
@@ -3754,6 +3742,9 @@ $(globalSwitch);
 <ul>
 <li>
 <p>对接口增加限流.</p>
+</li>
+<li>
+<p>读取时增加互斥锁.</p>
 </li>
 </ul>
 </div>
@@ -4361,6 +4352,22 @@ $(globalSwitch);
 </div>
 </li>
 <li>
+<p><em>MySQL binlog日志格式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>statement: 记录执行的SQL语句.</p>
+</li>
+<li>
+<p>row: 记录SQL执行后被修改的行数据.</p>
+</li>
+<li>
+<p>mixed: 根据执行的SQL动态选择statement或者row格式.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><em>MySQL默认的事务隔离级别?</em></p>
 <p>Repeatable Read</p>
 </li>
@@ -4806,7 +4813,7 @@ $(globalSwitch);
 <p>ntile(n): 将分组内的行平均分为n个组, 为每行按顺序分配1到n之间的组号.</p>
 </li>
 <li>
-<p>sum()</p>
+<p>sum(): 从第一行累加到当前行.</p>
 </li>
 <li>
 <p>avg()</p>
@@ -4831,6 +4838,222 @@ $(globalSwitch);
 </li>
 <li>
 <p>nth_value(column, n): 返回分组内第n个值.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_elasticsearch"><a class="link" href="#_elasticsearch">9.3. Elasticsearch</a></h3>
+<div class="qlist qanda">
+<ol>
+<li>
+<p><em>ES的应用场景?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>全文搜索</p>
+</li>
+<li>
+<p>日志分析</p>
+</li>
+<li>
+<p>聚合报表</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES集群节点的角色有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>master: 负责处理集群节点管理, 索引配置, 索引分片分配, 选举等.</p>
+</li>
+<li>
+<p>coordinating: 负责接收客户端请求和返回结果, 设置方式: <code>node.roles: []</code></p>
+</li>
+<li>
+<p>voting_only: 负责master选举.</p>
+</li>
+<li>
+<p>data: 负责CRUD索引数据.</p>
+</li>
+<li>
+<p>ingest: 负责在数据索引前执行前置操作.</p>
+</li>
+<li>
+<p>data_content</p>
+</li>
+<li>
+<p>data_hot</p>
+</li>
+<li>
+<p>data_warm</p>
+</li>
+<li>
+<p>data_cold</p>
+</li>
+<li>
+<p>data_frozen</p>
+</li>
+<li>
+<p>ml: 机器学习节点.</p>
+</li>
+<li>
+<p>remote_cluster_client: 负责连接远程的ES集群处理.</p>
+</li>
+<li>
+<p>transform</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES查询文档的处理流程?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>根据文档id查询:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>客户端发送请求到coordinating节点.</p>
+</li>
+<li>
+<p>coordinating节点根据_id转发请求到文档所在分片的node, 主分片和副本分片随机选择.</p>
+</li>
+<li>
+<p>node返回文档数据到coordinating节点, coordinating节点返回给客户端.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>条件查询:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>客户端发送请求到coordinating节点.</p>
+</li>
+<li>
+<p>coordinating节点转发查询请求到该索引所有分片所在的node.</p>
+</li>
+<li>
+<p>node返回文档_id到coordinating节点.</p>
+</li>
+<li>
+<p>coordinating节点根据文档_id转发到所在分片的node.</p>
+</li>
+<li>
+<p>node返回文档数据到coordinating节点, coordinating节点排好序返回给客户端.</p>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES的字段数据类型有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>普通数据类型: binary, boolean, long, double, keyword, constant_keyword, wildcard, date, date_nanos, alias</p>
+</li>
+<li>
+<p>对象数据类型: object, flattened, nested, join</p>
+</li>
+<li>
+<p>结构化数据类型: long_range, double_range, date_range, ip_range, ip, version, murmur3</p>
+</li>
+<li>
+<p>聚合数据类型: aggregate_metric_double, histogram</p>
+</li>
+<li>
+<p>全文搜索类型: text, completion, token_count, search_as_you_type</p>
+</li>
+<li>
+<p>文档排行类型: dense_vector, sparse_vector, rank_feature, rank_features</p>
+</li>
+<li>
+<p>空间数据类型: point, geo_point, shape, geo_shape</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES字段类型text和keyword的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>text和keyword都支持精确查询和模糊查询.</p>
+</li>
+<li>
+<p>text支持分词查询, keyword不支持.</p>
+</li>
+<li>
+<p>text不支持聚合查询, keyword支持.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES查询search_type有哪些类型?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>query_then_fetch: 向索引所有分片查询, 各个分片返回符合的文档_id和score, 然后再根据score排好序, 筛选size数量的文档, 最后根据筛选出来的_id取文档数据.</p>
+</li>
+<li>
+<p>dfs_query_then_fetch: 查询索引所有分片的TF和DF值, 汇总后代入查询请求中再次进行query_then_fetch.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES如何保证读写一致性?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>写: <code>wait_for_active_shards</code> 参数控制写完多少分片后请求才会返回, 默认写完主分片返回.</p>
+</li>
+<li>
+<p>读: <code>_preference=primary</code> 参数控制读主分片上的数据.</p>
+</li>
+<li>
+<p>更新: 更新时可以指定 <code>_version</code> 字段, 如果不是最新的版本则更新失败.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES分页查询的方式?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>from+size</p>
+</li>
+<li>
+<p>search_after</p>
+</li>
+<li>
+<p>scroll</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>ES索引refresh和flush的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>refresh: 将内存buffer中的数据写入到segment中, 并同步给副本分片.</p>
+</li>
+<li>
+<p>flush: 将translog中的数据持久化到硬盘.</p>
 </li>
 </ul>
 </div>
@@ -5520,11 +5743,11 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </li>
 <li>
 <p><em>为什么需要三次握手而不是两次?</em></p>
-<p>客户端也需要向服务端证明自己的收消息能力, 所以在收到服务端的SYN包后, 也要回复ACK包.</p>
+<p>服务端也需要向客户端证明自己的发消息能力, 所以服务端也需要发SYN包确保客户端能收到.</p>
 </li>
 <li>
 <p><em>为什么需要三次握手而不是四次?</em></p>
-<p>服务端需要证明自己的消息收发能力, 所以需要答复客户端的同时发送一个SYN包, 两个包可以同时发送.</p>
+<p>握手流程未完成, 此时应用程序还没有开始发送数据包, 所以ACK包可以和SYN包合并发送.</p>
 </li>
 <li>
 <p><em>TCP四次挥手的过程?</em></p>
@@ -5709,6 +5932,28 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </ul>
 </div>
 </li>
+<li>
+<p><em>request_time和upstream_response_time的区别?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>request_time: 从Nginx开始接收请求到返回响应完成的整体时间.</p>
+</li>
+<li>
+<p>upstream_connect_time: Nginx跟上游建立连接花费的时间.</p>
+</li>
+<li>
+<p>upstream_header_time: Nginx从建立上游连接到接收完上游返回的header花费的时间.</p>
+</li>
+<li>
+<p>upstream_response_time: Nginx从建立上游连接到接收完上游返回的header+body花费的时间.</p>
+</li>
+<li>
+<p>上游处理花费的时间: upstream_header_time - upstream_connect_time.</p>
+</li>
+</ul>
+</div>
+</li>
 </ol>
 </div>
 </div>
@@ -5806,7 +6051,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </li>
 <li>
-<p>mmap:</p>
+<p>mmap+write:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -5847,7 +6092,7 @@ alpha状态只需要在内存中读取消息, delta状态需要两次I/O操作, 
 </div>
 </li>
 <li>
-<p>mmap存在一次CPU拷贝, 适用于小文件频繁修改, sendfile适用于大文件网络传输.</p>
+<p>mmap适用于小文件频繁修改, sendfile适用于大文件网络传输.</p>
 </li>
 </ul>
 </div>
@@ -6341,6 +6586,115 @@ Multi Paxos 相比较Basic Paxos少了一次调用流程.</p>
 <p><code>georadius &lt;key&gt; &lt;longitude&gt; &lt;latitude&gt; &lt;radius&gt; m|km|ft|mi withcoord withdist</code> : 获取指定经纬度radius半径内的用户数据, 包含经纬度和距离.</p>
 </li>
 </ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>限流算法有哪些?</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p>固定窗口: 计数器.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>记录上次请求时间和请求数.</p>
+</li>
+<li>
+<p>请求到达时, 用当前时间减去上次请求时间, 如果大于窗口则重置计数器, 否则请求数加1.</p>
+</li>
+<li>
+<p>判断请求数是否超过限流值, 如果超过则限流.</p>
+</li>
+<li>
+<p>更新上次请求时间为当前时间.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>滑动窗口: 环形队列.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>将时间区间划分为N个窗口, 组成环形队列, 并记录上次请求时间.</p>
+</li>
+<li>
+<p>请求到达后, 用(当前时间-上次请求时间)/窗口时长=这段时间的窗口数M, 将M-N外的窗口计数置0.</p>
+</li>
+<li>
+<p>计算当前时间所处的窗口, 该窗口请求数加1.</p>
+</li>
+<li>
+<p>对队列内的请求数统计求和得到时间区间内的请求数, 判断是否超过限流值.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>漏斗:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>定义:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>burst: 漏斗容量.</p>
+</li>
+<li>
+<p>rate: 漏斗允许的流出速率.</p>
+</li>
+<li>
+<p>excess: 漏斗剩余的数据量, 初始为0.</p>
+</li>
+<li>
+<p>lastTimestamp: 上次请求的时间戳.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>请求到达后, 计算当前漏斗数据量: <code>excess = max(excess - rate * (currentTimestamp - lastTimestamp) + 1, 0)</code> .</p>
+</li>
+<li>
+<p>如果漏斗剩余的数据量excess大于burst, 则需要限流; 如果在0~burst区间内, 需要延迟 <code>excess/burst</code> 秒再放行请求; 如果excess为0则直接放行请求.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>令牌桶:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>定义</p>
+<div class="ulist">
+<ul>
+<li>
+<p>capacity: 令牌桶容量.</p>
+</li>
+<li>
+<p>rate: 令牌流入速率.</p>
+</li>
+<li>
+<p>tokens: 令牌桶剩余的令牌量, 初始为capacity.</p>
+</li>
+<li>
+<p>lastTimestamp: 上次请求的时间戳.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>请求到达后, 计算当前令牌桶剩余的令牌量: <code>tokens = min(tokens + rate * (currentTimestamp - lastTimestamp), capacity)</code> .</p>
+</li>
+<li>
+<p>如果剩余的令牌量tokens是否为0, 则需要限流.</p>
+</li>
+</ol>
 </div>
 </li>
 </ul>
