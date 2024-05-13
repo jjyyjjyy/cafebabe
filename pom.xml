@@ -34,7 +34,7 @@
         <algs4.version>1.0.4</algs4.version>
         <jmh.version>1.37</jmh.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.39</nimbus-jose-jwt.version>
         <netty.version>4.1.109.Final</netty.version>
         <jol.version>0.17</jol.version>
         <jcstress.version>0.16</jcstress.version>
@@ -45,12 +45,12 @@
         <asciidoctor-kroki.version>0.9.1</asciidoctor-kroki.version>
         <asciidoctorj-diagram.version>2.3.0</asciidoctorj-diagram.version>
         <asciidoctorj-diagram-plantuml.version>1.2024.3</asciidoctorj-diagram-plantuml.version>
-        <testcontainer.version>1.19.7</testcontainer.version>
+        <testcontainer.version>1.19.8</testcontainer.version>
         <arthas.version>3.7.2</arthas.version>
         <javassist.version>3.30.2-GA</javassist.version>
         <logstash-logback.version>7.4</logstash-logback.version>
         <postgresql.version>42.7.3</postgresql.version>
-        <redisson.version>3.29.0</redisson.version>
+        <redisson.version>3.30.0</redisson.version>
 
         <maven-complier-plugin.version>3.13.0</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
