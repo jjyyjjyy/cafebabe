@@ -51,6 +51,7 @@
         <logstash-logback.version>7.4</logstash-logback.version>
         <postgresql.version>42.7.3</postgresql.version>
         <redisson.version>3.30.0</redisson.version>
+        <rocketmq-client.version>2.3.0</rocketmq-client.version>
 
         <maven-complier-plugin.version>3.13.0</maven-complier-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
@@ -116,6 +117,11 @@
                 <groupId>com.taobao.arthas</groupId>
                 <artifactId>arthas-spring-boot-starter</artifactId>
                 <version>${arthas.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-v5-client-spring-boot-starter</artifactId>
+                <version>${rocketmq-client.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

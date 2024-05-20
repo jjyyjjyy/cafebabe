@@ -1,0 +1,4 @@
+rocketmq:
+  endpoints: localhost:18081
+  producer:
+    endpoints: ${rocketmq.endpoints}
