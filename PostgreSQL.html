@@ -141,8 +141,9 @@ $(globalSwitch);
 <li><a href="#_数字类型">5.1. 数字类型</a></li>
 <li><a href="#_字符串类型">5.2. 字符串类型</a></li>
 <li><a href="#_日期类型">5.3. 日期类型</a></li>
-<li><a href="#_range类型">5.4. range类型</a></li>
-<li><a href="#_其他">5.5. 其他</a></li>
+<li><a href="#_几何类型">5.4. 几何类型</a></li>
+<li><a href="#_range类型">5.5. range类型</a></li>
+<li><a href="#_其他">5.6. 其他</a></li>
 </ul>
 </li>
 <li><a href="#_函数">6. 函数</a></li>
@@ -161,7 +162,7 @@ $(globalSwitch);
 <li><a href="#_物理结构">9.2. 物理结构</a>
 <ul class="sectlevel3">
 <li><a href="#_oid">9.2.1. OID</a></li>
-<li><a href="#_表空间">9.2.2. 表空间</a></li>
+<li><a href="#_表数据文件结构">9.2.2. 表数据文件结构</a></li>
 </ul>
 </li>
 <li><a href="#_进程结构">9.3. 进程结构</a></li>
@@ -170,36 +171,59 @@ $(globalSwitch);
 </li>
 <li><a href="#_事务">10. 事务</a>
 <ul class="sectlevel2">
-<li><a href="#_脏读">10.1. 脏读</a></li>
-<li><a href="#_不可重复读">10.2. 不可重复读</a></li>
-<li><a href="#_幻读">10.3. 幻读</a></li>
-<li><a href="#_查看全局事务默认隔离级别">10.4. 查看全局事务默认隔离级别</a></li>
-<li><a href="#_修改全局事务默认隔离级别">10.5. 修改全局事务默认隔离级别</a></li>
-<li><a href="#_查看当前会话事务默认隔离级别">10.6. 查看当前会话事务默认隔离级别</a></li>
-<li><a href="#_设置当前会话事务默认隔离级别">10.7. 设置当前会话事务默认隔离级别</a></li>
+<li><a href="#_事务语法">10.1. 事务语法</a>
+<ul class="sectlevel3">
+<li><a href="#_开启事务">10.1.1. 开启事务</a></li>
+<li><a href="#_完成事务">10.1.2. 完成事务</a></li>
+<li><a href="#_回滚事务">10.1.3. 回滚事务</a></li>
+<li><a href="#_设置savepoint">10.1.4. 设置savepoint</a></li>
+<li><a href="#_手动释放savepoint">10.1.5. 手动释放savepoint</a></li>
 </ul>
 </li>
-<li><a href="#_分区">11. 分区</a>
+<li><a href="#_事务隔离级别">10.2. 事务隔离级别</a>
+<ul class="sectlevel3">
+<li><a href="#_脏读">10.2.1. 脏读</a></li>
+<li><a href="#_不可重复读">10.2.2. 不可重复读</a></li>
+<li><a href="#_幻读">10.2.3. 幻读</a></li>
+<li><a href="#_查看全局事务默认隔离级别">10.2.4. 查看全局事务默认隔离级别</a></li>
+<li><a href="#_修改全局事务默认隔离级别">10.2.5. 修改全局事务默认隔离级别</a></li>
+<li><a href="#_查看当前会话事务默认隔离级别">10.2.6. 查看当前会话事务默认隔离级别</a></li>
+<li><a href="#_设置当前会话事务默认隔离级别">10.2.7. 设置当前会话事务默认隔离级别</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_锁">11. 锁</a>
 <ul class="sectlevel2">
-<li><a href="#_优势">11.1. 优势</a></li>
-<li><a href="#_分区方式">11.2. 分区方式</a></li>
-<li><a href="#_sql">11.3. SQL</a></li>
+<li><a href="#_表锁">11.1. 表锁</a>
+<ul class="sectlevel3">
+<li><a href="#_语法">11.1.1. 语法</a></li>
+<li><a href="#_表锁冲突">11.1.2. 表锁冲突</a></li>
 </ul>
 </li>
-<li><a href="#_清除wal日志">12. 清除WAL日志</a></li>
-<li><a href="#_查询优化">13. 查询优化</a>
+</ul>
+</li>
+<li><a href="#_分区">12. 分区</a>
 <ul class="sectlevel2">
-<li><a href="#_逻辑优化">13.1. 逻辑优化</a></li>
-<li><a href="#_物理优化">13.2. 物理优化</a></li>
+<li><a href="#_优势">12.1. 优势</a></li>
+<li><a href="#_分区方式">12.2. 分区方式</a></li>
+<li><a href="#_sql">12.3. SQL</a></li>
 </ul>
 </li>
-<li><a href="#_pgbench">14. pgbench</a>
+<li><a href="#_清除wal日志">13. 清除WAL日志</a></li>
+<li><a href="#_查询优化">14. 查询优化</a>
 <ul class="sectlevel2">
-<li><a href="#_初始化数据集">14.1. 初始化数据集</a></li>
-<li><a href="#_sql性能测试">14.2. SQL性能测试</a></li>
+<li><a href="#_逻辑优化">14.1. 逻辑优化</a></li>
+<li><a href="#_物理优化">14.2. 物理优化</a></li>
 </ul>
 </li>
-<li><a href="#_参考配置">15. 参考配置</a></li>
+<li><a href="#_pgbench">15. pgbench</a>
+<ul class="sectlevel2">
+<li><a href="#_初始化数据集">15.1. 初始化数据集</a></li>
+<li><a href="#_sql性能测试">15.2. SQL性能测试</a></li>
+</ul>
+</li>
+<li><a href="#_参考配置">16. 参考配置</a></li>
 </ul>
 </div>
 </div>
@@ -389,6 +413,9 @@ pg_ctl -D &lt;data-dir&gt; -m [fast|smart|immediate]  -t &lt;timeout&gt; stop</c
 <div class="sect1">
 <h2 id="_数据类型"><a class="link" href="#_数据类型">5. 数据类型</a></h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>文档: <a href="https://www.postgresql.org/docs/current/datatype.html" class="bare external" target="_blank" rel="noopener">https://www.postgresql.org/docs/current/datatype.html</a></p>
+</div>
 <div class="sect2">
 <h3 id="_数字类型"><a class="link" href="#_数字类型">5.1. 数字类型</a></h3>
 <div class="ulist">
@@ -408,6 +435,9 @@ pg_ctl -D &lt;data-dir&gt; -m [fast|smart|immediate]  -t &lt;timeout&gt; stop</c
 <li>
 <p>smallserial/serial/bigserial 2/4/8字节自增序列</p>
 </li>
+<li>
+<p>bytea: 二进制</p>
+</li>
 </ul>
 </div>
 </div>
@@ -416,13 +446,13 @@ pg_ctl -D &lt;data-dir&gt; -m [fast|smart|immediate]  -t &lt;timeout&gt; stop</c
 <div class="ulist">
 <ul>
 <li>
-<p>varchar/character varying 变长</p>
+<p>varchar/character varying 变长, 如果不指定长度, 最大不能超过1GB.</p>
 </li>
 <li>
 <p>character/char 定长</p>
 </li>
 <li>
-<p>text 变长, 长度小于1GB</p>
+<p>text 变长, 最大不能超过1GB</p>
 </li>
 </ul>
 </div>
@@ -448,9 +478,40 @@ pg_ctl -D &lt;data-dir&gt; -m [fast|smart|immediate]  -t &lt;timeout&gt; stop</c
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>时区名称查看: <code>select * from pg_timezone_names;</code></p>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_range类型"><a class="link" href="#_range类型">5.4. range类型</a></h3>
+<h3 id="_几何类型"><a class="link" href="#_几何类型">5.4. 几何类型</a></h3>
+<div class="ulist">
+<ul>
+<li>
+<p>point: 点</p>
+</li>
+<li>
+<p>line: 线</p>
+</li>
+<li>
+<p>lseg: 线段</p>
+</li>
+<li>
+<p>box: 矩形</p>
+</li>
+<li>
+<p>path: 路径</p>
+</li>
+<li>
+<p>polygon: 多边形</p>
+</li>
+<li>
+<p>circle: 圆</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_range类型"><a class="link" href="#_range类型">5.5. range类型</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -475,7 +536,7 @@ pg_ctl -D &lt;data-dir&gt; -m [fast|smart|immediate]  -t &lt;timeout&gt; stop</c
 </div>
 </div>
 <div class="sect2">
-<h3 id="_其他"><a class="link" href="#_其他">5.5. 其他</a></h3>
+<h3 id="_其他"><a class="link" href="#_其他">5.6. 其他</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -983,81 +1044,86 @@ limit 10;</code></pre>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_逻辑结构"><a class="link" href="#_逻辑结构">9.1. 逻辑结构</a></h3>
-<div class="literalblock">
+<div class="imageblock kroki">
 <div class="content">
-<pre>创建一个Database时会为这个Database创建一个名为public的默认schema.
-相同数据库不同schema可以拥有相同名称的table/index/view/sequence/function等</pre>
+<img src="https://kroki.io/plantuml/svg/eNpNkE0OgkAMhfdzirqdBBaegOAvGzVC3BdoAgaK0hI5vuCMgd33Xtu0fZEo9trWXLb4MmajFbUEglyKdkzGWNijYo5CsGsGUeqNXbyJLaTFNIQzWsgwb8hhwiWNP7QQB9oTeXFGqTyeksuf6jTzmN6ClYrvvgceNX38lh5ZsNC6Y2ccB16plN4DceGuO4xKLK62_LKFMAxn59R0OTZwzZ9UqBgT0RSFi-ML6axQKQ==" alt="Diagram">
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_物理结构"><a class="link" href="#_物理结构">9.2. 物理结构</a></h3>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNp9VV1PG0cUfd9fMX2Kgyw7phWi1EGhxLGQCFgYNerTamyP8Ub71Z1xgD6RKBQDdXAUpaAEJY1kEtQ0Nmmo49qh-TM7u_a_6N0dG2-w6YPlmdlz7j33zJ2ZG5Rhi2mKntOwKUlfsQLRCKJYz1Fm6ESSxtBNzHAGU4Jm1SJlxJLGxlAqeXNmeQZGY1PI-xaVnPqe3fzDeXrilGu89cRubsDUUHLu8xo_expGzssj93DX2d7g71-co6akeNbIkWkpnZhPzC4jwIdRDjMdg4hbS4u3kbki5_r5VwvEIh4GXUexia8nv5HiUZ_-nScElMSi_XghRjRTxYxcuzoEGp_8dgQwNhI4MQCaBmUrFqHDOE9K34DOq-P_LR2-nxdNiUqyTBRtEdUr2h_kFZXogEB5y9A8B7IqpvRC-ROT430hkkgAoYWxXqbDY_fZQyHgYj4ICEkwUwxd9lKZmBVCV-JgskpkT8T0lQs1QpEBWVJokOm3LbvdCKNu-6BTqzqHG7z6Jpb8Pow6jc3O5y1eeWR_esZLz3m7FYmFUWQcfpGIYF3txQ6GlvNUG7F6TxOdtqIaGaxGpVDSH6DFzF0oiAotYcRfPwi0S9h3ztCZZaiQVKSbEouapjCZUYhkt3b5zitnr2K3qs5-o7t_6pQ-iIABRm5dpwWNaEDgO8fOxn2--d5uveW_bPJ3B_xdxf3Qdtsvh2iqsaJkfcG9Ea-Weanh7jQgxBBaK6pMWcNZBnh_zCysU5jDRl1C0Q2m5NcBPz-XXk4sRBcWl-du_XgJ2CImVQ0v-hIxVZDjBUZpWBqCUmIpvm7-8S_hDXSTWFR-9vrEbb3hpbfCvCBPxyYtGL6zMCVrpmGx81X--MxuV3n9E99qBXtAUBn2pHl_CmVKlg5sHQWVmWaOhtvNU9jIYVIx4_vpkYoZofwSo1hGpWYWgP6RoCbOEnGSwITOWb375F_n0VEQv2qYBf8ShHb6tXvQcGp_91zzEwSgq76rd2bmnf0j_nk_Ahdp7Jr9zy7fLvNK2W62ALMGzRKg9Drii0b1FY8kZwVZsFNJ-YfEUnpucUEKpZJ2s-1ul5zDP_nex0D8QgZH4Jjk4VifvoZPcJA79fvdzbJ7VhtyUckRnX0Bh8zOwe_85OEFbO-2_EntoVPJkSEHMFxkRg-LVXhmEF2H10bjew-g3Mu4GvZepIhhMgqCaiewSakkr9ThlIpuE16gwU6eO5NOLIE5fYOinkI5fhvfNSx0j1gUzsa0HJ-FywQcLZL-GtKLWoZY017cGwReTfFy_gd90CR1" alt="Diagram">
+</div>
+</div>
+<div class="paragraph">
+<p>template0和template1属于数据库模板, 区别是template1可以修改, template0只读.</p>
+</div>
 <div class="sect3">
 <h4 id="_oid"><a class="link" href="#_oid">9.2.1. OID</a></h4>
-<div class="literalblock">
-<div class="content">
-<pre>OID,对象标识符,无符号4字节整数.所有的数据库对象由各自的OID管理</pre>
-</div>
+<div class="paragraph">
+<p>对象标识符,无符号4字节整数.所有的数据库对象由各自的OID管理</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>数据库对象OID保存在pg_database系统表里.</p>
+<p>数据库对象OID保存在 <code>pg_database</code> 系统表里.</p>
 </li>
 <li>
-<p>表/索引/序列等对象OID保存在pg_class系统表里.</p>
+<p>表/索引/序列等对象OID保存在 <code>pg_class</code> 系统表里.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_表空间"><a class="link" href="#_表空间">9.2.2. 表空间</a></h4>
-<div class="literalblock">
+<h4 id="_表数据文件结构"><a class="link" href="#_表数据文件结构">9.2.2. 表数据文件结构</a></h4>
+<div class="imageblock kroki">
 <div class="content">
-<pre>初始化数据库目录时会自动创建两个表空间: pg_global和pg_default</pre>
+<img src="https://kroki.io/rackdiag/svg/eNorSkzOTslMTFeo5lJQSCxOTs1LycxLtwZyLEKtuYBUSmpxclFmQUlmfp6CrYKShbeTQkFqkUJBYnqqQlIlUDotsTSnRAms1tBKQdkApNcIyDAEMYyBDCMQwwTI0NPTU4g2CY0Fmw7k-1lz1QIAKIkgWw==" alt="表数据文件结构" width="400" height="200">
 </div>
+<div class="title">Figure 1. 表数据文件结构</div>
 </div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/bytefield/svg/eNqdj01qwzAQhfc9xeCVvRDUJlDjA_QE3YVgFGlsi8rSoJ_aNPjuVUgbaGtE6Urwvu89NKXEAc52Rc8IHXN2gbZ6KD9TtigZJnh6vEU8BOehI82VgUs3WBOYV-8IdQPbVXF8YcLqOBs2IZfo_FeaxqAg2WtvilT1xA20208qJhSvPs53pfmlDJqPPsO1XdBleCTKck8oFNcZg_iI16v7t3SfsianumiwX5W8O4dvThlwDbdvK0MFHLuZh-mUXh_PUJ-q_9SavdrICYpnhwgJCCx25l4iacyMtdtfS_V-KQQ7Vx98G83U" alt="page结构" width="800" height="400">
+</div>
+<div class="title">Figure 2. page结构</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>pd_lower</code>: 指向free space开始位置</p>
+</li>
+<li>
+<p><code>pd_upper</code>: 指向free space结束位置</p>
+</li>
+<li>
+<p>如果Tuple超过page 1/4, 则会放到 <code>TOAST</code> page中.</p>
+</li>
+<li>
+<p>Tuple可以使用 <code>TID&lt;pageNumber, offset&gt;</code> 二元组定位</p>
 <div class="ulist">
 <ul>
 <li>
-<p>pg_global保存在global目录中, 用来保存系统表</p>
+<p>pageNumber: page序号.</p>
 </li>
 <li>
-<p>pg_default保存在base目录中, 默认数据库表空间</p>
-<div class="literalblock">
-<div class="content">
-<pre>每个数据库的oid都是base目录下的子目录, 表文件在所属数据库目录下以表OID命名.
-杜宇超过1GB大小的表文件则会自动切分为多个文件存储,以OID.&lt;seq&gt; 命名</pre>
-</div>
-</div>
+<p>offset: 指向第几个line pointer.</p>
 </li>
 </ul>
+</div>
+</li>
+</ol>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_进程结构"><a class="link" href="#_进程结构">9.3. 进程结构</a></h3>
-<div class="ulist">
-<ul>
-<li>
-<p>postmaster</p>
-</li>
-<li>
-<p>postgres</p>
-</li>
-<li>
-<p>syslogger</p>
-</li>
-<li>
-<p>checkpointer</p>
-</li>
-<li>
-<p>bgwriter</p>
-</li>
-<li>
-<p>walwriter</p>
-</li>
-</ul>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNplUt1OwjAUvt9T1FsSX0CN4U1I6crWsLVL20H0zgQRo4liCKi7MIsSvVAhUUFdCC-zbuMt7BwG1Lv2-znnfD0tCwm5dAk1XegZxoa0sYuBgNQUklFsGCXgMSEtjgUQmDcwBx5nCAthlNaoKkR1TM0fDuxs7gLkEEyllm0Bh1kW5oZqXyWDoZoPVGesoaR_FEeT7W8F5MgmjVwzu0jC20K2LtBzSiIkQQIg5jgYScaNpDdZBG3PquRspZRet9LoJnsO43mYHIwKI7IxqnuMUKmrJ8f3WXi6glR3Fkd3hTDPYHHm6xhNTnK1sCE3K1W_VsM8fn_S5bPW2SJ80znU4VCHSMPHNLgs7E3oLG0Fre_LsB8T1Zkm_fF_g_BdF3Kyn08WvGqJxkAB7hVJfr2RL1kDIt93gQN9qlPoXufdP_vJ5kH6cJL2XrLRVHUCFX2u-ZqM1zHPy-U7IUi349hz9EESRldljbLe5vJXfAEr__zS" alt="Diagram">
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1098,12 +1164,99 @@ limit 10;</code></pre>
 </li>
 </ul>
 </div>
+<div class="imageblock kroki">
+<div class="content">
+<img src="https://kroki.io/plantuml/svg/eNp1Uj1rw0AM3fUrVE_tYCgdgwkJzdhOGTqEEO5DiY_cF3cypQ357z2TutitOx16T9LTk26VWSTunAW445YcYRZeZw6eALRgIUUmrJpsPmnx9LjcDNCz7TJTqnC9RS0BVHCxFHnG7HAHlwsgKpE0Vtu2f17JhfRRYY8PTC4MaZTd8UgJYwi2GrFv65dvaowWHWcYbTjd0LkmWO9aozX5fTKnluvl32ZjYCZ9qnKF6xX2vUdrSbEJPqOMU5dSqDN5jTEFRTlPjTK5eLip5bGZ95DOB0dujDlhPJMXXtFhyk_bzEz9K_0nnEn9T2Wwev-AyppyToDitKlrS0euS-UNxQWq4H1ZBpRzN3UXCyUjaDkE2QGsykL6r_UF-gzCGw==" alt="Diagram" width="600" height="400">
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_事务"><a class="link" href="#_事务">10. 事务</a></h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>PostgreSQL中每个SQL默认都是在一个事务中.</p>
+</div>
+<div class="sect2">
+<h3 id="_事务语法"><a class="link" href="#_事务语法">10.1. 事务语法</a></h3>
+<div class="sect3">
+<h4 id="_开启事务"><a class="link" href="#_开启事务">10.1.1. 开启事务</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Command:     BEGIN
+Description: start a transaction block
+Syntax:
+BEGIN [ WORK | TRANSACTION ] [ transaction_mode [, ...] ]
+
+where transaction_mode is one of:
+
+    ISOLATION LEVEL { SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED }
+    READ WRITE | READ ONLY
+    [ NOT ] DEFERRABLE</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_完成事务"><a class="link" href="#_完成事务">10.1.2. 完成事务</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Command:     COMMIT
+Description: commit the current transaction
+Syntax:
+COMMIT [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>commit and chain: 复用上一个事务的设置.</p>
+</li>
+<li>
+<p>如果事务过程中出错, 所有后续的SQL将直接报错不会执行, commit也会视为rollback处理.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_回滚事务"><a class="link" href="#_回滚事务">10.1.3. 回滚事务</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Command:     ROLLBACK
+Description: abort the current transaction
+Syntax:
+ROLLBACK [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_设置savepoint"><a class="link" href="#_设置savepoint">10.1.4. 设置savepoint</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Command:     SAVEPOINT
+Description: define a new savepoint within the current transaction
+Syntax:
+SAVEPOINT savepoint_name</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>事务完成后会自动释放savepoint.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_手动释放savepoint"><a class="link" href="#_手动释放savepoint">10.1.5. 手动释放savepoint</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Command:     RELEASE SAVEPOINT
+Description: release a previously defined savepoint
+Syntax:
+RELEASE [ SAVEPOINT ] savepoint_name</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_事务隔离级别"><a class="link" href="#_事务隔离级别">10.2. 事务隔离级别</a></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-sql hljs" data-lang="sql">create table tbl_mvcc
@@ -1114,8 +1267,8 @@ limit 10;</code></pre>
 insert into tbl_mvcc(ival) values (1);</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_脏读"><a class="link" href="#_脏读">10.1. 脏读</a></h3>
+<div class="sect3">
+<h4 id="_脏读"><a class="link" href="#_脏读">10.2.1. 脏读</a></h4>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
@@ -1168,8 +1321,8 @@ update tbl_mvcc set ival = 10 where id = 1;</code></pre>
 </tbody>
 </table>
 </div>
-<div class="sect2">
-<h3 id="_不可重复读"><a class="link" href="#_不可重复读">10.2. 不可重复读</a></h3>
+<div class="sect3">
+<h4 id="_不可重复读"><a class="link" href="#_不可重复读">10.2.2. 不可重复读</a></h4>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
@@ -1220,8 +1373,8 @@ end;</code></pre>
 </tbody>
 </table>
 </div>
-<div class="sect2">
-<h3 id="_幻读"><a class="link" href="#_幻读">10.3. 幻读</a></h3>
+<div class="sect3">
+<h4 id="_幻读"><a class="link" href="#_幻读">10.2.3. 幻读</a></h4>
 <div class="quoteblock">
 <blockquote>
 <div class="paragraph">
@@ -1316,10 +1469,11 @@ select ival from tbl_mvcc where id =1;</code></pre>
 <table class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 8. 事务隔离级别</caption>
 <colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
 </colgroup>
 <thead>
 <tr>
@@ -1327,23 +1481,20 @@ select ival from tbl_mvcc where id =1;</code></pre>
 <th class="tableblock halign-left valign-top">脏读</th>
 <th class="tableblock halign-left valign-top">不可重复读</th>
 <th class="tableblock halign-left valign-top">幻读</th>
+<th class="tableblock halign-left valign-top">序列化异常</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Read Uncommitted</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
-</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Read Committed (PostgreSQL默认)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Repeatable Read (MySQL默认)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✅</p></td>
@@ -1353,20 +1504,21 @@ select ival from tbl_mvcc where id =1;</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">❎</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sect2">
-<h3 id="_查看全局事务默认隔离级别"><a class="link" href="#_查看全局事务默认隔离级别">10.4. 查看全局事务默认隔离级别</a></h3>
+<div class="sect3">
+<h4 id="_查看全局事务默认隔离级别"><a class="link" href="#_查看全局事务默认隔离级别">10.2.4. 查看全局事务默认隔离级别</a></h4>
 <div class="literalblock">
 <div class="content">
 <pre>select name,setting from pg_settings where name='default_transaction_isolation';</pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_修改全局事务默认隔离级别"><a class="link" href="#_修改全局事务默认隔离级别">10.5. 修改全局事务默认隔离级别</a></h3>
+<div class="sect3">
+<h4 id="_修改全局事务默认隔离级别"><a class="link" href="#_修改全局事务默认隔离级别">10.2.5. 修改全局事务默认隔离级别</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1378,8 +1530,8 @@ select ival from tbl_mvcc where id =1;</code></pre>
 </ul>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_查看当前会话事务默认隔离级别"><a class="link" href="#_查看当前会话事务默认隔离级别">10.6. 查看当前会话事务默认隔离级别</a></h3>
+<div class="sect3">
+<h4 id="_查看当前会话事务默认隔离级别"><a class="link" href="#_查看当前会话事务默认隔离级别">10.2.6. 查看当前会话事务默认隔离级别</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1391,8 +1543,8 @@ select ival from tbl_mvcc where id =1;</code></pre>
 </ul>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_设置当前会话事务默认隔离级别"><a class="link" href="#_设置当前会话事务默认隔离级别">10.7. 设置当前会话事务默认隔离级别</a></h3>
+<div class="sect3">
+<h4 id="_设置当前会话事务默认隔离级别"><a class="link" href="#_设置当前会话事务默认隔离级别">10.2.7. 设置当前会话事务默认隔离级别</a></h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1406,8 +1558,152 @@ select ival from tbl_mvcc where id =1;</code></pre>
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_分区"><a class="link" href="#_分区">11. 分区</a></h2>
+<h2 id="_锁"><a class="link" href="#_锁">11. 锁</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_表锁"><a class="link" href="#_表锁">11.1. 表锁</a></h3>
+<div class="sect3">
+<h4 id="_语法"><a class="link" href="#_语法">11.1.1. 语法</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text hljs" data-lang="text">Command:     LOCK
+Description: lock a table
+Syntax:
+LOCK [ TABLE ] [ ONLY ] name [ * ] [, ...] [ IN lockmode MODE ] [ NOWAIT ]
+
+where lockmode is one of:
+
+    ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE
+    | SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_表锁冲突"><a class="link" href="#_表锁冲突">11.1.2. 表锁冲突</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1112%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-center valign-top"></th>
+<th class="tableblock halign-left valign-top">ACCESS SHARE</th>
+<th class="tableblock halign-left valign-top">ROW SHARE</th>
+<th class="tableblock halign-left valign-top">ROW EXCLUSIVE</th>
+<th class="tableblock halign-left valign-top">SHARE UPDATE EXCLUSIVE</th>
+<th class="tableblock halign-left valign-top">SHARE</th>
+<th class="tableblock halign-left valign-top">SHARE ROW EXCLUSIVE</th>
+<th class="tableblock halign-left valign-top">EXCLUSIVE</th>
+<th class="tableblock halign-left valign-top">ACCESS EXCLUSIVE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">ACCESS SHARE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">ROW SHARE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">ROW EXCLUSIVE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">SHARE UPDATE EXCLUSIVE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">SHARE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">SHARE ROW EXCLUSIVE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">EXCLUSIVE</p></th>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-center valign-top"><p class="tableblock">ACCESS EXCLUSIVE</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_分区"><a class="link" href="#_分区">12. 分区</a></h2>
 <div class="sectionbody">
 <div class="quoteblock">
 <blockquote>
@@ -1430,7 +1726,7 @@ select ival from tbl_mvcc where id =1;</code></pre>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_优势"><a class="link" href="#_优势">11.1. 优势</a></h3>
+<h3 id="_优势"><a class="link" href="#_优势">12.1. 优势</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1455,7 +1751,7 @@ select ival from tbl_mvcc where id =1;</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_分区方式"><a class="link" href="#_分区方式">11.2. 分区方式</a></h3>
+<h3 id="_分区方式"><a class="link" href="#_分区方式">12.2. 分区方式</a></h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1486,7 +1782,7 @@ select ival from tbl_mvcc where id =1;</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sql"><a class="link" href="#_sql">11.3. SQL</a></h3>
+<h3 id="_sql"><a class="link" href="#_sql">12.3. SQL</a></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-postgresql hljs" data-lang="postgresql">-- 创建主表
@@ -1520,7 +1816,7 @@ update语句违反了当前分区键的约束会报错
 </div>
 </div>
 <div class="sect1">
-<h2 id="_清除wal日志"><a class="link" href="#_清除wal日志">12. 清除WAL日志</a></h2>
+<h2 id="_清除wal日志"><a class="link" href="#_清除wal日志">13. 清除WAL日志</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>文档: <a href="https://www.postgresql.org/docs/current/pgarchivecleanup.html" class="bare">https://www.postgresql.org/docs/current/pgarchivecleanup.html</a></p>
@@ -1549,10 +1845,10 @@ update语句违反了当前分区键的约束会报错
 </div>
 </div>
 <div class="sect1">
-<h2 id="_查询优化"><a class="link" href="#_查询优化">13. 查询优化</a></h2>
+<h2 id="_查询优化"><a class="link" href="#_查询优化">14. 查询优化</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_逻辑优化"><a class="link" href="#_逻辑优化">13.1. 逻辑优化</a></h3>
+<h3 id="_逻辑优化"><a class="link" href="#_逻辑优化">14.1. 逻辑优化</a></h3>
 <div class="paragraph">
 <p>根据关系代数等价式优化查询</p>
 </div>
@@ -1568,7 +1864,7 @@ update语句违反了当前分区键的约束会报错
 </div>
 </div>
 <div class="sect2">
-<h3 id="_物理优化"><a class="link" href="#_物理优化">13.2. 物理优化</a></h3>
+<h3 id="_物理优化"><a class="link" href="#_物理优化">14.2. 物理优化</a></h3>
 <div class="paragraph">
 <p>通过代价估算的方式挑选代价比较低的物理路径</p>
 </div>
@@ -1576,7 +1872,7 @@ update语句违反了当前分区键的约束会报错
 </div>
 </div>
 <div class="sect1">
-<h2 id="_pgbench"><a class="link" href="#_pgbench">14. pgbench</a></h2>
+<h2 id="_pgbench"><a class="link" href="#_pgbench">15. pgbench</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>文档地址: <a href="https://www.postgresql.org/docs/current/pgbench.html" class="bare external" target="_blank" rel="noopener">https://www.postgresql.org/docs/current/pgbench.html</a></p>
@@ -1616,7 +1912,7 @@ update语句违反了当前分区键的约束会报错
 </tbody>
 </table>
 <div class="sect2">
-<h3 id="_初始化数据集"><a class="link" href="#_初始化数据集">14.1. 初始化数据集</a></h3>
+<h3 id="_初始化数据集"><a class="link" href="#_初始化数据集">15.1. 初始化数据集</a></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pgbench -i -I dtgvpf -q -s 1000 benchtest</code></pre>
@@ -1666,7 +1962,7 @@ update语句违反了当前分区键的约束会报错
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sql性能测试"><a class="link" href="#_sql性能测试">14.2. SQL性能测试</a></h3>
+<h3 id="_sql性能测试"><a class="link" href="#_sql性能测试">15.2. SQL性能测试</a></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">pgbench -b tpcb-like -c 100 -C -j 100 -M simple -v -P 5 -r -T 30 benchtest</code></pre>
@@ -1727,7 +2023,7 @@ update语句违反了当前分区键的约束会报错
 </div>
 </div>
 <div class="sect1">
-<h2 id="_参考配置"><a class="link" href="#_参考配置">15. 参考配置</a></h2>
+<h2 id="_参考配置"><a class="link" href="#_参考配置">16. 参考配置</a></h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
@@ -1814,8 +2110,10 @@ lc_time = 'C'
 
 # 动态参数(以16C64G为例)
 max_connections = 3200                 # 物理内存(GB)*1000*(1/4)/5
+# 共享内存, 读取数据后缓存在此处
 shared_buffers = 16GB                  # IF use hugepage: 主机内存*(1/4)   ELSE: min(32GB, 主机内存*(1/4))
 max_prepared_transactions = 3200       # max_prepared_transactions=max_connections
+# 单个SQL用于排序, HASH JOIN的内存区域
 work_mem = 16MB                        # max(min(物理内存/4096, 64MB), 4MB)
 maintenance_work_mem = 1GB             # min( 8G, (主机内存*1/8)/max_parallel_maintenance_workers )
 autovacuum_work_mem = 1GB              # min( 8G, (主机内存*1/8)/autovacuum_max_workers )

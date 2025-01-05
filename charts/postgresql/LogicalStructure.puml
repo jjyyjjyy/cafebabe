@@ -1,0 +1,24 @@
+@startmindmap
+
+!theme sandstone
+
+* Database Cluster
+** Database
+*** Schema
+**** Table
+**** Index
+***** B-tree
+***** Hash
+***** GIN
+***** GiST
+***** SP-GiST
+***** BRIN
+**** View
+**** Transaction
+**** Function
+**** Sequence
+*** Extension
+** Database 2 ...
+** Global Objects
+
+@endmindmap

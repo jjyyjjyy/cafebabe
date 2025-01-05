@@ -1,0 +1,20 @@
+@startmindmap
+
+!include ../global/stylesheet.iuml
+!include ../global/mindmap.iuml
+
+* Spark
+** Spark Core
+*** Local
+*** Yarn
+*** RDD
+** Spark SQL
+*** Dataset
+*** SQL
+*** UDF
+*** UDAF
+** Spark Streaming
+*** Socket
+*** Kafka
+
+@endmindmap
