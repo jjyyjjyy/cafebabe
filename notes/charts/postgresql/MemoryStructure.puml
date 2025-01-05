@@ -1,0 +1,37 @@
+@startuml
+
+!theme sandstone
+
+database "<size:20>Database Cluster" AS db
+
+component sm [
+{{
+  card "Shard Memory" {
+    card "shared buffer pool"
+    card "WAL buffer"
+    card "commit log"
+    "shared buffer pool" -[hidden]right-> "WAL buffer"
+    "WAL buffer" -[hidden]right-> "commit log"
+  }
+}}
+]
+
+collections bp [
+{{
+  card "backend process" {
+    card "temp_buffers"
+    card "work_mem"
+    card "maintenance_work_mem"
+    "temp_buffers" -[hidden]right-> "work_mem"
+    "work_mem" -[hidden]right-> "maintenance_work_mem"
+  }
+}}
+]
+
+() client
+
+bp <--left--> client : connect
+sm <-up-> bp
+db <-up-> sm
+
+@enduml

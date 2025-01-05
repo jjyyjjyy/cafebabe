@@ -1,0 +1,25 @@
+@startmindmap
+
+!theme sandstone
+
+* postgres server process
+** postgres backend process <-> client
+**: logger
+写日志到log文件;
+**: archiver
+归档日志文件;
+**: statistics collector
+收集pg_stat_*的统计信息;
+**: checkpointer
+执行checkpoint命令;
+**: background writer
+shard_buffer中的脏页写入到硬盘;
+**: walwriter
+写入wal日志并刷新到硬盘;
+**: walsummarizer
+更新wal summary统计文件;
+**: autovacuum launcher
+向postgres server进程申请创建autovacuum worker;
+** logical replication launcher
+
+@endmindmap

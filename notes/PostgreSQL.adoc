@@ -119,6 +119,9 @@ TYPE  DATABASE  USER  ADDRESS  METHOD
 
 == 数据类型
 
+文档: https://www.postgresql.org/docs/current/datatype.html[, role="external", window="_blank"]
+
+
 === 数字类型
 
 * int2 int4 int8
@@ -126,12 +129,13 @@ TYPE  DATABASE  USER  ADDRESS  METHOD
 * real 6位十进制精度浮点数
 * double precision 15位十进制精度浮点数
 * smallserial/serial/bigserial 2/4/8字节自增序列
+* bytea: 二进制
 
 === 字符串类型
 
-* varchar/character varying 变长
+* varchar/character varying 变长, 如果不指定长度, 最大不能超过1GB.
 * character/char 定长
-* text 变长, 长度小于1GB
+* text 变长, 最大不能超过1GB
 
 === 日期类型
 
@@ -140,6 +144,18 @@ TYPE  DATABASE  USER  ADDRESS  METHOD
 * date 日期
 * time[with[out] time zone] 一天的时间
 * interval 时间间隔
+
+时区名称查看: `select * from pg_timezone_names;`
+
+=== 几何类型
+
+* point: 点
+* line: 线
+* lseg: 线段
+* box: 矩形
+* path: 路径
+* polygon: 多边形
+* circle: 圆
 
 === range类型
 
@@ -503,36 +519,73 @@ limit 10;
 
 === 逻辑结构
 
- 创建一个Database时会为这个Database创建一个名为public的默认schema.
- 相同数据库不同schema可以拥有相同名称的table/index/view/sequence/function等
+plantuml::charts/postgresql/LogicalStructure.puml[format=svg]
 
 === 物理结构
 
+plantuml::charts/postgresql/PhysicalStructure.puml[format=svg]
+
+template0和template1属于数据库模板, 区别是template1可以修改, template0只读.
+
 ==== OID
 
- OID,对象标识符,无符号4字节整数.所有的数据库对象由各自的OID管理
+对象标识符,无符号4字节整数.所有的数据库对象由各自的OID管理
 
-* 数据库对象OID保存在pg_database系统表里.
-* 表/索引/序列等对象OID保存在pg_class系统表里.
+* 数据库对象OID保存在 `pg_database` 系统表里.
+* 表/索引/序列等对象OID保存在 `pg_class` 系统表里.
 
-==== 表空间
+==== 表数据文件结构
 
- 初始化数据库目录时会自动创建两个表空间: pg_global和pg_default
+[rackdiag, pg_table_file, svg, width=400, height=200]
+.表数据文件结构
+----
+rackdiag {
+  ascending;
+  8U;
 
-* pg_global保存在global目录中, 用来保存系统表
-* pg_default保存在base目录中, 默认数据库表空间
+  description = "8KB per page by default";
 
- 每个数据库的oid都是base目录下的子目录, 表文件在所属数据库目录下以表OID命名.
- 杜宇超过1GB大小的表文件则会自动切分为多个文件存储,以OID.<seq> 命名
+  1: #0;
+  2: #1;
+  3: #2;
+  4: #... [4U];
+  8: #N;
+}
+----
+
+[bytefield, pg_table_tuple, svg, width=800, height=400]
+.page结构
+----
+(def boxes-per-row 8)
+(def box-width 70)
+(defattrs :plain {:font-size 12 })
+(draw-column-headers)
+(draw-box "pd_lsn" {:span 8})
+(draw-box "pd_checksum" {:span 2})
+(draw-box "pd_flags" {:span 2})
+(draw-box "pd_lower" {:span 2})
+(draw-box "pd_upper" {:span 2})
+(draw-box "pd_special" {:span 2})
+(draw-box "pd_pagesize_version" {:span 2})
+(draw-box "pd_prune_xid" {:span 4})
+(draw-box (text "pd_linp" [:math] [:sub 1]) {:span 4})
+(draw-box (text "pd_linp" [:math] [:sub 2]) {:span 4})
+(draw-gap "Free space")
+(draw-box (text "Tuple" [:math] [:sub 2]) {:span 8})
+(draw-box (text "Tuple" [:math] [:sub 1]) {:span 8})
+(draw-bottom)
+----
+
+. `pd_lower`: 指向free space开始位置
+. `pd_upper`: 指向free space结束位置
+. 如果Tuple超过page 1/4, 则会放到 `TOAST` page中.
+. Tuple可以使用 `TID<pageNumber, offset>` 二元组定位
+** pageNumber: page序号.
+** offset: 指向第几个line pointer.
 
 === 进程结构
 
-* postmaster
-* postgres
-* syslogger
-* checkpointer
-* bgwriter
-* walwriter
+plantuml::charts/postgresql/ProcessStructure.puml[format=svg]
 
 === 内存结构
 
@@ -546,7 +599,77 @@ limit 10;
 ** WAL buffer: WAL文件持久化缓冲区
 ** CommitLog buffer: commit log中保存事务的状态,保存在缓冲区
 
+plantuml::charts/postgresql/MemoryStructure.puml[format=svg, width=600, height=400]
+
 == 事务
+
+PostgreSQL中每个SQL默认都是在一个事务中.
+
+=== 事务语法
+
+==== 开启事务
+
+[source, text]
+----
+Command:     BEGIN
+Description: start a transaction block
+Syntax:
+BEGIN [ WORK | TRANSACTION ] [ transaction_mode [, ...] ]
+
+where transaction_mode is one of:
+
+    ISOLATION LEVEL { SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED }
+    READ WRITE | READ ONLY
+    [ NOT ] DEFERRABLE
+----
+
+==== 完成事务
+
+[source, text]
+----
+Command:     COMMIT
+Description: commit the current transaction
+Syntax:
+COMMIT [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]
+----
+
+. commit and chain: 复用上一个事务的设置.
+. 如果事务过程中出错, 所有后续的SQL将直接报错不会执行, commit也会视为rollback处理.
+
+==== 回滚事务
+
+[source, text]
+----
+Command:     ROLLBACK
+Description: abort the current transaction
+Syntax:
+ROLLBACK [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]
+----
+
+==== 设置savepoint
+
+[source, text]
+----
+Command:     SAVEPOINT
+Description: define a new savepoint within the current transaction
+Syntax:
+SAVEPOINT savepoint_name
+----
+
+事务完成后会自动释放savepoint.
+
+==== 手动释放savepoint
+
+[source, text]
+----
+Command:     RELEASE SAVEPOINT
+Description: release a previously defined savepoint
+Syntax:
+RELEASE [ SAVEPOINT ] savepoint_name
+----
+
+
+=== 事务隔离级别
 
 [source,sql]
 ----
@@ -558,7 +681,7 @@ create table tbl_mvcc
 insert into tbl_mvcc(ival) values (1);
 ----
 
-=== 脏读
+==== 脏读
 
 > 一个事务看到了另外一个事务未提交的数据.
 (PostgreSQL下不可复现)
@@ -593,7 +716,7 @@ select * from tbl_mvcc where id = 1; -- 10
 
 |===
 
-=== 不可重复读
+==== 不可重复读
 
 > 一个事务查询结果与第一次的结果不同.(受到其他已提交事务 *UPDATE* 的影响)
 
@@ -626,7 +749,7 @@ select * from tbl_mvcc where id = 1; -- 10
 
 |===
 
-=== 幻读
+==== 幻读
 
 > 一个事务两次查询的结果集数量不一致.(受到其他已提交事务 *INSERT/DELETE* 的影响)
 
@@ -687,52 +810,160 @@ update tbl_mvcc set ival = 100 where id = 1;
 
 .事务隔离级别
 |===
-| 隔离级别 | 脏读 | 不可重复读 | 幻读
+| 隔离级别 | 脏读 | 不可重复读 | 幻读 | 序列化异常
 
-| Read Uncommitted
-| ✅
-| ✅
-| ✅
-
+// | Read Uncommitted
+// | ✅
+// | ✅
+// | ✅
+// | ✅
 
 | Read Committed (PostgreSQL默认)
 | ❎
 | ✅
 | ✅
-
+| ✅
 
 | Repeatable Read (MySQL默认)
 | ❎
 | ❎
+| ❎
 | ✅
-
 
 | Serializable
 | ❎
 | ❎
 | ❎
-
+| ❎
 
 |===
 
-=== 查看全局事务默认隔离级别
+==== 查看全局事务默认隔离级别
 
  select name,setting from pg_settings where name='default_transaction_isolation';
 
-=== 修改全局事务默认隔离级别
+==== 修改全局事务默认隔离级别
 
 * 修改postgresql.conf的default_transaction_isolation参数
 * `ALTER SYSTEM SET default_transaction_isolation TO 'REPEATABLE READ';`
 
-=== 查看当前会话事务默认隔离级别
+==== 查看当前会话事务默认隔离级别
 
 * `SHOW transaction_isolation;`
 * `select current_setting('transaction_isolation');`
 
-=== 设置当前会话事务默认隔离级别
+==== 设置当前会话事务默认隔离级别
 
 * `set session characteristics as transaction isolation level REPEATABLE READ`
 * `START|BEGIN TRANSACTION ISOLATION LEVEL READ UNCOMMITTED ... END`
+
+== 锁
+
+=== 表锁
+
+==== 语法
+
+[source, text]
+----
+Command:     LOCK
+Description: lock a table
+Syntax:
+LOCK [ TABLE ] [ ONLY ] name [ * ] [, ...] [ IN lockmode MODE ] [ NOWAIT ]
+
+where lockmode is one of:
+
+    ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE
+    | SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE
+----
+
+==== 表锁冲突
+
+[cols="^1h,8*"]
+|===
+| | ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE | SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE
+
+| ACCESS SHARE
+|
+|
+|
+|
+|
+|
+|
+| x
+
+| ROW SHARE
+|
+|
+|
+|
+|
+|
+| x
+| x
+
+| ROW EXCLUSIVE
+|
+|
+|
+|
+| x
+| x
+| x
+| x
+
+| SHARE UPDATE EXCLUSIVE
+|
+|
+|
+| x
+| x
+| x
+| x
+| x
+
+| SHARE
+|
+|
+| x
+| x
+| x
+| x
+| x
+| x
+
+| SHARE ROW EXCLUSIVE
+|
+|
+| x
+| x
+| x
+| x
+| x
+| x
+
+| EXCLUSIVE
+|
+| x
+| x
+| x
+| x
+| x
+| x
+| x
+
+| ACCESS EXCLUSIVE
+| x
+| x
+| x
+| x
+| x
+| x
+| x
+| x
+
+|===
+
 
 == 分区
 
@@ -964,8 +1195,10 @@ lc_time = 'C'
 
 # 动态参数(以16C64G为例)
 max_connections = 3200                 # 物理内存(GB)*1000*(1/4)/5
+# 共享内存, 读取数据后缓存在此处
 shared_buffers = 16GB                  # IF use hugepage: 主机内存*(1/4)   ELSE: min(32GB, 主机内存*(1/4))
 max_prepared_transactions = 3200       # max_prepared_transactions=max_connections
+# 单个SQL用于排序, HASH JOIN的内存区域
 work_mem = 16MB                        # max(min(物理内存/4096, 64MB), 4MB)
 maintenance_work_mem = 1GB             # min( 8G, (主机内存*1/8)/max_parallel_maintenance_workers )
 autovacuum_work_mem = 1GB              # min( 8G, (主机内存*1/8)/autovacuum_max_workers )

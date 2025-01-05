@@ -249,6 +249,8 @@ include::../jvm/src/test/java/oom/OOMDemo.java[tag=StackOOM]
 
 查看指定Java进程中每个线程栈信息
 
+plantuml::charts/java/jstack.puml[format=svg]
+
 === jstat
 
 `jstat [option] <pid> [interval] [times]`

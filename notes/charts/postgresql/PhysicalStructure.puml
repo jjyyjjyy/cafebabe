@@ -1,0 +1,87 @@
+@startmindmap
+
+!theme sandstone
+
+* Database Cluster
+** PGDATA
+***: base/
+每个数据库一个oid目录, 查看所属数据库:
+<code>
+SELECT oid, datname FROM pg_database where oid = 16384
+</code>;
+****: 1/
+<code>
+(template0)
+</code>;
+****: 12891/
+<code>
+(template1)
+</code>;
+****: 12896/
+<code>
+(postgres)
+</code>;
+****: 16384/
+每个表一个oid目录, 查看所属表:
+<code>
+select oid, relname, relfilenode from pg_class where oid = 16682
+</code>
+查看表数据所在的目录:
+<code>
+select pg_relation_filepath('<table_name>')
+</code>;
+*****: relfilenode
+(表数据文件, 默认最大1GB, 超过后会创建.1, .2, ...文件);
+***** relfilenode_fsm
+***** relfilenode_vm
+***: global/
+(Global Objects数据, 如pg_database, pg_control...);
+***: pg_commit_ts/
+(事务提交时间戳数据);
+***: pg_dynshmem/
+(动态共享内存子系统数据);
+***: pg_logical/
+(logical复制状态数据);
+***: pg_multixact/
+(multitransaction状态数据);
+***: pg_notify/
+(LISTEN/NOTIFY状态数据);
+***: pg_repslot/
+(Replication Slot数据);
+***: pg_serial/
+(已提交的serializable级别事务);
+***: pg_snapshots/
+(pg_export_snapshot命令导出文件);
+***: pg_stat/
+(statistics子系统文件);
+***: pg_stat_tmp/
+(statistics子系统临时文件);
+***: pg_subtrans/
+(sub事务状态数据);
+***: pg_tblspc/
+(tablespace目录的软链接);
+***: pg_twophase/
+(二阶段提交状态);
+***: pg_wal/
+(WAL日志. PG10之前名为pg_xlog);
+***: pg_xact/
+(事务提交数据. PG10之前名为pg_clog);
+
+***: PG_VERSION
+(PG主版本号);
+***: pg_hba.conf
+(账号认证配置文件);
+***: pg_ident.conf
+(账号名映射文件);
+***: postgresql.conf
+(PG配置文件);
+***: postgresql.auto.conf
+(alter system参数配置文件);
+***: postmaster.opts
+(记录PG启动命令);
+
+** tablespace
+***: PG_SERVER_VERSION/
+(PG_<Major version>_<Catalogue version number>);
+
+@endmindmap

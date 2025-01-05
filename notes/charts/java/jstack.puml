@@ -1,0 +1,30 @@
+@startmindmap
+
+!include ../global/stylesheet.iuml
+!include ../global/mindmap.iuml
+
+
+* jstack
+** jstack参数
+*** `-l`
+*** `-e`
+** jstack输出结构
+*** dump时间
+*** jvm信息
+*** SMR线程地址列表
+*** 线程信息
+**** 线程名称
+**** 线程ID
+**** 线程daemon标识
+**** Java线程优先级
+**** 操作系统线程优先级
+**** C++线程对象地址(tid)
+**** 操作系统线程ID
+**** 线程状态
+**** 最新栈指针地址
+*** Java线程状态
+*** 线程栈
+*** Locked Ownable Synchronizer: 线程持有的AbstractOwnableSynchronizer锁对象
+*** JNI全局引用数量
+
+@endmindmap
